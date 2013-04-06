@@ -4,20 +4,64 @@
  */
 package NetworksProjectPackage;
 
+import java.awt.*;
+import javax.swing.*;
+
 /**
  *
- * @author This PC
+ * @author 
  */
-public class GUITest extends javax.swing.JFrame {
-    
-    int radius = 50;
+public class GUITest extends javax.swing.JFrame implements Runnable {
+
+    final int RADIUS = 50;
+    final int DELAY = 50;
     int centerX = 0;
     int centerY = 0;
+    int orbitX;
+    int orbitY;
+    Thread animator;
+    double Vx = 0;
+    double Vy = 0;
+    double Ax = 0;
+    double Ay = 0;
+
     /**
      * Creates new form GUITest
      */
     public GUITest() {
+        //initComponents();
+        this.setVisible(true);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        animator = new Thread(this);
+        animator.start();
+    }
+
+    public void run() {
+        System.out.println("Run called ");
         initComponents();
+
+        long beforeTime, timeDiff, sleep;
+
+
+        beforeTime = System.currentTimeMillis();
+
+        while (true) {
+            orbit();
+            repaint();
+
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                System.out.println("interrupted");
+            }
+
+            beforeTime = System.currentTimeMillis();
+        }
     }
 
     /**
@@ -67,7 +111,7 @@ public class GUITest extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(314, 314, 314)
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(706, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(560, Short.MAX_VALUE)
                 .addComponent(jLabel2)
@@ -96,52 +140,43 @@ public class GUITest extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-    public void orbit()
-    {
-        try{
-            Thread.sleep(100);
-       
-         repaint();
-        this.jLabel2.setLocation((int)(this.jLabel2.getLocationOnScreen().getX()+250), (int)(this.jLabel2.getLocationOnScreen().getY()));
-        Thread.sleep(100);
-        repaint();
-         }catch(InterruptedException e)
-        {
-            System.out.println(e);
-        }
-        return;
+
+    public void orbit() {
+
+
+
+        Ax = -0.1 * (this.jLabel2.getLocationOnScreen().getX() - centerX);
+        Ay = 0.1 * (centerY - this.jLabel2.getLocationOnScreen().getY());
+        Vx += Ax;
+        Vx *= 0.90;
+        Vy += Ay;
+        Vy *= 0.90;
+        this.jLabel2.setLocation((int) (this.jLabel2.getLocationOnScreen().getX() + Vx), (int) (this.jLabel2.getLocationOnScreen().getY() + Vy));
+        System.out.println("X:" + this.jLabel2.getLocationOnScreen().getX());
+        System.out.println("Y:" + this.jLabel2.getLocationOnScreen().getY());
+
+
     }
-    
+
     private void jLabel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseMoved
         this.centerX = evt.getXOnScreen();
         this.centerY = evt.getYOnScreen();
-        this.jLabel1.setLocation(evt.getXOnScreen()-(this.jLabel1.getWidth()/2), evt.getYOnScreen()-(this.jLabel1.getHeight()/2));
+        this.jLabel1.setLocation(evt.getXOnScreen() - (this.jLabel1.getWidth() / 2), evt.getYOnScreen() - (this.jLabel1.getHeight()));
     }//GEN-LAST:event_jLabel1MouseMoved
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        
-               
-        this.jLabel2.setLocation((int)(this.jLabel1.getLocationOnScreen().getX()), (int)(this.jLabel1.getLocationOnScreen().getY()+radius));
-        
-        orbit();
-        
-       
-        
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
-        this.jLabel2.setLocation((int)(this.jLabel1.getLocationOnScreen().getX()), (int)(this.jLabel1.getLocationOnScreen().getY()+radius));
-        
-        orbit();
     }//GEN-LAST:event_jPanel1MouseClicked
 
     private void jPanel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseMoved
-        this.jLabel1.setLocation(evt.getXOnScreen()-(this.jLabel1.getWidth()/2), evt.getYOnScreen()-(this.jLabel1.getHeight()/2));
+        this.jLabel1.setLocation(evt.getXOnScreen() - (this.jLabel1.getWidth() / 2),
+                evt.getYOnScreen() - (this.jLabel1.getHeight()));
         this.centerX = evt.getXOnScreen();
         this.centerY = evt.getYOnScreen();
     }//GEN-LAST:event_jPanel1MouseMoved
-    
+
     /**
      * @param args the command line arguments
      */
@@ -170,11 +205,13 @@ public class GUITest extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GUITest().setVisible(true);
-            }
-        });
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new GUITest().setVisible(true);
+//            }
+//        });
+
+        new GUITest();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
