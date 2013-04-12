@@ -41,83 +41,19 @@ public class UDPClient {
     private static InetAddress IPAddress = null;
     private static int portNum = -1;
     public static byte[] dataFromServer;
-    
-    //this method will run when the program starts
-    public static void main(String args[]) throws Exception  
-    { 
-        //make sure that the user enters a valid command
-        //and let the user know about the correct format when the command
-        //user entered was invalid
-        if(args.length != 2)
+    private DatagramSocket listen_socket = null;
+
+    public UDPClient(int listen_port)
+    {
+        try {
+            listen_socket = new DatagramSocket(listen_port);
+        }
+        catch(SocketException se)
         {
-            System.err.println("Invalid Arguments");
-            System.out.println(USAGE_MESSAGE);
+            System.err.println("Error: Could not open a server socket on port " + listen_port + ".\n" + se.getMessage());
             System.exit(1);
         }
-        
-        address = args[0];
-        portNum = Integer.parseInt(args[1]);
-        
-        if(portNum == -1)
-        {
-            System.err.println("Invalid Port Number");
-            System.exit(1);
-        }
-        
-        //try establish a connection and let the user know what went wrong if the 
-        //connection cannot be established 
-        try
-        {
-            clientSocket = new DatagramSocket();  
-        }catch(SocketException e)
-        {
-            System.out.println("The IP address or the port number for the server is not valid");
-            System.exit(1);
-        }
-        
-        //get the IP address
-        IPAddress = InetAddress.getByName(address);    
-        
-        sendRequestPacket();
-        
-        //construct a DatagramPacket
-        byte[] receiveData = new byte[1024];  
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);  
-        
-        //set the timeout to be 3 seconds
-        try{
-            clientSocket.setSoTimeout(3000);
-        }catch(SocketException e)
-        {
-            System.out.println("SocketException has occurred.");
-        }
-        
-        //Try receive a packet. If the 3-seconds timer expires, throw an exception and let the user
-        //know that the server isn't responding.
-        try{
-            clientSocket.receive(receivePacket);  
-        }catch(SocketTimeoutException e)
-        {
-            System.out.println("The server is not responding.(3 sec exceeded)");
-            System.exit(1);
-        }
-        
-        //if the packet is received from the server within 3 seconds,
-        //verify the length of the packet and interpret the packet from the server
-        dataFromServer = receivePacket.getData(); 
-        if(receivePacket.getLength() >= 14)
-        {
-            processPacketFromServer();
-        }else
-        {
-            System.out.println("Invalid Data Packet Length");
-        }
-        
-        //close the connection
-        clientSocket.close();  
-        
-    } 
-    
+    }
     
     //send the request packet
     public static void sendRequestPacket()
@@ -216,5 +152,82 @@ public class UDPClient {
       	//print the error message to the output.
         System.out.println("[An error has occurred]:"+errorMsg);
     }
+    
+    public static void main(String args[]) throws Exception  
+    { 
+        //make sure that the user enters a valid command
+        //and let the user know about the correct format when the command
+        //user entered was invalid
+        if(args.length != 2)
+        {
+            System.err.println("Invalid Arguments");
+            System.out.println(USAGE_MESSAGE);
+            System.exit(1);
+        }
+        
+        address = args[0];
+        portNum = Integer.parseInt(args[1]);
+        
+        if(portNum == -1)
+        {
+            System.err.println("Invalid Port Number");
+            System.exit(1);
+        }
+        
+        //try establish a connection and let the user know what went wrong if the 
+        //connection cannot be established 
+        try
+        {
+            clientSocket = new DatagramSocket();  
+        }catch(SocketException e)
+        {
+            System.out.println("The IP address or the port number for the server is not valid");
+            System.exit(1);
+        }
+        
+        //get the IP address
+        IPAddress = InetAddress.getByName(address);    
+        
+        sendRequestPacket();
+        
+        //construct a DatagramPacket
+        byte[] receiveData = new byte[1024];  
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);  
+        
+        //set the timeout to be 3 seconds
+        try{
+            clientSocket.setSoTimeout(3000);
+        }catch(SocketException e)
+        {
+            System.out.println("SocketException has occurred.");
+        }
+        
+        //Try receive a packet. If the 3-seconds timer expires, throw an exception and let the user
+        //know that the server isn't responding.
+        try{
+            clientSocket.receive(receivePacket);  
+        }catch(SocketTimeoutException e)
+        {
+            System.out.println("The server is not responding.(3 sec exceeded)");
+            System.exit(1);
+        }
+        
+        //if the packet is received from the server within 3 seconds,
+        //verify the length of the packet and interpret the packet from the server
+        dataFromServer = receivePacket.getData(); 
+        if(receivePacket.getLength() >= 14)
+        {
+            processPacketFromServer();
+        }else
+        {
+            System.out.println("Invalid Data Packet Length");
+        }
+        
+        //close the connection
+        clientSocket.close();  
+        
+    } 
+    
+    
    
 }

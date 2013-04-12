@@ -28,6 +28,11 @@ public class NetworkManager {
         udpServerThread.start();
     }
     
+    public void createClient()
+    {
+        this.udpClient = new UDPClient(4444);
+    }
+    
     public void addPlayer(InetAddress ip, Integer portNumber)
     {
         this.playersInfo.put(ip, portNumber);

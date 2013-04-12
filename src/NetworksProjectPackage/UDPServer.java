@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -36,9 +36,6 @@ public class UDPServer extends Thread{
 
     private DatagramSocket listen_socket = null;
 
-    /**
-     * @param args
-     */
     
 
     public UDPServer(int listen_port)
