@@ -10,15 +10,18 @@ import java.util.*;
  *
  * @author This PC
  */
-public class UDPClient {
+public class UDPClient extends Thread{
     
     private static final String USAGE_MESSAGE = "Usage: <program_name> <IP_address> <list_port>";
     private static final char[] PROTOCOL_HEADER = {'C','S','3','0','5','T','S','P'};
     private static final int MAJOR_VERSION_NUMBER = 1;
     private static final int MINOR_VERSION_NUMBER = 0;
-    private static final byte TYPE_REQUEST = 1;
+    private static final int TYPE_REQUEST = 1;
     private static final int TYPE_RESPONSE = 2;
     private static final int TYPE_ERROR = 3;
+    private static final int TYPE_UNICAST = 4;
+    private static final int TYPE_MULTICAST = 5;
+    private static NetworkManager networkManager = null;
     
     private static final byte[] REQUEST_PACKET_WIHTOUT_DATA = 
     {(byte) PROTOCOL_HEADER[0], 
@@ -43,8 +46,9 @@ public class UDPClient {
     public static byte[] dataFromServer;
     private DatagramSocket listen_socket = null;
 
-    public UDPClient(int listen_port)
+    public UDPClient(int listen_port, NetworkManager _networkManager)
     {
+        this.networkManager = _networkManager;
         try {
             listen_socket = new DatagramSocket(listen_port);
         }
@@ -108,7 +112,11 @@ public class UDPClient {
              
             //If the packet type cannot be recognized, then it is not a valid packet type,
             //process of this packet will not be continued.
-            }else{
+            }else if( packet_type == TYPE_UNICAST || packet_type == TYPE_MULTICAST )
+            {
+                processPacket();
+            }else
+            {
                 System.out.println("Invalid packet type!");
             }
         }else
@@ -138,7 +146,17 @@ public class UDPClient {
         }
     }
     
-    
+    public static void processPacket()
+    {
+        byte[] msgBuffer = new byte[dataFromServer.length-14];
+        System.arraycopy(dataFromServer,14,msgBuffer,0,dataFromServer.length-14);
+        //construct a string from all the byte in the data section, which is the error message
+        String msg = new String(msgBuffer);
+      	
+      	//print the error message to the output.
+        System.out.println("[Received Packet]:"+msg);
+
+    }
     //This method will process the error packet and display proper message to the user
     public static void processErrorPacket()
     {
@@ -158,6 +176,7 @@ public class UDPClient {
         //make sure that the user enters a valid command
         //and let the user know about the correct format when the command
         //user entered was invalid
+        /*
         if(args.length != 2)
         {
             System.err.println("Invalid Arguments");
@@ -173,9 +192,10 @@ public class UDPClient {
             System.err.println("Invalid Port Number");
             System.exit(1);
         }
-        
+        */
         //try establish a connection and let the user know what went wrong if the 
         //connection cannot be established 
+        /*
         try
         {
             clientSocket = new DatagramSocket();  
@@ -186,8 +206,11 @@ public class UDPClient {
         }
         
         //get the IP address
+        address = "139.147.103.11";
+        portNum = 4444;
         IPAddress = InetAddress.getByName(address);    
-        
+
+
         sendRequestPacket();
         
         //construct a DatagramPacket
@@ -225,9 +248,105 @@ public class UDPClient {
         
         //close the connection
         clientSocket.close();  
-        
+        */
+        UDPClient ts = new UDPClient(4445, null);
+        System.out.println("Time server started on port 4445.");
+        ts.start();
     } 
     
+    private final void sendErrorPacket(InetAddress address, int port, String message)
+    {
+        try {
+                final byte[] buffer = new byte[14+message.length()];
+                for(int i = 0; i < PROTOCOL_HEADER.length; i++)
+                        buffer[i] = (byte) PROTOCOL_HEADER[i];
+                buffer[8] = (byte)MAJOR_VERSION_NUMBER;
+                buffer[9] = (byte)MINOR_VERSION_NUMBER;
+                buffer[10] = (byte)(TYPE_ERROR>>8);
+                buffer[11] = (byte)(TYPE_ERROR);
+                buffer[12] = (byte)(message.length()>>8);
+                buffer[13] = (byte)message.length();
+                int msg_len = message.length();
+                for(int i = 0; i < msg_len; i++)
+                        buffer[14+i] = (byte)message.charAt(i);
+                this.listen_socket.send(new DatagramPacket(buffer, buffer.length, address, port));
+        }
+        catch(IOException ioe)
+        {
+                System.err.println("ERROR: Could not send error packet to " + address + ":" + port + ".");
+        }
+        displayErrorFromClient(address, port, message);
+    }
     
-   
+    private final void displayErrorFromClient(InetAddress ip, int port, String message)
+    {
+        System.err.println("[" + ip + ":" + port + "] ERROR: " + message);
+    }
+    
+    public void run()
+    {
+        while(true)
+        {
+            byte[] buffer = new byte[65535];
+            DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+            try {
+                listen_socket.receive(dp);
+            }
+            catch(IOException ioe)
+            {
+                System.err.println("Warning: Could not receive datagram packet.");
+            }
+
+            byte[] payload = dp.getData();
+            if(dp.getLength() < 14)
+            {
+                sendErrorPacket(dp.getAddress(), dp.getPort(), "Incorrect packet length:"+dp.getLength());
+                continue;
+            }
+            
+            boolean error = false;
+            String error_msg = null;
+
+            for(int i = 0; i < PROTOCOL_HEADER.length; i++)
+            {
+                if(payload[i] != (byte) PROTOCOL_HEADER[i])
+                {
+                        error = true;
+                        error_msg = "Invalid protocol header.";
+                        break;
+                }
+            }
+
+            if(error)
+            {
+                sendErrorPacket(dp.getAddress(), dp.getPort(), error_msg);
+                continue;
+            }
+
+            int client_version_maj = (int)payload[8];
+            int client_version_minor = (int)payload[9];
+
+            if(client_version_maj != MAJOR_VERSION_NUMBER || client_version_minor != MINOR_VERSION_NUMBER)
+            {
+                sendErrorPacket(dp.getAddress(), dp.getPort(), "Version number mismatch(" + client_version_maj + "." + client_version_minor + ").");
+                continue;
+            }
+
+            int packet_type = (int) ((payload[10] << 8) | payload[11]);
+
+            if(packet_type == TYPE_UNICAST)
+            {
+                dataFromServer = dp.getData(); 
+                if(dp.getLength() >= 14)
+                {
+                    processPacketFromServer();
+                }else
+                {
+                    System.out.println("Invalid Data Packet Length");
+                }
+                continue;
+            }
+        }
+    }
+
 }

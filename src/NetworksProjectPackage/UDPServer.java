@@ -15,9 +15,12 @@ public class UDPServer extends Thread{
     private static final char[] PROTOCOL_HEADER = {'C','S','3','0','5','T','S','P'};
     private static final int MAJOR_VERSION_NUMBER = 1;
     private static final int MINOR_VERSION_NUMBER = 0;
-    private static final byte TYPE_REQUEST = 1;
+    private static final int TYPE_REQUEST = 1;
     private static final int TYPE_RESPONSE = 2;
     private static final int TYPE_ERROR = 3;
+    private static final int TYPE_UNICAST = 4;
+    private static final int TYPE_MULTICAST = 5;
+    private static NetworkManager networkManager = null;
 
     private static final byte[] RESPONSE_PACKET = { (byte) PROTOCOL_HEADER[0], 
                                                     (byte) PROTOCOL_HEADER[1], 
@@ -35,11 +38,11 @@ public class UDPServer extends Thread{
                                                     8};
 
     private DatagramSocket listen_socket = null;
-
     
 
-    public UDPServer(int listen_port)
+    public UDPServer(int listen_port, NetworkManager _networkManager)
     {
+        this.networkManager = _networkManager;
         try {
             listen_socket = new DatagramSocket(listen_port);
         }
@@ -54,14 +57,16 @@ public class UDPServer extends Thread{
     {		
         while(true)
         {
+
+            
             byte[] buffer = new byte[65535];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {
-                    listen_socket.receive(dp);
+                listen_socket.receive(dp);
             }
             catch(IOException ioe)
             {
-                    System.err.println("Warning: Could not receive datagram packet.");
+                System.err.println("Warning: Could not receive datagram packet.");
             }
 
             byte[] payload = dp.getData();
@@ -107,8 +112,19 @@ public class UDPServer extends Thread{
                 continue;
             }
 
-            sendResponsePacket(dp.getAddress(), dp.getPort());
+            //sendResponsePacket(dp.getAddress(), dp.getPort());
+            //System.out.println(dp.getAddress().toString());
+            //System.out.println(dp.getPort());
+            //sendPacket(dp.getAddress(), dp.getPort(),"hahahahaha");
+            
+            //sendPacket(InetAddress.getByName("139.147.103.11"), 4445, "hahahalol");
+
         }
+    }
+    
+    public void processMessage(InetAddress ip, int portNum, String msg)
+    {
+        this.networkManager.processServerMessage(ip, portNum, msg);
     }
 
     private final void sendErrorPacket(InetAddress address, int port, String message)
@@ -134,6 +150,29 @@ public class UDPServer extends Thread{
         }
         displayErrorFromClient(address, port, message);
     }
+    
+    public final void sendPacket(InetAddress address, int port, String message)
+    {
+        try {
+                final byte[] buffer = new byte[14+message.length()];
+                for(int i = 0; i < PROTOCOL_HEADER.length; i++)
+                        buffer[i] = (byte) PROTOCOL_HEADER[i];
+                buffer[8] = (byte)MAJOR_VERSION_NUMBER;
+                buffer[9] = (byte)MINOR_VERSION_NUMBER;
+                buffer[10] = (byte)(TYPE_UNICAST>>8);
+                buffer[11] = (byte)(TYPE_UNICAST);
+                buffer[12] = (byte)(message.length()>>8);
+                buffer[13] = (byte)message.length();
+                int msg_len = message.length();
+                for(int i = 0; i < msg_len; i++)
+                        buffer[14+i] = (byte)message.charAt(i);
+                this.listen_socket.send(new DatagramPacket(buffer, buffer.length, address, port));
+        }
+        catch(IOException ioe)
+        {
+                System.err.println("ERROR: Could not send packet to " + address + ":" + port + ".");
+        }
+    }
 
     private final void sendResponsePacket(InetAddress address, int port)
     {
@@ -158,28 +197,6 @@ public class UDPServer extends Thread{
         System.err.println("INFO: Sent response packet to [" + address + ":" + port + "]:"+date);
     }
     
-    public final void sendPacket(byte[] data, InetAddress address, int port)
-    {
-        byte[] buffer = new byte[22];
-        System.arraycopy(RESPONSE_PACKET, 0, buffer, 0, 14);
-        long time = System.currentTimeMillis();
-        Date date = new Date(time);
-
-        try {
-
-                for(int i = 0; i < data.length; i++)
-                {
-                        buffer[14+i] = data[i];
-                }
-                this.listen_socket.send(new DatagramPacket(buffer, 14+data.length, address, port));
-
-        }
-        catch(IOException ioe)
-        {
-                System.err.println("ERROR: Could not send packet to " + address + ":" + port + ".");
-        }
-        System.err.println("INFO: Sent packet to [" + address + ":" + port + "]:"+date);
-    }
 
     private final void displayErrorFromClient(InetAddress ip, int port, String message)
     {
@@ -187,6 +204,8 @@ public class UDPServer extends Thread{
     }
     
     public static void main(String[] args) {
+            
+        /*
             if(args.length != 1)
             {
                 System.err.println(USAGE_MESSAGE);
@@ -214,9 +233,9 @@ public class UDPServer extends Thread{
                     System.err.println("Error: Port must be above 1024 and below 65535.\n");
                     System.exit(1);
             }
-
-            UDPServer ts = new UDPServer(port_num);
-            System.out.println("Time server started on port " + port_num + ".");
+            */
+            UDPServer ts = new UDPServer(4444, null);
+            System.out.println("Time server started on port 4444.");
             ts.start();
     }
 }
