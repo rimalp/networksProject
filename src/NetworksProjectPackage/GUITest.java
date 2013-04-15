@@ -19,6 +19,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
     int centerY = 0;
     int orbitX;
     int orbitY;
+    int frame_time = 5;
     Thread animator;
     double Vx = 0;
     double Vy = 0;
@@ -55,7 +56,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
 
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(frame_time);
             } catch (InterruptedException e) {
                 System.out.println("interrupted");
             }
@@ -90,6 +91,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
             }
         });
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363852977_ball.png"))); // NOI18N
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -102,6 +104,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
             }
         });
 
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363853010_Green Ball.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -109,22 +112,23 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(314, 314, 314)
-                .addComponent(jLabel1)
-                .addContainerGap(706, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(560, Short.MAX_VALUE)
-                .addComponent(jLabel2)
-                .addGap(492, 492, 492))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(314, 314, 314)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(600, 600, 600)
+                        .addComponent(jLabel2)))
+                .addContainerGap(928, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(165, 165, 165)
+                .addGap(170, 170, 170)
                 .addComponent(jLabel2)
-                .addGap(48, 48, 48)
+                .addGap(126, 126, 126)
                 .addComponent(jLabel1)
-                .addContainerGap(497, Short.MAX_VALUE))
+                .addContainerGap(938, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -145,12 +149,16 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
 
 
 
-        Ax = -0.1 * (this.jLabel2.getLocationOnScreen().getX() - centerX);
-        Ay = 0.1 * (centerY - this.jLabel2.getLocationOnScreen().getY());
+        Ax = -0.001* frame_time * (this.jLabel2.getLocationOnScreen().getX() - centerX+24);
+        Ay = 0.001 * frame_time * (centerY - this.jLabel2.getLocationOnScreen().getY()-80);
+        
         Vx += Ax;
-        Vx *= 0.90;
-        Vy += Ay;
-        Vy *= 0.90;
+        //if (Vx > 0.001)
+        Vx *= 0.99;
+        
+        Vy += Ay; 
+        //if (Vy > 0.001)
+        Vy *= 0.99;
         this.jLabel2.setLocation((int) (this.jLabel2.getLocationOnScreen().getX() + Vx), (int) (this.jLabel2.getLocationOnScreen().getY() + Vy));
         System.out.println("X:" + this.jLabel2.getLocationOnScreen().getX());
         System.out.println("Y:" + this.jLabel2.getLocationOnScreen().getY());
