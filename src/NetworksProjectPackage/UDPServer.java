@@ -20,7 +20,8 @@ public class UDPServer extends Thread{
     private static final int TYPE_ERROR = 3;
     private static final int TYPE_UNICAST = 4;
     private static final int TYPE_MULTICAST = 5;
-    private static NetworkManager networkManager = null;
+    
+    private static NetworkController networkManager = null;
 
     private static final byte[] RESPONSE_PACKET = { (byte) PROTOCOL_HEADER[0], 
                                                     (byte) PROTOCOL_HEADER[1], 
@@ -40,7 +41,7 @@ public class UDPServer extends Thread{
     private DatagramSocket listen_socket = null;
     
 
-    public UDPServer(int listen_port, NetworkManager _networkManager)
+    public UDPServer(int listen_port, NetworkController _networkManager)
     {
         this.networkManager = _networkManager;
         try {
@@ -57,8 +58,6 @@ public class UDPServer extends Thread{
     {		
         while(true)
         {
-
-            
             byte[] buffer = new byte[65535];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {

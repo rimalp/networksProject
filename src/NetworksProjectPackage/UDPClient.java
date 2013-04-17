@@ -21,7 +21,7 @@ public class UDPClient extends Thread{
     private static final int TYPE_ERROR = 3;
     private static final int TYPE_UNICAST = 4;
     private static final int TYPE_MULTICAST = 5;
-    private static NetworkManager networkManager = null;
+    private static NetworkController networkManager = null;
     
     private static final byte[] REQUEST_PACKET_WIHTOUT_DATA = 
     {(byte) PROTOCOL_HEADER[0], 
@@ -41,14 +41,15 @@ public class UDPClient extends Thread{
     
     private static DatagramSocket clientSocket = null;
     private static String address = null;
-    private static InetAddress IPAddress = null;
-    private static int portNum = -1;
+    private InetAddress IPAddress = null;
+    private int portNum = -1;
     public static byte[] dataFromServer;
     private DatagramSocket listen_socket = null;
 
-    public UDPClient(int listen_port, NetworkManager _networkManager)
+    public UDPClient(int listen_port, NetworkController _networkManager)
     {
         this.networkManager = _networkManager;
+        this.portNum = 6666;
         try {
             listen_socket = new DatagramSocket(listen_port);
         }
@@ -57,17 +58,33 @@ public class UDPClient extends Thread{
             System.err.println("Error: Could not open a server socket on port " + listen_port + ".\n" + se.getMessage());
             System.exit(1);
         }
+        
+        try
+        {
+            clientSocket = new DatagramSocket();  
+        }catch(SocketException e)
+        {
+            System.out.println("The IP address or the port number for the server is not valid");
+            System.exit(1);
+        }
+        
+        try{
+            this.IPAddress = InetAddress.getByName("localhost");
+        }catch(Exception e)
+        {
+            System.out.println("Cannot find local host");
+        }
     }
     
     //send the request packet
-    public static void sendRequestPacket()
+    public void sendRequestPacket()
     {
         //create a buffer that stores all the byte to send
         byte[] data_to_send = new byte[14];
         System.arraycopy(REQUEST_PACKET_WIHTOUT_DATA, 0, data_to_send, 0, 14);
         
         //construct a DatagramPacket
-        DatagramPacket sendPacket =  new DatagramPacket(data_to_send, data_to_send.length, IPAddress, portNum);
+        DatagramPacket sendPacket =  new DatagramPacket(data_to_send, data_to_send.length, this.IPAddress, this.portNum);
         
         //Try sending the packet. Let the user know when an exception has occurred.
         try{
@@ -76,6 +93,7 @@ public class UDPClient extends Thread{
         {
             System.out.println("IO Exception has occured while sending the request packet");
         }
+        System.out.println("Request Packet Sent");
     } 
     
     //process the packet received from the server
@@ -149,12 +167,13 @@ public class UDPClient extends Thread{
     public static void processPacket()
     {
         byte[] msgBuffer = new byte[dataFromServer.length-14];
+        System.out.println("I received "+msgBuffer.length+" bytes of data.");
         System.arraycopy(dataFromServer,14,msgBuffer,0,dataFromServer.length-14);
         //construct a string from all the byte in the data section, which is the error message
         String msg = new String(msgBuffer);
       	
       	//print the error message to the output.
-        System.out.println("[Received Packet]:"+msg);
+        System.out.println("[I Received Packet]:"+msg);
 
     }
     //This method will process the error packet and display proper message to the user
@@ -347,6 +366,7 @@ public class UDPClient extends Thread{
                 continue;
             }
         }
+        
     }
 
 }
