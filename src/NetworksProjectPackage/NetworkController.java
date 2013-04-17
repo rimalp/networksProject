@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author This PC
  */
-public class NetworkManager {
+public class NetworkController {
     
     private UDPServer udpServer = null;
     private Thread udpServerThread = null;
@@ -17,21 +17,26 @@ public class NetworkManager {
     private Thread udpClientThread = null;
     private HashMap<InetAddress,Integer> playersInfo = null;
     
-    public NetworkManager()
+    public NetworkController()
     {
-        
+        this.createClient();
+        this.udpClient.sendRequestPacket();
     }
     
     public void createServer()
     {
         this.udpServer = new UDPServer(4444, this);
-        udpServerThread = new Thread(this.udpServer);
-        udpServerThread.start();
+        this.udpServer.start();
+        //this.udpServerThread = new Thread(this.udpServer);
+        //this.udpServerThread.start();
     }
     
     public void createClient()
     {
         this.udpClient = new UDPClient(4444, this);
+        this.udpClient.start();
+        //this.udpClientThread = new Thread(this.udpClient);
+        //this.udpClientThread.start();
     }
     
     public void addPlayer(InetAddress ip, Integer portNumber)
