@@ -48,7 +48,7 @@ public class SessionServer extends Thread{
             System.exit(1);
         }
         
-        this.protocolInfo = new ProtocolInfo();
+        //this.protocolInfo = new ProtocolInfo();
         this.sessionServers = new HashMap<InetAddress, Integer>();
     }
     
@@ -77,9 +77,9 @@ public class SessionServer extends Thread{
             boolean error = false;
             String error_msg = null;
 
-            for(int i = 0; i < this.protocolInfo.getProtocolHeader().length; i++)
+            for(int i = 0; i < ProtocolInfo.PROTOCOL_HEADER.length; i++)
             {
-                if(payload[i] != (byte) this.protocolInfo.getProtocolHeaderElement(i))
+                if(payload[i] != (byte)ProtocolInfo.PROTOCOL_HEADER[i])
                 {
                         error = true;
                         error_msg = "Invalid protocol header.";
@@ -97,7 +97,7 @@ public class SessionServer extends Thread{
             int client_version_maj = (int)payload[8];
             int client_version_minor = (int)payload[9];
 
-            if(client_version_maj != this.protocolInfo.getMajorVersionNumber() || client_version_minor != this.protocolInfo.getMinorVersionNumber())
+            if(client_version_maj != ProtocolInfo.MAJOR_VERSION_NUMBER || client_version_minor != ProtocolInfo.MINOR_VERSION_NUMBER)
             {
                 //sendErrorPacket(dp.getAddress(), dp.getPort(), "Version number mismatch(" + client_version_maj + "." + client_version_minor + ").");
                 System.out.println("Error");
@@ -106,29 +106,32 @@ public class SessionServer extends Thread{
 
             int packet_type = (int) ((payload[10] << 8) | payload[11]);
 
-            if(packet_type != this.protocolInfo.getTypeReqeust())
+            if(packet_type != ProtocolInfo.TYPE_REQUEST)
             {
                 //sendErrorPacket(dp.getAddress(), dp.getPort(), "Received non-request packet.");
                 System.out.println("Error");
                 continue;
             }
             
-            if(payload[12]!= 0 || payload[13] != 0)
+            if(payload[12]!= 0 || payload[13] != 2)
             {
                 System.out.println("Error");
             }
             
             System.out.println("Received Request");
+            
+            int clientListenPort = (int)((payload[14]<<8) + payload[15]);
+  
+
+            //print the error message to the output.
+            System.out.println("Client Port number:"+clientListenPort);
+        
             System.out.println(dp.getAddress());
             System.out.println(dp.getPort());
-            this.sendPacket(dp.getAddress(), 4444, "Session Server is me!");
-            //sendResponsePacket(dp.getAddress(), dp.getPort());
-            //System.out.println(dp.getAddress().toString());
-            //System.out.println(dp.getPort());
-            //sendPacket(dp.getAddress(), dp.getPort(),"hahahahaha");
-            
-            //sendPacket(InetAddress.getByName("139.147.103.11"), 4445, "hahahalol");
-
+            if(this.sessionServers.isEmpty())
+            {
+                this.sendPacket(dp.getAddress(), clientListenPort, "No server's running.");
+            }
         }
     }
     
@@ -136,12 +139,12 @@ public class SessionServer extends Thread{
     {
         try {
                 final byte[] buffer = new byte[14+message.length()];
-                for(int i = 0; i < this.protocolInfo.getProtocolHeader().length; i++)
-                        buffer[i] = (byte) this.protocolInfo.getProtocolHeaderElement(i);
-                buffer[8] = (byte)this.protocolInfo.getMajorVersionNumber();
-                buffer[9] = (byte)this.protocolInfo.getMinorVersionNumber();
-                buffer[10] = (byte)(this.protocolInfo.getTypeUnicast()>>8);
-                buffer[11] = (byte)(this.protocolInfo.getTypeUnicast());
+                for(int i = 0; i < ProtocolInfo.PROTOCOL_HEADER.length; i++)
+                        buffer[i] = (byte)ProtocolInfo.PROTOCOL_HEADER[i];
+                buffer[8] = (byte)ProtocolInfo.MAJOR_VERSION_NUMBER;
+                buffer[9] = (byte)ProtocolInfo.MINOR_VERSION_NUMBER;
+                buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST>>8);
+                buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST);
                 buffer[12] = (byte)(message.length()>>8);
                 buffer[13] = (byte)message.length();
                 int msg_len = message.length();
