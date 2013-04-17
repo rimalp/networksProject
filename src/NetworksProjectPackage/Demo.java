@@ -16,6 +16,6 @@ public class Demo {
     {
         sessionServer = new SessionServer(6666, null);
         sessionServer.start();
-        networkController = new NetworkController();
+        networkController = new NetworkController(null, -1);
     }
 }

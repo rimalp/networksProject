@@ -114,7 +114,7 @@ public class UDPServer extends Thread{
             //sendResponsePacket(dp.getAddress(), dp.getPort());
             //System.out.println(dp.getAddress().toString());
             //System.out.println(dp.getPort());
-            //sendPacket(dp.getAddress(), dp.getPort(),"hahahahaha");
+            //this.sendPacketWithPortNumber(dp.getAddress(), dp.getPort(), );
             
             //sendPacket(InetAddress.getByName("139.147.103.11"), 4445, "hahahalol");
 
@@ -123,7 +123,7 @@ public class UDPServer extends Thread{
     
     public void processMessage(InetAddress ip, int portNum, String msg)
     {
-        this.networkManager.processServerMessage(ip, portNum, msg);
+        //this.networkManager.processServerMessage(ip, portNum, msg);
     }
 
     private final void sendErrorPacket(InetAddress address, int port, String message)
@@ -165,6 +165,31 @@ public class UDPServer extends Thread{
                 int msg_len = message.length();
                 for(int i = 0; i < msg_len; i++)
                         buffer[14+i] = (byte)message.charAt(i);
+                this.listen_socket.send(new DatagramPacket(buffer, buffer.length, address, port));
+        }
+        catch(IOException ioe)
+        {
+                System.err.println("ERROR: Could not send packet to " + address + ":" + port + ".");
+        }
+    }
+    
+    public final void sendPacketWithPortNumber(InetAddress address, int port, String message, int portNumber)
+    {
+        try {
+                final byte[] buffer = new byte[14+message.length()+2];
+                for(int i = 0; i < PROTOCOL_HEADER.length; i++)
+                        buffer[i] = (byte) PROTOCOL_HEADER[i];
+                buffer[8] = (byte)MAJOR_VERSION_NUMBER;
+                buffer[9] = (byte)MINOR_VERSION_NUMBER;
+                buffer[10] = (byte)(TYPE_UNICAST>>8);
+                buffer[11] = (byte)(TYPE_UNICAST);
+                buffer[12] = (byte)(message.length()>>8);
+                buffer[13] = (byte)message.length();
+                int msg_len = message.length();
+                for(int i = 0; i < msg_len; i++)
+                        buffer[14+i] = (byte)message.charAt(i);
+                buffer[14+message.length()] = (byte)((portNumber & 0x0000FF00) >> 8);
+                buffer[14+message.length()+1] = (byte)(portNumber & 0x000000FF);
                 this.listen_socket.send(new DatagramPacket(buffer, buffer.length, address, port));
         }
         catch(IOException ioe)
