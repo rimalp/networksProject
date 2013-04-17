@@ -11,32 +11,59 @@ import java.util.*;
  */
 public class NetworkController {
     
+    private InetAddress sessionServerAddress = null;
+    private InetAddress serverAddress = null;
+    
     private UDPServer udpServer = null;
     private Thread udpServerThread = null;
     private UDPClient udpClient = null;
     private Thread udpClientThread = null;
     private HashMap<InetAddress,Integer> playersInfo = null;
+    private boolean thisIsServer;
     
-    public NetworkController()
+    private int clientPortNumber;
+    
+    public NetworkController(String _sessionServerIPAddress, int clientPortNumber)
     {
-        this.createClient();
+        try{
+            if(_sessionServerIPAddress != null)
+            {
+                this.sessionServerAddress = InetAddress.getByName(_sessionServerIPAddress);
+            }else
+            {
+                this.sessionServerAddress = InetAddress.getByName("localhost");
+            }
+        }catch(UnknownHostException e)
+        {
+            System.out.println("Cannot find Session Server");
+            System.exit(1);
+        }
+        
+        this.thisIsServer = false;
+        this.createClient(clientPortNumber);
         this.udpClient.sendRequestPacket();
     }
     
+    /*
     public void createServer()
     {
-        this.udpServer = new UDPServer(4444, this);
+        this.udpServer = new UDPServer(5555, this);
+        this.thisIsServer = true;
         this.udpServer.start();
-        //this.udpServerThread = new Thread(this.udpServer);
-        //this.udpServerThread.start();
     }
+    */
     
-    public void createClient()
+    public void createClient(int _portNumber)
     {
-        this.udpClient = new UDPClient(4444, this);
+        if(_portNumber < 1)
+        {
+            this.clientPortNumber = ProtocolInfo.DEFAULT_CLIENT_LISTEN_PORT_NUMBER;
+        }else
+        {
+            this.clientPortNumber = _portNumber;
+        }
+        this.udpClient = new UDPClient(this.clientPortNumber, this);
         this.udpClient.start();
-        //this.udpClientThread = new Thread(this.udpClient);
-        //this.udpClientThread.start();
     }
     
     public void addPlayer(InetAddress ip, Integer portNumber)
@@ -68,9 +95,29 @@ public class NetworkController {
     {
         
     }
-    
-    public void processServerMessage(InetAddress ip, int portNum, String msg)
+
+    public boolean isThisServer()
     {
-        
+        return this.thisIsServer;
+    }
+    
+    public void setThisToBeServer()
+    {
+        System.out.println("This station is now the server");
+        this.thisIsServer = true;
+    }
+    
+    public InetAddress getSessionServerAddress()
+    {
+        return this.sessionServerAddress;
+    }
+    public InetAddress getClientIPAddress()
+    {
+        return this.udpClient.getClientAddress();
+    }
+    
+    public static void main(String[] args)
+    {
+        NetworkController networkController = new NetworkController(null,4000);
     }
 }
