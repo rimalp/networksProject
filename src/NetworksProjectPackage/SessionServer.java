@@ -101,19 +101,19 @@ public class SessionServer extends Thread{
 
         System.out.println("Received Request");
         int clientPort = (int)payload[14];
-        System.out.println(clientPort);
+        //System.out.println(clientPort);
         clientPort <<= 8;
-        System.out.println(clientPort);
+        //System.out.println(clientPort);
         int temp = (int)(payload[15]);
         temp &= 0x000000FF;
         clientPort |=temp;
-        System.out.println(clientPort);
+        //System.out.println(clientPort);
         return clientPort;
     }
     
     public void run()
     {
-        System.out.println("Session server running at "+ ipAddress.toString() + " at port: "+this.listen_port +".\r\n");
+        System.out.println("Session server running at "+ ipAddress.toString() + " at port: "+this.listen_port +".");
         while(true)
         {
             byte[] buffer = new byte[65535];
@@ -152,7 +152,8 @@ public class SessionServer extends Thread{
             {
                 Iterator it = this.servers.entrySet().iterator();
                 Map.Entry server = (Map.Entry)it.next();
-                this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, ((InetAddress)(server.getKey())).toString(), ((Integer)(server.getValue())).intValue());  
+                this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, ((InetAddress)(server.getKey())).toString().substring(1), ((Integer)(server.getValue())).intValue());  
+                this.sendPacketWithClientInformation((InetAddress)server.getKey(), (int)servers.get((InetAddress)server.getKey()), dp.getAddress().toString().substring(1), clientListenPort);
                 System.out.println("Server Info Sent");
             }
         }
@@ -168,6 +169,31 @@ public class SessionServer extends Thread{
                 buffer[9] = (byte)ProtocolInfo.MINOR_VERSION_NUMBER;
                 buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_SERVER_INFO>>8);
                 buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_SERVER_INFO);
+                buffer[12] = (byte)((ipAddress.length()+2)>>8);
+                buffer[13] = (byte)(ipAddress.length()+2);
+                int msg_len = ipAddress.length();
+                for(int i = 0; i < msg_len; i++)
+                        buffer[14+i] = (byte)ipAddress.charAt(i);
+                buffer[buffer.length-2] = (byte)((portNum & 0x0000FF00)>> 8);
+                buffer[buffer.length-1] = (byte)((portNum & 0x000000FF));
+                this.listen_socket.send(new DatagramPacket(buffer, buffer.length, address, port));
+        }
+        catch(IOException ioe)
+        {
+                System.err.println("ERROR: Could not send packet to " + address + ":" + port + ".");
+        }
+    }
+    
+    public void sendPacketWithClientInformation(InetAddress address, int port, String ipAddress, int portNum)
+    {
+        try {
+                final byte[] buffer = new byte[16+ipAddress.length()];
+                for(int i = 0; i < ProtocolInfo.PROTOCOL_HEADER.length; i++)
+                        buffer[i] = (byte)ProtocolInfo.PROTOCOL_HEADER[i];
+                buffer[8] = (byte)ProtocolInfo.MAJOR_VERSION_NUMBER;
+                buffer[9] = (byte)ProtocolInfo.MINOR_VERSION_NUMBER;
+                buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_CLIENT_INFO>>8);
+                buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_CLIENT_INFO);
                 buffer[12] = (byte)((ipAddress.length()+2)>>8);
                 buffer[13] = (byte)(ipAddress.length()+2);
                 int msg_len = ipAddress.length();

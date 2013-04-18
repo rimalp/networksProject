@@ -11,24 +11,24 @@ import java.util.*;
  * @author This PC
  */
 public class PlayerData {
-    private InetAddress address = null;
+    //private InetAddress address = null;
     private int playerX;
     private int playerY;
     private int ballX;
     private int ballY;
     
-    public PlayerData(InetAddress _address, int _playerX, int _playerY)
+    public PlayerData(int _playerX, int _playerY)
     {
-        this.address = _address;
+        //this.address = _address;
         this.playerX = _playerX;
         this.playerY = _playerY;
         this.ballX = this.playerX + 10;
         this.ballY = this.playerY + 10;
     }
     
-    public PlayerData(InetAddress _address, int _playerX, int _playerY, int _ballX, int _ballY)
+    public PlayerData(int _playerX, int _playerY, int _ballX, int _ballY)
     {
-        this.address = _address;
+        //this.address = _address;
         this.playerX = _playerX;
         this.playerY = _playerY;
         this.ballX = _ballX;
@@ -55,8 +55,8 @@ public class PlayerData {
         return this.ballY;
     }
     
-    public InetAddress getAddress()
-    {
-        return this.address;
-    }
+    //public InetAddress getAddress()
+   // {
+   //     return this.address;
+   // }
 }

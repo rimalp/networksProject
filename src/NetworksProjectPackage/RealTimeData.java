@@ -24,12 +24,17 @@ public class RealTimeData {
     
     public void setPlayerData(InetAddress address, int playerX, int playerY, int ballX, int ballY)
     {
-        PlayerData newPlayerData = new PlayerData(address, playerX, playerY, ballX, ballY);
+        PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
         this.players.put(address, newPlayerData);
     }
     
     public PlayerData getPlayerData(InetAddress address)
     {
         return this.players.get(address);
+    }
+    
+    public HashMap<InetAddress, PlayerData> getAllPlayerData()
+    {
+        return this.players; 
     }
 }
