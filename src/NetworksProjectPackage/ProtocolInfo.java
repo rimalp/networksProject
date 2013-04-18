@@ -37,6 +37,7 @@ interface ProtocolInfo {
                                                                 (byte)MINOR_VERSION_NUMBER, 
                                                                 (byte)(TYPE_REQUEST >> 8), 
                                                                 (byte)TYPE_REQUEST};
+    
     public final byte[] REQUEST_PACKET_WIHTOUT_TYPE_LENGTH_DATA = { (byte) PROTOCOL_HEADER[0], 
                                                                     (byte) PROTOCOL_HEADER[1], 
                                                                     (byte) PROTOCOL_HEADER[2],

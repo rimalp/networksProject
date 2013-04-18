@@ -103,7 +103,7 @@ public class UDPClient extends Thread{
     
     
     //process the packet received from the server
-    public String processPacketFromServer()
+    public String processPacketFromServer(InetAddress clientAddress)
     {
         //verify the header of the packet
         for(int i = 0; i < ProtocolInfo.PROTOCOL_HEADER.length; i++)
@@ -127,7 +127,8 @@ public class UDPClient extends Thread{
         //verify the type of the packet
         int packet_type = (int) ((dataFromServer[10] << 8) | dataFromServer[11]);
         
-        
+        //System.out.println("Start switching!");
+        //System.out.println("Type is:" +packet_type);
         switch(packet_type)
         {
             case ProtocolInfo.TYPE_REQUEST:break;
@@ -154,14 +155,18 @@ public class UDPClient extends Thread{
                 }
                 break;
             case ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO:
+                //System.out.println("Congrats!");
                 if(dataFromServer.length > 14 && this.networkController.isThisServer())
                 {
-                    return processPacketWithPlayerInformation();
+                    return processPacketWithPlayerInformation(clientAddress);
                 }
             case ProtocolInfo.TYPE_MULTICAST:
                 if(dataFromServer.length > 14)
                 {
-                    return processMulticastPacket();
+                    return processMulticastPacket(clientAddress);
+                }else
+                {
+                    //System.out.println("I'm here!");
                 }
                 break;
             default: 
@@ -170,8 +175,18 @@ public class UDPClient extends Thread{
         return "";
     }
     
-    public String processMulticastPacket()
+    public String processMulticastPacket(InetAddress address)
     {
+//        byte[] msgBuffer = new byte[dataFromServer.length-14];
+//        //System.out.println("I received "+ (dataFromServer.length-14) +" bytes of data.");
+//        System.arraycopy(dataFromServer,14,msgBuffer,0,dataFromServer.length-14);
+//        //construct a string from all the byte in the data section, which is the error message
+//        String msg = new String(msgBuffer);
+//      	
+//      	//print the error message to the output.
+//        System.out.println("[I Received Packet]:"+msg);
+//        return "Broadcast Message received";
+        
         byte[] msgBuffer = new byte[dataFromServer.length-14];
         //System.out.println("I received "+ (dataFromServer.length-14) +" bytes of data.");
         System.arraycopy(dataFromServer,14,msgBuffer,0,dataFromServer.length-14);
@@ -179,11 +194,25 @@ public class UDPClient extends Thread{
         String msg = new String(msgBuffer);
       	
       	//print the error message to the output.
-        System.out.println("[I Received Packet]:"+msg);
+        //System.out.println("[I Received Packet]:"+msg);
+        int playerX = ((int)msgBuffer[0] << 8)|((int)msgBuffer[1] & 0xFF);
+        int playerY = ((int)msgBuffer[2] << 8)|((int)msgBuffer[3] & 0xFF);
+        int ballX = ((int)msgBuffer[4] << 8) |((int)msgBuffer[5] & 0xFF);
+        int ballY = ((int)msgBuffer[6] << 8)|((int)msgBuffer[7] & 0xFF);
+        System.out.println("playerX is:"+playerX);
+        System.out.println("playerY is:"+playerY);
+        System.out.println("ballX is:"+ballX);
+        System.out.println("ballY is:"+ballY);
+        PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
+        this.networkController.updatePlayerData(address, newPlayerData);
+        if(this.networkController.isThisServer())
+        {
+            this.networkController.broadcastMessage();
+        }
         return "Broadcast Message received";
     }
     
-    public String processPacketWithPlayerInformation()
+    public String processPacketWithPlayerInformation(InetAddress address)
     {
         byte[] msgBuffer = new byte[dataFromServer.length-14];
         //System.out.println("I received "+ (dataFromServer.length-14) +" bytes of data.");
@@ -192,7 +221,21 @@ public class UDPClient extends Thread{
         String msg = new String(msgBuffer);
       	
       	//print the error message to the output.
-        System.out.println("[I Received Packet]:"+msg);
+        //System.out.println("[I Received Packet]:"+msg);
+        int playerX = ((int)msgBuffer[0] << 8)|((int)msgBuffer[1] & 0xFF);
+        int playerY = ((int)msgBuffer[2] << 8)|((int)msgBuffer[3] & 0xFF);
+        int ballX = ((int)msgBuffer[4] << 8) |((int)msgBuffer[5] & 0xFF);
+        int ballY = ((int)msgBuffer[6] << 8)|((int)msgBuffer[7] & 0xFF);
+        System.out.println("playerX is:"+playerX);
+        System.out.println("playerY is:"+playerY);
+        System.out.println("ballX is:"+ballX);
+        System.out.println("ballY is:"+ballY);
+        PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
+        this.networkController.updatePlayerData(address, newPlayerData);
+        if(this.networkController.isThisServer())
+        {
+            this.networkController.broadcastMessage();
+        }
         return "Player Update Received";
     }
     
@@ -214,7 +257,7 @@ public class UDPClient extends Thread{
         this.myServerListenPort = 0;
         this.myServerListenPort += (dataFromServer[dataFromServer.length-2] << 8);
         this.myServerListenPort += dataFromServer[dataFromServer.length-1];
-        System.out.println("My server's listening port is:"+this.myServerListenPort);
+        //System.out.println("My server's listening port is:"+this.myServerListenPort);
         byte[] msgBuffer = new byte[dataFromServer.length-16];
         //System.out.println("I received "+ (dataFromServer.length-16) +" bytes of data.");
         System.arraycopy(dataFromServer,14,msgBuffer,0,dataFromServer.length-16);
@@ -222,7 +265,7 @@ public class UDPClient extends Thread{
         String msg = new String(msgBuffer);
       	
       	//print the error message to the output.
-        System.out.println("[I Received Packet]:"+msg);
+        //System.out.println("[I Received Packet]:"+msg);
         return msg;
     }
     
@@ -232,7 +275,7 @@ public class UDPClient extends Thread{
         newClientListenPort <<= 8;
         newClientListenPort &= 0x0000FF00;
         newClientListenPort |= (((int)dataFromServer[dataFromServer.length-1]) & 0x000000FF);
-        System.out.println("My new Client's listening port is:"+newClientListenPort);
+        //System.out.println("My new Client's listening port is:"+newClientListenPort);
         byte[] msgBuffer = new byte[dataFromServer.length-16];
         //System.out.println("I received "+ (dataFromServer.length-16) +" bytes of data.");
         System.arraycopy(dataFromServer,14,msgBuffer,0,dataFromServer.length-16);
@@ -249,7 +292,7 @@ public class UDPClient extends Thread{
         this.networkController.addPlayer(newClientIP, newClientListenPort);
         
       	//print the error message to the output.
-        System.out.println("New Player with IP at "+newClientIP.toString().substring(1) + " at port: " + newClientListenPort);
+        //System.out.println("New Player with IP at "+newClientIP.toString().substring(1) + " at port: " + newClientListenPort);
     }
     
     
@@ -264,7 +307,7 @@ public class UDPClient extends Thread{
         String errorMsg = new String(errorMsgBuffer);
       	
       	//print the error message to the output.
-        System.out.println("[An error has occurred]:"+errorMsg);
+        //System.out.println("[An error has occurred]:"+errorMsg);
     }
     
     //send the request packet
@@ -275,7 +318,7 @@ public class UDPClient extends Thread{
         System.arraycopy(ProtocolInfo.REQUEST_PACKET_WIHTOUT_LENGTH_DATA, 0, data_to_send, 0, 12);
         data_to_send[12] = 0x00;
         data_to_send[13] = 0x02;
-        System.out.println("My Listening port is:" + this.myListenPort);
+        //System.out.println("My Listening port is:" + this.myListenPort);
         data_to_send[14] = (byte)((this.myListenPort >> 8) & 0x000000FF);
         //System.out.println((int)data_to_send[14]);
         data_to_send[15] = (byte)(this.myListenPort & 0x000000FF);
@@ -299,15 +342,17 @@ public class UDPClient extends Thread{
     
     public void sendPacket(InetAddress targetAddress, int targetPort, byte[] msg, int type)
     {
-        //create a buffer that stores all the byte to send
+        if(msg == null)
+            return;
+        //System.out.println("Regular Packet Sent");  
         byte[] data_to_send = new byte[14+msg.length];
         System.arraycopy(ProtocolInfo.REQUEST_PACKET_WIHTOUT_TYPE_LENGTH_DATA, 0, data_to_send, 0, 10);
-        data_to_send[10] = (byte)(type >> 8);
+        data_to_send[10] =(byte)(type >> 8); 
         data_to_send[11] = (byte)(type);
         data_to_send[12] = (byte)(msg.length >> 8);
         data_to_send[13] = (byte)(msg.length);
-
-        for(int i = 0; i < msg.length; i++)
+        
+        for (int i = 0; i < msg.length; i++)
         {
             data_to_send[14+i] = msg[i];
         }
@@ -325,7 +370,6 @@ public class UDPClient extends Thread{
         {
             System.out.println("IO Exception has occured while sending the request packet");
         }
-        System.out.println("Regular Packet Sent");
     }
     
     private void sendErrorPacket(InetAddress address, int port, String message)
@@ -364,6 +408,7 @@ public class UDPClient extends Thread{
         {
             byte[] buffer = new byte[65535];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+            //System.out.println("Ready to receive a new packet!");
             try {
                 listen_socket.receive(dp);
             }
@@ -371,7 +416,11 @@ public class UDPClient extends Thread{
             {
                 System.err.println("Warning: Could not receive datagram packet.");
             }
+            
+            //System.out.println("I received a packet!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            
             this.dataFromServer = new byte[dp.getLength()];
+            
             System.arraycopy(dp.getData(), 0, this.dataFromServer, 0, dp.getLength());
             if(dp.getLength() < 14)
             {
@@ -379,7 +428,7 @@ public class UDPClient extends Thread{
                 continue;
             }
             
-            String messageFromServer = processPacketFromServer();
+            String messageFromServer = processPacketFromServer(dp.getAddress());
             if(messageFromServer.equals("No server's running."))
             {
                 this.networkController.setThisToBeServer();
@@ -402,8 +451,11 @@ public class UDPClient extends Thread{
             }else
             {
                 try{
-                    messageFromServer = messageFromServer.substring(1, messageFromServer.length());                    
+                    //System.out.println(messageFromServer);
+                    //messageFromServer = messageFromServer.substring(1);                    
                     this.myServerIPAddress = InetAddress.getByName(messageFromServer);
+                    PlayerData newPlayerData = new PlayerData(100,100,120,120);
+                    this.networkController.updatePlayerData(this.myServerIPAddress, newPlayerData);
                 }catch(UnknownHostException e)
                 {
                     System.out.println("Cannot find server address");

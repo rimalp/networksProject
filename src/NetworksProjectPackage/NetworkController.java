@@ -26,6 +26,7 @@ public class NetworkController extends Thread{
     public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData)
     {
         playersInfo = new HashMap<InetAddress, Integer>();
+        playersData = new HashMap<InetAddress, PlayerData>();
         if(initialPlayerData == null)
         {
             this.myData = new PlayerData(100,100,150,150);
@@ -51,6 +52,54 @@ public class NetworkController extends Thread{
         this.udpClient.sendRequestPacket();
     }
     
+    public byte[] getBytesFromAllPlayerData()
+    {
+//        byte[] buffer = new byte[(this.playersData.size()+1)*(12)];
+//        byte[] ipBuffer = new byte[4];
+//        PlayerData tempData = null;
+//        int i = 0;
+//        Iterator it = this.playersData.entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry playerInfo = (Map.Entry)it.next();
+//            ipBuffer = ((InetAddress)playerInfo.getKey()).getAddress();
+//            tempData = (PlayerData)playerInfo.getValue();
+//            buffer[12*i] = ipBuffer[0];
+//            buffer[12*i+1] = ipBuffer[1];
+//            buffer[12*i+2] = ipBuffer[2];
+//            buffer[12*i+3] = ipBuffer[3];
+//            buffer[12*i+4] = (byte)(tempData.getPlayerX()>>8);
+//            buffer[12*i+5] = (byte)(tempData.getPlayerX());
+//            buffer[12*i+6] = (byte)(tempData.getPlayerY()>>8);
+//            buffer[12*i+7] = (byte)(tempData.getPlayerY());
+//            buffer[12*i+8] = (byte)(tempData.getBallX() >> 8);
+//            buffer[12*i+9] = (byte)(tempData.getBallX());
+//            buffer[12*i+10] = (byte)(tempData.getBallY()>>8);
+//            buffer[12*i+11] = (byte)(tempData.getBallY());
+//            i++;
+//             //it.remove();
+//        }
+//        byte[] playerDataInBytes = new byte[8];
+
+//        PlayerData tempData = null;
+
+//        Iterator it = this.playersData.entrySet().iterator();
+        //if(it.hasNext())
+        //{
+//            Map.Entry playerInfo = (Map.Entry)it.next();
+//            tempData = (PlayerData)playerInfo.getValue();
+        byte[] playerDataInBytes = new byte[8];
+        playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
+        playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
+        playerDataInBytes[2] = (byte)(this.myData.getPlayerY()>>8);
+        playerDataInBytes[3] = (byte)(this.myData.getPlayerY());
+        playerDataInBytes[4] = (byte)(this.myData.getBallX() >> 8);
+        playerDataInBytes[5] = (byte)(this.myData.getBallX());
+        playerDataInBytes[6] = (byte)(this.myData.getBallY()>>8);
+        playerDataInBytes[7] = (byte)(this.myData.getBallY());
+        //}
+        return playerDataInBytes;
+    }
+    
     public byte[] getBytesFromPlayerData()
     {
         byte[] playerDataInBytes = new byte[8];
@@ -58,10 +107,14 @@ public class NetworkController extends Thread{
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
         playerDataInBytes[2] = (byte)(this.myData.getPlayerY()>>8);
         playerDataInBytes[3] = (byte)(this.myData.getPlayerY());
-        playerDataInBytes[4] = (byte)(this.myData.getBallX()>>8);
+        playerDataInBytes[4] = (byte)(this.myData.getBallX() >> 8);
         playerDataInBytes[5] = (byte)(this.myData.getBallX());
         playerDataInBytes[6] = (byte)(this.myData.getBallY()>>8);
         playerDataInBytes[7] = (byte)(this.myData.getBallY());
+        for(int i = 0; i < 8; i++)
+        {
+            //System.out.println(playerDataInBytes[i]);
+        }
         return playerDataInBytes;
     }
     
@@ -91,6 +144,11 @@ public class NetworkController extends Thread{
         return playerDataToReturn;
     }
     
+    public void updatePlayerData(InetAddress playerAddress, PlayerData playerData)
+    {
+        this.playersData.put(playerAddress, playerData);
+    }
+    
     public void createClient(int _portNumber)
     {
         if(_portNumber < 1)
@@ -115,10 +173,22 @@ public class NetworkController extends Thread{
         while (it.hasNext()) {
              Map.Entry playerInfo = (Map.Entry)it.next();
              this.udpClient.sendPacket((InetAddress)playerInfo.getKey(), ((Integer)playerInfo.getValue()).intValue(), message, ProtocolInfo.TYPE_MULTICAST);
-             System.out.println("Send a packet!");
+             //System.out.println("Send a packet!");
              //it.remove();
         }
-        System.out.println("Finished broadcasting");
+        //System.out.println("Finished broadcasting");
+    }
+    
+    public void broadcastMessage()
+    {
+        Iterator it = this.playersInfo.entrySet().iterator();
+        while (it.hasNext()) {
+             Map.Entry playerInfo = (Map.Entry)it.next();
+             this.udpClient.sendPacket((InetAddress)playerInfo.getKey(), ((Integer)playerInfo.getValue()).intValue(), this.getBytesFromAllPlayerData(), ProtocolInfo.TYPE_MULTICAST);
+             //System.out.println("Send a packet!");
+             //it.remove();
+        }
+        //System.out.println("Finished broadcasting");
     }
     
     
@@ -134,7 +204,7 @@ public class NetworkController extends Thread{
     
     public void setThisToBeServer()
     {
-        System.out.println("This station is now the server");
+        //System.out.println("This station is now the server");
         this.thisIsServer = true;
     }
     
@@ -168,14 +238,16 @@ public class NetworkController extends Thread{
         while(true)
         {
             try{
-                Thread.sleep(1000);
-                //this.broadcastMessage((new String("hahahahaha")).getBytes());
-                
-                //if(!this.getServerAddress().equals(this.getClientIPAddress()))
-                //{
-                    this.udpClient.sendPacket(this.getServerAddress(), this.getServerPortNumber(), this.getBytesFromPlayerData(), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO);
-                    System.out.println("Data Sent to Server!");
-                //}
+                Thread.sleep(200);
+                if(this.thisIsServer)
+                {
+                    //this.broadcastMessage((new String("hahahahaha")).getBytes());
+                }else{
+                    //System.out.println("About to send packet to server at "+ this.getServerAddress() + " at port: "+this.getServerPortNumber());
+                    //this.udpClient.sendPacket(InetAddress.getByName("127.0.0.1"), this.getServerPortNumber(), (new String("hahahahaha")).getBytes(), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO);
+                     this.udpClient.sendPacket(this.getServerAddress(), this.getServerPortNumber(), this.getBytesFromPlayerData(), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO);
+
+                }
             }catch(Exception e)
             {
                 System.out.println(e);

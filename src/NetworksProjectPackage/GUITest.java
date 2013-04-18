@@ -12,7 +12,7 @@ import java.net.*;
  *
  * @author 
  */
-public class GUITest extends javax.swing.JFrame implements Runnable {
+public class GUITest extends javax.swing.JFrame implements Runnable{
 
     //ball physics variables
     final int RADIUS = 50;
