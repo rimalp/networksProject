@@ -16,6 +16,11 @@ public class RealTimeData {
     {
         players = new HashMap<InetAddress, PlayerData>();
     }
+    
+    public RealTimeData(HashMap<InetAddress, PlayerData> newPlayers)
+    {
+        this.players = newPlayers;
+    }
 
     //some test methods for simulation
     public void createTestPlayer(){

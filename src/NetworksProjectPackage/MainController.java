@@ -28,7 +28,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public MainController()
     {
         realTimeData = new RealTimeData();
-        networkController = new NetworkController(null, -1, null);
+        networkController = new NetworkController(null, -1, null, null);
         this.guiController = new GUITest();
     }
     

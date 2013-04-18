@@ -10,7 +10,7 @@ import java.util.*;
  * @author This PC
  */
 public class NetworkController extends Thread{
-    
+    private GUITest guiTest = null;
     private InetAddress sessionServerAddress = null;
     private InetAddress serverAddress = null;
 
@@ -23,8 +23,9 @@ public class NetworkController extends Thread{
     
     private int clientPortNumber;
     
-    public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData)
+    public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, GUITest _guiTest)
     {
+        this.guiTest = _guiTest;
         playersInfo = new HashMap<InetAddress, Integer>();
         playersData = new HashMap<InetAddress, PlayerData>();
         if(initialPlayerData == null)
@@ -50,6 +51,17 @@ public class NetworkController extends Thread{
         this.thisIsServer = false;
         this.createClient(clientPortNumber);
         this.udpClient.sendRequestPacket();
+    }
+    
+    public void setRealTimeData()
+    {
+        //this.playersData = realTimeData.getAllPlayerData();
+    }
+    
+    public RealTimeData getRealTimeData(RealTimeData realTimeData)
+    {
+        RealTimeData newRealTimedata = new RealTimeData(this.playersData);
+        return newRealTimedata;
     }
     
     public byte[] getBytesFromAllPlayerData()
@@ -87,6 +99,10 @@ public class NetworkController extends Thread{
         //{
 //            Map.Entry playerInfo = (Map.Entry)it.next();
 //            tempData = (PlayerData)playerInfo.getValue();
+        this.myData.setPlayerX(this.guiTest.px);
+        this.myData.setPlayerY(this.guiTest.py);
+        this.myData.setBallX(this.guiTest.bx);
+        this.myData.setBallY(this.guiTest.by);
         byte[] playerDataInBytes = new byte[8];
         playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
@@ -102,6 +118,10 @@ public class NetworkController extends Thread{
     
     public byte[] getBytesFromPlayerData()
     {
+        this.myData.setPlayerX(this.guiTest.px);
+        this.myData.setPlayerY(this.guiTest.py);
+        this.myData.setBallX(this.guiTest.bx);
+        this.myData.setBallY(this.guiTest.by);
         byte[] playerDataInBytes = new byte[8];
         playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
@@ -219,7 +239,7 @@ public class NetworkController extends Thread{
     
     public static void main(String[] args)
     {
-        NetworkController networkController = new NetworkController(null,4000, null);
+        NetworkController networkController = new NetworkController(null,4000, null, null);
         networkController.run();
     }
     

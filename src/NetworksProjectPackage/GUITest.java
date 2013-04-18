@@ -27,6 +27,11 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
     double Vy = 0;
     double Ax = 0;
     double Ay = 0;
+    
+    public int px = 0;
+    public int py = 0;
+    public int bx = 0;
+    public int by = 0;
 
     //variables for data handling
     RealTimeData realTimeData = null;
@@ -41,8 +46,8 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
      */
     public GUITest() {
         realTimeData = new RealTimeData();
-        //networkController = new NetworkController(null, -1, null);
-
+        networkController = new NetworkController(null, -1, null,this);
+        networkController.start();
         this.setVisible(true);
 
     }
@@ -66,9 +71,13 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         while (true) {
             orbit();
             repaint();
+            px = this.jLabel1.getLocationOnScreen().x;
+            py = this.jLabel1.getLocationOnScreen().y;
+            bx = this.jLabel2.getLocationOnScreen().x;
+            by = this.jLabel2.getLocationOnScreen().y;
             System.out.println("Player location: " + this.otherBall.getLocationOnScreen().getX() + "  Y: " + this.otherBall.getLocationOnScreen().getY());
             
-
+            this.realTimeData = this.networkController.getRealTimeData(realTimeData);
             this.repaintAll(this.realTimeData);
             this.realTimeData.changePlayerData();
 
@@ -194,7 +203,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         //if (Vy > 0.001)
         Vy *= 0.99;
         this.jLabel2.setLocation((int) (this.jLabel2.getLocationOnScreen().getX() + Vx), (int) (this.jLabel2.getLocationOnScreen().getY() + Vy));
-
+        
 
     }
 

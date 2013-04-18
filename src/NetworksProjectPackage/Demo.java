@@ -11,12 +11,12 @@ package NetworksProjectPackage;
 public class Demo {
     
     private static SessionServer sessionServer = null;
-    private static NetworkController networkController = null;
+    //private static NetworkController networkController = null;
     public static void main(String[] args) throws Exception  
     {
         sessionServer = new SessionServer(6666, null);
         sessionServer.start();
-        networkController = new NetworkController(null, -1, null);
-        networkController.start();
+        //networkController = new NetworkController(null, -1, null);
+        //networkController.start();
     }
 }
