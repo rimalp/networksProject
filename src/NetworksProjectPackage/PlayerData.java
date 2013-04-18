@@ -54,7 +54,24 @@ public class PlayerData {
     {
         return this.ballY;
     }
-    
+
+
+
+    public void setPlayerX(int x){
+        this.playerX = x;
+    }
+
+    public void setPlayerY(int y){
+        this.playerY = y;
+    }
+
+    public void setBallX(int x){
+        this.ballX = x;
+    }
+
+    public void setBallY(int y){
+        this.ballY = y;
+    }
     //public InetAddress getAddress()
    // {
    //     return this.address;

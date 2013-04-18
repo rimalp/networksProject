@@ -6,8 +6,9 @@ package NetworksProjectPackage;
 
 import java.awt.*;
 import javax.swing.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.lang.*;
+import java.net.*;
 /**
  *
  * @author Drew Jeffrey
@@ -15,11 +16,16 @@ import java.lang.*;
 public class ClientGUIController extends javax.swing.JFrame {
 
     public ArrayList<JLabel> objectList;
+
+    private MainController controller;
+
     /**
      * Creates new form ClientGUIController
      */
     public ClientGUIController() {
         initComponents();
+
+
         ArrayList<Integer> x = new ArrayList<Integer>();
         ArrayList<Integer> y = new ArrayList<Integer>();
         ArrayList<Integer> object = new ArrayList<Integer>();
@@ -27,12 +33,42 @@ public class ClientGUIController extends javax.swing.JFrame {
         object.add(new Integer(11));
         x.add(new Integer(200));
         x.add(new Integer(250));
-        y.add(new Integer(500));
+        y.add(new Integer(50));
         y.add(new Integer(300));
         drawScreen(object,x,y);
-        
-        
+
+
     }
+
+    public void repaintAll(RealTimeData data){
+        this.getContentPane().removeAll();
+
+        HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
+
+        //paint each of the player and its ball in the screen one by one
+        String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
+        String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
+
+        for(PlayerData player: players.values()){
+
+           //player
+           JLabel newPlayer =  new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+           newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
+           newPlayer.setVisible(true);
+           newPlayer.setSize(200,200);
+           this.getContentPane().add(newPlayer);
+
+           //ball
+           JLabel newBall = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+           newBall.setLocation(player.getBallX(), player.getBallY());
+           newBall.setVisible(true);
+           newBall.setSize(200,200);
+           this.getContentPane().add(newBall);
+        }
+
+
+    }
+
     
     public void drawScreen(ArrayList<Integer> object, ArrayList<Integer> xpositions, ArrayList<Integer> ypositions)
     {

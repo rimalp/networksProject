@@ -4,8 +4,9 @@
  */
 package NetworksProjectPackage;
 
-import java.awt.*;
 import javax.swing.*;
+import java.util.*;
+import java.net.*;
 
 /**
  *
@@ -13,6 +14,7 @@ import javax.swing.*;
  */
 public class GUITest extends javax.swing.JFrame implements Runnable {
 
+    //ball physics variables
     final int RADIUS = 50;
     final int DELAY = 50;
     int centerX = 0;
@@ -26,33 +28,49 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
     double Ax = 0;
     double Ay = 0;
 
+    //variables for data handling
+    RealTimeData realTimeData = null;
+    NetworkController networkController = null;
+
+    HashMap<String, PlayerData> activePlayers = new HashMap<String, PlayerData>();
+    JLabel otherPlayer = null;
+    JLabel otherBall = null;
+
     /**
      * Creates new form GUITest
      */
     public GUITest() {
-        //initComponents();
+        realTimeData = new RealTimeData();
+        //networkController = new NetworkController(null, -1, null);
+
         this.setVisible(true);
+
     }
 
     @Override
     public void addNotify() {
         super.addNotify();
         animator = new Thread(this);
-        animator.start();
+        animator.start(); //thread started here
     }
 
-    public void run() {
-        System.out.println("Run called ");
+    public void run(){
+        System.out.println("GUITest Run called ");
         initComponents();
 
-        long beforeTime, timeDiff, sleep;
 
+        this.realTimeData.createTestPlayer();
+          this.createOtherPlayer();
 
-        beforeTime = System.currentTimeMillis();
 
         while (true) {
             orbit();
             repaint();
+            System.out.println("Player location: " + this.otherBall.getLocationOnScreen().getX() + "  Y: " + this.otherBall.getLocationOnScreen().getY());
+            
+
+            this.repaintAll(this.realTimeData);
+            this.realTimeData.changePlayerData();
 
 
             try {
@@ -61,7 +79,6 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
                 System.out.println("interrupted");
             }
 
-            beforeTime = System.currentTimeMillis();
         }
     }
 
@@ -77,6 +94,8 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -107,6 +126,11 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363853010_Green Ball.png"))); // NOI18N
 
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363853010_Green Ball.png"))); // NOI18N
+        jLabel3.setText("jLabel3");
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363852977_ball.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -117,18 +141,28 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
                         .addGap(314, 314, 314)
                         .addComponent(jLabel1))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(600, 600, 600)
-                        .addComponent(jLabel2)))
-                .addContainerGap(928, Short.MAX_VALUE))
+                        .addGap(636, 636, 636)
+                        .addComponent(jLabel2))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(125, 125, 125)
+                        .addComponent(jLabel4)
+                        .addGap(351, 351, 351)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(892, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(170, 170, 170)
-                .addComponent(jLabel2)
-                .addGap(126, 126, 126)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel3)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(34, 34, 34)
+                        .addComponent(jLabel4)))
+                .addGap(43, 43, 43)
                 .addComponent(jLabel1)
-                .addContainerGap(938, Short.MAX_VALUE))
+                .addContainerGap(923, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -160,8 +194,6 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
         //if (Vy > 0.001)
         Vy *= 0.99;
         this.jLabel2.setLocation((int) (this.jLabel2.getLocationOnScreen().getX() + Vx), (int) (this.jLabel2.getLocationOnScreen().getY() + Vy));
-        System.out.println("X:" + this.jLabel2.getLocationOnScreen().getX());
-        System.out.println("Y:" + this.jLabel2.getLocationOnScreen().getY());
 
 
     }
@@ -184,6 +216,71 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
         this.centerX = evt.getXOnScreen();
         this.centerY = evt.getYOnScreen();
     }//GEN-LAST:event_jPanel1MouseMoved
+
+
+
+
+
+    //repaint the screen
+
+    public void repaintAll(RealTimeData data){
+//        this.getContentPane().removeAll();
+
+        
+        HashMap<InetAddress, PlayerData> newPlayers = data.getAllPlayerData();
+        System.out.println("NewPlayers size: " + newPlayers.size());
+        for(PlayerData pd: newPlayers.values()){
+            this.jLabel3.setLocation(pd.getBallX(), pd.getBallY());
+            this.jLabel4.setLocation(pd.getPlayerX(), pd.getPlayerY());
+            this.repaint();
+        }
+
+        //paint each of the player and its ball in the screen one by one
+//        String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
+//        String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
+
+//        for(PlayerData player: newPlayers.values()){
+//
+//           //player
+//           JLabel newPlayer =  new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+//           newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
+//           newPlayer.setVisible(true);
+//           newPlayer.setSize(200,200);
+//           this.getContentPane().add(newPlayer);
+//
+//           //ball
+//           JLabel newBall = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+//           newBall.setLocation(player.getBallX(), player.getBallY());
+//           newBall.setVisible(true);
+//           newBall.setSize(200,200);
+//           this.getContentPane().add(newBall);
+//        }
+
+
+    }
+
+
+    private void createOtherPlayer(){
+
+           String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
+           String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
+           //player
+           this.otherPlayer =  new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+//           this.otherPlayer = this.jLabel3;
+           otherPlayer.setLocation(100,100);
+           otherPlayer.setVisible(true);
+           otherPlayer.setSize(100,100);
+           this.getContentPane().add(otherPlayer);
+
+           //ball
+           this.otherBall = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+//           this.otherBall = this.jLabel4;
+           otherBall.setLocation(200,200);
+           otherBall.setVisible(true);
+           otherBall.setSize(100,100);
+           this.getContentPane().add(otherBall);
+
+    }
 
     /**
      * @param args the command line arguments
@@ -212,18 +309,15 @@ public class GUITest extends javax.swing.JFrame implements Runnable {
         }
         //</editor-fold>
 
-        /* Create and display the form */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new GUITest().setVisible(true);
-//            }
-//        });
-
         new GUITest();
     }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
