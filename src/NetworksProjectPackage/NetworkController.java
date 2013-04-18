@@ -40,7 +40,7 @@ public class NetworkController extends Thread{
                 this.sessionServerAddress = InetAddress.getByName(_sessionServerIPAddress);
             }else
             {
-                this.sessionServerAddress = InetAddress.getByName("139.147.103.11");
+                this.sessionServerAddress = InetAddress.getByName("139.147.103.6");
             }
         }catch(UnknownHostException e)
         {
@@ -258,7 +258,7 @@ public class NetworkController extends Thread{
         while(true)
         {
             try{
-                Thread.sleep(200);
+                Thread.sleep(10);
                 if(this.thisIsServer)
                 {
                     //this.broadcastMessage((new String("hahahahaha")).getBytes());

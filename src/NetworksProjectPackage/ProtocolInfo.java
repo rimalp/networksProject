@@ -23,7 +23,7 @@ interface ProtocolInfo {
     public static final int DEFAULT_CLIENT_LISTEN_PORT_NUMBER = 4444;
     public static final int DEFAULT_SERVER_LISTEN_PORT_NUMBER = 5555;
     public static final int DEFAULT_SESSION_SERVER_PORT_NUMBER = 6666;
-    public static final String DEFAULT_SESSION_SERVER_ADDRESS = "139.147.103.11";
+    public static final String DEFAULT_SESSION_SERVER_ADDRESS = "139.147.103.6";
     
     public final byte[] REQUEST_PACKET_WIHTOUT_LENGTH_DATA = { (byte) PROTOCOL_HEADER[0], 
                                                                 (byte) PROTOCOL_HEADER[1], 

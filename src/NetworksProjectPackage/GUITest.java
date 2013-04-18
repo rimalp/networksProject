@@ -8,10 +8,7 @@ import javax.swing.*;
 import java.util.*;
 import java.net.*;
 
-/**
- *
- * @author 
- */
+
 public class GUITest extends javax.swing.JFrame implements Runnable{
 
     //ball physics variables
@@ -75,11 +72,11 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
             py = this.jLabel1.getLocationOnScreen().y;
             bx = this.jLabel2.getLocationOnScreen().x;
             by = this.jLabel2.getLocationOnScreen().y;
-            System.out.println("Player location: " + this.otherBall.getLocationOnScreen().getX() + "  Y: " + this.otherBall.getLocationOnScreen().getY());
+            //System.out.println("Player location: " + this.otherBall.getLocationOnScreen().getX() + "  Y: " + this.otherBall.getLocationOnScreen().getY());
             
             this.realTimeData = this.networkController.getRealTimeData(realTimeData);
             this.repaintAll(this.realTimeData);
-            this.realTimeData.changePlayerData();
+            //this.realTimeData.changePlayerData();
 
 
             try {
@@ -317,7 +314,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
             java.util.logging.Logger.getLogger(GUITest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        System.out.println("lol0ad");
         new GUITest();
     }
 

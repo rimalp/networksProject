@@ -28,7 +28,7 @@ public class RealTimeData {
         try{
         players.put(InetAddress.getLocalHost(), pd);
         }catch(Exception e){
-            System.out.println("Exception getting localhost");
+            //System.out.println("Exception getting localhost");
         }
     }
 
