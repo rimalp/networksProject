@@ -126,6 +126,7 @@ public class SessionServer extends Thread{
                 System.err.println("Warning: Could not receive datagram packet.");
             }
 
+            System.out.println("Received a request!");
             
             if(dp.getLength() < 14)
             {

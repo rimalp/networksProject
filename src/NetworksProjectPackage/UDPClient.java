@@ -66,7 +66,7 @@ public class UDPClient extends Thread{
     public InetAddress getClientAddress()
     {
         try{
-            this.myIPAddress = InetAddress.getByName("localhost");
+            this.myIPAddress = InetAddress.getByName("139.147.103.11");
         }catch(Exception e)
         {
             System.err.println(e);
@@ -433,7 +433,7 @@ public class UDPClient extends Thread{
             {
                 this.networkController.setThisToBeServer();
                 try{
-                    this.myServerIPAddress = InetAddress.getByName("localhost");
+                    this.myServerIPAddress = InetAddress.getByName("139.147.103.11");
                 }catch(Exception e)
                 {
                     System.out.println(e);

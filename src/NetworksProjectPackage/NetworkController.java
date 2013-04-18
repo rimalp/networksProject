@@ -40,7 +40,7 @@ public class NetworkController extends Thread{
                 this.sessionServerAddress = InetAddress.getByName(_sessionServerIPAddress);
             }else
             {
-                this.sessionServerAddress = InetAddress.getByName("localhost");
+                this.sessionServerAddress = InetAddress.getByName("139.147.103.11");
             }
         }catch(UnknownHostException e)
         {
