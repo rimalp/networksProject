@@ -33,6 +33,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
     //variables for data handling
     RealTimeData realTimeData = null;
     NetworkController networkController = null;
+    //ClientGUIController guiController = null;
 
     HashMap<String, PlayerData> activePlayers = new HashMap<String, PlayerData>();
     JLabel otherPlayer = null;
@@ -45,7 +46,10 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         realTimeData = new RealTimeData();
         networkController = new NetworkController(null, -1, null,this);
         networkController.start();
+        //guiController = new ClientGUIController();
         this.setVisible(true);
+        //this.drawArena();
+        
 
     }
 
@@ -60,9 +64,9 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         System.out.println("GUITest Run called ");
         initComponents();
 
-
         this.realTimeData.createTestPlayer();
-          this.createOtherPlayer();
+         this.createOtherPlayer();
+         this.drawArena();
 
 
         while (true) {
@@ -76,6 +80,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
             
             this.realTimeData = this.networkController.getRealTimeData(realTimeData);
             this.repaintAll(this.realTimeData);
+            //guiController.repaintAll(this.realTimeData);
             //this.realTimeData.changePlayerData();
 
 
@@ -104,13 +109,19 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(1024, 768));
 
+        jPanel1.setMaximumSize(new java.awt.Dimension(1024, 768));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1024, 768));
         jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jPanel1MouseClicked(evt);
             }
         });
         jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel1MouseDragged(evt);
+            }
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 jPanel1MouseMoved(evt);
             }
@@ -118,16 +129,6 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363852977_ball.png"))); // NOI18N
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel1MouseClicked(evt);
-            }
-        });
-        jLabel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jLabel1MouseMoved(evt);
-            }
-        });
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/NetworksProjectPackage/1363853010_Green Ball.png"))); // NOI18N
@@ -185,6 +186,37 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+        public void drawArena() {
+        String wallImage =  "/NetworksProjectPackage/wall.gif";
+        String lineImage = "/NetworksProjectPackage/line.gif";
+        JLabel currentWall;
+        JLabel currentLine;
+        for (int i = 0; i <= this.getWidth()-16; i += 16)
+        {
+            for(int j = 0; j <= this.getHeight()-16; j += 16)
+            {
+                if ((i<1 || j < 1) || (i > this.getWidth()-33 || j > this.getHeight()-49))
+                {
+            currentWall = new JLabel(new ImageIcon(getClass().getResource(wallImage)));
+                currentWall.setSize(16, 16);
+            currentWall.setLocation(i,j);
+            currentWall.setVisible(true);
+            jPanel1.add(currentWall);
+                }
+        }            
+    }
+        for (int i = 0; i <= this.getHeight() - 16; i += 16)
+        {
+            currentLine = new JLabel(new ImageIcon(getClass().getResource(lineImage)));
+            currentLine.setSize(6, 16);
+            currentLine.setLocation(this.getWidth()/2-3,i);
+            currentLine.setVisible(true);
+            jPanel1.add(currentLine);
+        }
+            
+        jPanel1.repaint();
+        }
+      
     public void orbit() {
 
 
@@ -204,24 +236,39 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
 
     }
 
-    private void jLabel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseMoved
-        this.centerX = evt.getXOnScreen();
-        this.centerY = evt.getYOnScreen();
-        this.jLabel1.setLocation(evt.getXOnScreen() - (this.jLabel1.getWidth() / 2), evt.getYOnScreen() - (this.jLabel1.getHeight()));
-    }//GEN-LAST:event_jLabel1MouseMoved
-
-    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-    }//GEN-LAST:event_jLabel1MouseClicked
-
     private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
+
     }//GEN-LAST:event_jPanel1MouseClicked
 
     private void jPanel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseMoved
-        this.jLabel1.setLocation(evt.getXOnScreen() - (this.jLabel1.getWidth() / 2),
-                evt.getYOnScreen() - (this.jLabel1.getHeight()));
-        this.centerX = evt.getXOnScreen();
+       this.centerX = evt.getXOnScreen();
+        if (this.centerX < this.getWidth()/2 + 32)
+            this.centerX = this.getWidth()/2 + 32;
+        if (this.centerX > this.getWidth()-64)
+            this.centerX = this.getWidth()-64;
         this.centerY = evt.getYOnScreen();
+        if (this.centerY < 80)
+            this.centerY = 80;
+        if (this.centerY > this.getHeight()-48)
+            this.centerY = this.getHeight()-48;
+        this.jLabel1.setLocation(this.centerX - (this.jLabel1.getWidth() / 2),
+            this.centerY - (this.jLabel1.getHeight()));
     }//GEN-LAST:event_jPanel1MouseMoved
+
+    private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
+       this.centerX = evt.getXOnScreen();
+        if (this.centerX < this.getWidth()/2 + 32)
+            this.centerX = this.getWidth()/2 + 32;
+        if (this.centerX > this.getWidth()-64)
+            this.centerX = this.getWidth()-64;
+        this.centerY = evt.getYOnScreen();
+        if (this.centerY < 80)
+            this.centerY = 80;
+        if (this.centerY > this.getHeight()-48)
+            this.centerY = this.getHeight()-48;
+        this.jLabel1.setLocation(this.centerX - (this.jLabel1.getWidth() / 2),
+            this.centerY - (this.jLabel1.getHeight()));
+    }//GEN-LAST:event_jPanel1MouseDragged
 
 
 
@@ -230,9 +277,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
     //repaint the screen
 
     public void repaintAll(RealTimeData data){
-//        this.getContentPane().removeAll();
-
-        
+//        this.getContentPane().removeAll();   
         HashMap<InetAddress, PlayerData> newPlayers = data.getAllPlayerData();
         System.out.println("NewPlayers size: " + newPlayers.size());
         for(PlayerData pd: newPlayers.values()){
@@ -316,6 +361,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
         //</editor-fold>
         System.out.println("lol0ad");
         new GUITest();
+                     
     }
 
 

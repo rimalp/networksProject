@@ -24,6 +24,7 @@ public class ClientGUIController extends javax.swing.JFrame {
      */
     public ClientGUIController() {
         initComponents();
+        this.drawArena();
 
 
         ArrayList<Integer> x = new ArrayList<Integer>();
@@ -38,6 +39,26 @@ public class ClientGUIController extends javax.swing.JFrame {
         drawScreen(object,x,y);
 
 
+    }
+    
+        public void drawArena() {
+        String wallImage =  "/NetworksProjectPackage/wall.gif";
+        ImageIcon wall = new ImageIcon(getClass().getResource(wallImage));
+        JLabel currentWall;
+        for (int i = 0; i <= this.getWidth()-16; i += 16)
+        {
+            for(int j = 0; j <= this.getHeight()-16; j += 16)
+            {
+                if ((i<1 || j < 1) || (i > this.getWidth()-33 || j > this.getHeight()-49))
+                {
+            currentWall = new JLabel(new ImageIcon(getClass().getResource(wallImage)));
+                currentWall.setSize(16, 16);
+            currentWall.setLocation(i,j);
+            currentWall.setVisible(true);
+            this.getContentPane().add(currentWall);}}
+                    
+        }
+               
     }
 
     public void repaintAll(RealTimeData data){
@@ -73,7 +94,7 @@ public class ClientGUIController extends javax.swing.JFrame {
     public void drawScreen(ArrayList<Integer> object, ArrayList<Integer> xpositions, ArrayList<Integer> ypositions)
     {
         ArrayList<JLabel> paintedObjects = new ArrayList<JLabel>();
-        this.getContentPane().removeAll(); //Remove all previous objects on the screen
+        //this.getContentPane().removeAll(); //Remove all previous objects on the screen
         for (int i = 0; i < object.size(); i++) //Paint each object on the screen
         {
             String icon;
@@ -93,6 +114,7 @@ public class ClientGUIController extends javax.swing.JFrame {
             paintedObjects.get(i).setSize(200,200);
             this.getContentPane().add(paintedObjects.get(i));
         }
+        this.getContentPane().repaint();
     }
     
    
