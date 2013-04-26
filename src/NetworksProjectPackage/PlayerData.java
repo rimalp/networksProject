@@ -16,14 +16,16 @@ public class PlayerData {
     private int playerY;
     private int ballX;
     private int ballY;
+    //private int playerState;
     
     public PlayerData(int _playerX, int _playerY)
     {
         //this.address = _address;
         this.playerX = _playerX;
         this.playerY = _playerY;
-        this.ballX = this.playerX + 10;
-        this.ballY = this.playerY + 10;
+        this.ballX = this.playerX + 100;
+        this.ballY = this.playerY + 100;
+        //this.playerState = 
     }
     
     public PlayerData(int _playerX, int _playerY, int _ballX, int _ballY)

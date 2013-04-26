@@ -8,7 +8,7 @@ package NetworksProjectPackage;
 public class MainController extends Thread{// extends javax.swing.JFrame{
     RealTimeData realTimeData = null;
     NetworkController networkController = null;
-    GUITest guiController = null;
+    ClientGUIController guiController = null;
 
     //variables for the ball physics
     final int RADIUS = 50;
@@ -28,8 +28,10 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public MainController()
     {
         realTimeData = new RealTimeData();
+        realTimeData.createTestPlayer();
         networkController = new NetworkController(null, -1, null, null);
-        this.guiController = new GUITest();
+        guiController = new ClientGUIController();
+        guiController.drawMainMenu();
     }
     
     public RealTimeData getRealTimedata()
@@ -49,6 +51,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
         //acquire new data and call the guicontroller's repaint function
 
         this.guiController.repaintAll(realTimeData);
+        this.guiController.drawArena();
         
 
         //then pause for a while

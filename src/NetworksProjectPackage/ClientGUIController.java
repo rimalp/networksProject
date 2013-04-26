@@ -9,6 +9,9 @@ import javax.swing.*;
 import java.util.*;
 import java.lang.*;
 import java.net.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
  *
  * @author Drew Jeffrey
@@ -16,52 +19,87 @@ import java.net.*;
 public class ClientGUIController extends javax.swing.JFrame {
 
     public ArrayList<JLabel> objectList;
-
     private MainController controller;
+    private JButton hostGame;
+    private JButton joinGame;
+    private JButton exitGame;
+    private JLabel mmTitle;
+    private mainMenu main_menu;
 
     /**
      * Creates new form ClientGUIController
      */
+    //GUI controller's frame is the main area on which games are played.
+    //GUIcontroller also creates and hides other forms that may be necessary to setup
+    //a game.  Everything displayed on the screen is controlled by this class
     public ClientGUIController() {
         initComponents();
-        this.drawArena();
 
-
-        ArrayList<Integer> x = new ArrayList<Integer>();
-        ArrayList<Integer> y = new ArrayList<Integer>();
-        ArrayList<Integer> object = new ArrayList<Integer>();
-        object.add(new Integer(10));
-        object.add(new Integer(11));
-        x.add(new Integer(200));
-        x.add(new Integer(250));
-        y.add(new Integer(50));
-        y.add(new Integer(300));
-        drawScreen(object,x,y);
+        //Create Test Data
+        RealTimeData test = new RealTimeData();
+        test.createTestPlayer();
 
 
     }
-    
-        public void drawArena() {
-        String wallImage =  "/NetworksProjectPackage/wall.gif";
-        ImageIcon wall = new ImageIcon(getClass().getResource(wallImage));
+    //Moves to the main menu
+
+    public void drawMainMenu() {
+        main_menu = new mainMenu(this);
+        main_menu.setVisible(true);
+        this.setVisible(false);
+    }
+    //Moves to the game screen
+
+    public void drawGameScreen() {
+        main_menu.setVisible(false);
+        this.putWindowInCenter();
+        this.setVisible(true);
+    }
+
+    //Automatically moves the frame to the center of the screen
+    public void putWindowInCenter() {
+        // Get the size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Determine the new location of the window
+        int w = this.getSize().width;
+        int h = this.getSize().height;
+        int x = (dim.width - w) / 2;
+        int y = (dim.height - h) / 2;
+
+        // Move the window
+        this.setLocation(x, y);
+    }
+
+    //Draws the walls around the game and a center dividing line
+    public void drawArena() {
+        String wallImage = "/NetworksProjectPackage/wall.gif";
+        String lineImage = "/NetworksProjectPackage/line.gif";
         JLabel currentWall;
-        for (int i = 0; i <= this.getWidth()-16; i += 16)
-        {
-            for(int j = 0; j <= this.getHeight()-16; j += 16)
-            {
-                if ((i<1 || j < 1) || (i > this.getWidth()-33 || j > this.getHeight()-49))
-                {
-            currentWall = new JLabel(new ImageIcon(getClass().getResource(wallImage)));
-                currentWall.setSize(16, 16);
-            currentWall.setLocation(i,j);
-            currentWall.setVisible(true);
-            this.getContentPane().add(currentWall);}}
-                    
+        JLabel currentLine;
+        for (int i = 0; i <= this.getWidth() - 17; i += 16) {
+            for (int j = 0; j <= this.getHeight() - 16; j += 16) {
+                if ((i < 1 || j < 1) || (i > this.getWidth() - 33 || j > this.getHeight() - 49)) {
+                    currentWall = new JLabel(new ImageIcon(getClass().getResource(wallImage)));
+                    currentWall.setSize(16, 16);
+                    currentWall.setLocation(i, j);
+                    currentWall.setVisible(true);
+                    this.getContentPane().add(currentWall);
+                }
+            }
         }
-               
+        for (int i = 0; i <= this.getHeight() - 16; i += 16) {
+            currentLine = new JLabel(new ImageIcon(getClass().getResource(lineImage)));
+            currentLine.setSize(6, 16);
+            currentLine.setLocation(this.getWidth() / 2 - 3, i);
+            currentLine.setVisible(true);
+            this.getContentPane().add(currentLine);
+        }
+
+        this.getContentPane().repaint();
     }
 
-    public void repaintAll(RealTimeData data){
+    public void repaintAll(RealTimeData data) {
         this.getContentPane().removeAll();
 
         HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
@@ -70,54 +108,26 @@ public class ClientGUIController extends javax.swing.JFrame {
         String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
         String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
 
-        for(PlayerData player: players.values()){
+        for (PlayerData player : players.values()) {
 
-           //player
-           JLabel newPlayer =  new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
-           newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
-           newPlayer.setVisible(true);
-           newPlayer.setSize(200,200);
-           this.getContentPane().add(newPlayer);
+            //player
+            JLabel newPlayer = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+            newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
+            newPlayer.setVisible(true);
+            newPlayer.setSize(200, 200);
+            this.getContentPane().add(newPlayer);
 
-           //ball
-           JLabel newBall = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
-           newBall.setLocation(player.getBallX(), player.getBallY());
-           newBall.setVisible(true);
-           newBall.setSize(200,200);
-           this.getContentPane().add(newBall);
+            //ball
+            JLabel newBall = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+            newBall.setLocation(player.getBallX(), player.getBallY());
+            newBall.setVisible(true);
+            newBall.setSize(200, 200);
+            this.getContentPane().add(newBall);
         }
 
-
-    }
-
-    
-    public void drawScreen(ArrayList<Integer> object, ArrayList<Integer> xpositions, ArrayList<Integer> ypositions)
-    {
-        ArrayList<JLabel> paintedObjects = new ArrayList<JLabel>();
-        //this.getContentPane().removeAll(); //Remove all previous objects on the screen
-        for (int i = 0; i < object.size(); i++) //Paint each object on the screen
-        {
-            String icon;
-            int xpos, ypos;
-            switch (object.get(i).intValue()){
-                case Constants.PLAYER1: icon = "/NetworksProjectPackage/1363852977_ball.png"; break;
-                case Constants.PLAYER1BALL: icon = "/NetworksProjectPackage/1363853010_Green Ball.png"; break;
-                default: icon = ""; break;                  
-           }
-            xpos = xpositions.get(i).intValue();
-            ypos = ypositions.get(i).intValue();
-            
-            //Create and add the label to the screen
-            paintedObjects.add(new JLabel(new ImageIcon(getClass().getResource(icon))));
-            paintedObjects.get(i).setLocation(xpos,ypos);
-            paintedObjects.get(i).setVisible(true);
-            paintedObjects.get(i).setSize(200,200);
-            this.getContentPane().add(paintedObjects.get(i));
-        }
         this.getContentPane().repaint();
+
     }
-    
-   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -129,7 +139,15 @@ public class ClientGUIController extends javax.swing.JFrame {
     private void initComponents() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1024, 768));
+        setForeground(new java.awt.Color(255, 102, 0));
+        setMaximizedBounds(new java.awt.Rectangle(0, 0, 1014, 764));
+        setPreferredSize(new java.awt.Dimension(1014, 764));
+        setResizable(false);
+        addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                escapeKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -144,6 +162,45 @@ public class ClientGUIController extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    //Create a non-modal dialog box (so game can run in background) to allow user to exit game
+    private void escapeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_escapeKeyPressed
+        if (evt.getKeyCode() == 27) {
+            final JDialog optionPaneDialog = new JDialog(this, "Leave Game?");
+
+            //Note we are creating an instance of a JOptionPane
+            //Normally it's just a call to a static method.
+            JOptionPane optPane = new JOptionPane("Are You Sure You Want to Leave the Game?",
+                    JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+
+            //Listen for the JOptionPane button click. It comes through as property change 
+            //event with the property called "value". 
+            optPane.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals("value")) {
+                        switch ((Integer) e.getNewValue()) {
+                            case JOptionPane.OK_OPTION: 
+                                //Put code to exit game here
+                                optionPaneDialog.dispose();
+                                drawMainMenu();
+                                break;
+                            case JOptionPane.CANCEL_OPTION:
+                                //user clicks CANCEL
+                                break;
+                        }
+                        optionPaneDialog.dispose();
+                    }
+                }
+            });
+            optionPaneDialog.setContentPane(optPane);
+
+            //Let the JDialog figure out how big it needs to be
+            //based on the size of JOptionPane by calling the pack() method
+            optionPaneDialog.pack();
+            optionPaneDialog.setLocationRelativeTo(this);
+            optionPaneDialog.setVisible(true);
+        }
+    }//GEN-LAST:event_escapeKeyPressed
 
     /**
      * @param args the command line arguments
