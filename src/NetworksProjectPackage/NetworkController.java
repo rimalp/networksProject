@@ -167,8 +167,16 @@ public class NetworkController extends Thread{
     public void updatePlayerData(InetAddress playerAddress, PlayerData playerData)
     {
         this.playersData.put(playerAddress, playerData);
+
+        //update the MainController's realtimedata hashmap (static)
+        MainController.realTimeData.setPlayerData(playerAddress, playerData);
     }
     
+    public void updateHashMap(HashMap<InetAddress, PlayerData> processedPlayerData){
+        this.playersData = processedPlayerData;
+    }
+
+
     public void createClient(int _portNumber)
     {
         if(_portNumber < 1)

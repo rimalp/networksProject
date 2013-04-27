@@ -2,8 +2,12 @@ package NetworksProjectPackage;
 
 interface Constants
 {
+
     public static final int TEAM1 = 1;
     public static final int TEAM2 = 2;
+
+    public static final int ALIVE = 1;
+    public static final int DEAD = 0;
     
     public static final int PLAYER1 = 10;
     public static final int PLAYER1BALL = 11;
