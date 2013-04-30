@@ -94,26 +94,34 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public static void main(String[] args)
     {
         MainController mainController = new MainController();
-        
         mainController.start();
+    }
+    
+    public void setPlayerData(InetAddress playerAddress, PlayerData playerData){
+        MainController.realTimeData.setPlayerData(playerAddress, playerData);
+        //update the GUI when the player data changes
+        guiController.repaintAll(realTimeData);
+        
     }
     
     public void run()
     {
-        //acquire new data and call the guicontroller's repaint function
-
-        this.guiController.repaintAll(realTimeData);
         this.guiController.drawArena();
-        
 
-        //then pause for a while
-        try {
-                Thread.sleep(1000);
-        } catch (InterruptedException e) {
-                System.out.println("MainController thread interrupted!");
+        while(true)
+        {
+            //acquire new data and call the guicontroller's repaint function
+            
+            this.guiController.repaintAll(MainController.realTimeData);
+
+
+            //then pause for a while
+            try {
+                    Thread.sleep(1000/60);
+            } catch (InterruptedException e) {
+                    System.out.println("MainController thread interrupted!");
+            }
         }
-
-
     }
 
 

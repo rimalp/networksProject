@@ -102,7 +102,7 @@ public class ClientGUIController extends javax.swing.JFrame {
     public void repaintAll(RealTimeData data) {
         this.getContentPane().removeAll();
 
-        HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
+        HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();//
 
         //paint each of the player and its ball in the screen one by one
         String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";

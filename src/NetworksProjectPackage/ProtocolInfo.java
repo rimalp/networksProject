@@ -48,4 +48,5 @@ interface ProtocolInfo {
                                                                     (byte) PROTOCOL_HEADER[7],
                                                                     (byte)MAJOR_VERSION_NUMBER, 
                                                                     (byte)MINOR_VERSION_NUMBER};
+    
 }
