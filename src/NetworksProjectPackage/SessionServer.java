@@ -38,6 +38,7 @@ public class SessionServer extends Thread{
                 this.listen_port = ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER;
             }
             this.listen_socket = new DatagramSocket(listen_port);
+            
         }catch(SocketException se)
         {
             System.err.println("Error: Could not open a server socket on port " + listen_port + ".\n" + se.getMessage());

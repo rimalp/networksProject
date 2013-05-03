@@ -387,7 +387,7 @@ powerThrow = false;        // TODO add your handling code here:
             java.util.logging.Logger.getLogger(GUITest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        System.out.println("lol0adef");
+        System.out.println("lol0adefe");
         new GUITest();
                      
     }

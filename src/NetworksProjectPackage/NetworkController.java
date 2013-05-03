@@ -5,6 +5,7 @@
 package NetworksProjectPackage;
 import java.net.*;
 import java.util.*;
+import java.io.*;
 /**
  *
  * @author This PC
@@ -25,15 +26,18 @@ public class NetworkController extends Thread{
     
     public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, GUITest _guiTest)
     {
-        this.guiTest = _guiTest;
+        
+//        this.guiTest = _guiTest;
         playersInfo = new HashMap<InetAddress, Integer>();
         playersData = new HashMap<InetAddress, PlayerData>();
+        
         if(initialPlayerData == null)
         {
             this.myData = new PlayerData(100,100,150,150);
         }else{
             this.myData = initialPlayerData;
         }
+        
         try{
             if(_sessionServerIPAddress != null)
             {
@@ -118,10 +122,10 @@ public class NetworkController extends Thread{
     
     public byte[] getBytesFromPlayerData()
     {
-        this.myData.setPlayerX(this.guiTest.px);
-        this.myData.setPlayerY(this.guiTest.py);
-        this.myData.setBallX(this.guiTest.bx);
-        this.myData.setBallY(this.guiTest.by);
+        //this.myData.setPlayerX(this.guiTest.px);
+        //this.myData.setPlayerY(this.guiTest.py);
+        //this.myData.setBallX(this.guiTest.bx);
+        //this.myData.setBallY(this.guiTest.by);
         byte[] playerDataInBytes = new byte[8];
         playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
@@ -247,7 +251,44 @@ public class NetworkController extends Thread{
     
     public static void main(String[] args)
     {
-        NetworkController networkController = new NetworkController(null,4000, null, null);
+        try{
+        
+       URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+            String ip = in.readLine();
+            System.out.println(ip);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        }catch(Exception e)
+        {
+            System.out.println(e);
+        }
+        SessionServer ss = null;
+        
+        Scanner sc = new Scanner(System.in);
+        String session_ip = sc.nextLine();
+        if(session_ip != "")
+        {
+            System.out.println("Started session server at " + session_ip);
+            ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, session_ip);
+            ss.start();
+        }else
+        {
+            System.out.println("no session server running");
+        }
+        
+        
+        NetworkController networkController = new NetworkController("139.147.37.17", 4444, null, null);
         networkController.run();
     }
     
@@ -274,7 +315,7 @@ public class NetworkController extends Thread{
                     //System.out.println("About to send packet to server at "+ this.getServerAddress() + " at port: "+this.getServerPortNumber());
                     //this.udpClient.sendPacket(InetAddress.getByName("127.0.0.1"), this.getServerPortNumber(), (new String("hahahahaha")).getBytes(), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO);
                      this.udpClient.sendPacket(this.getServerAddress(), this.getServerPortNumber(), this.getBytesFromPlayerData(), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO);
-
+                     
                 }
             }catch(Exception e)
             {
@@ -282,4 +323,5 @@ public class NetworkController extends Thread{
             }
         }
     }
+    
 }
