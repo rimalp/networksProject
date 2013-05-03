@@ -25,7 +25,7 @@ public class ClientGUIController extends javax.swing.JFrame {
     private JButton exitGame;
     private JLabel mmTitle;
     private mainMenu main_menu;
-
+    private Container movingObjects;
     /**
      * Creates new form ClientGUIController
      */
@@ -37,6 +37,7 @@ public class ClientGUIController extends javax.swing.JFrame {
 
         //Create Test Data
         RealTimeData test = new RealTimeData();
+        movingObjects = new Container();
         test.createTestPlayer();
 
 
@@ -100,9 +101,12 @@ public class ClientGUIController extends javax.swing.JFrame {
     }
 
     public void repaintAll(RealTimeData data) {
-        this.getContentPane().removeAll();
+        for (int i = 0; i < movingObjects.getComponentCount(); i++)
+                {
+                    this.getContentPane().remove(movingObjects.getComponent(i));
+                }
 
-        HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();//
+        HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
 
         //paint each of the player and its ball in the screen one by one
         String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
@@ -115,6 +119,7 @@ public class ClientGUIController extends javax.swing.JFrame {
             newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
             newPlayer.setVisible(true);
             newPlayer.setSize(200, 200);
+            movingObjects.add(newPlayer);
             this.getContentPane().add(newPlayer);
 
             //ball
@@ -122,10 +127,13 @@ public class ClientGUIController extends javax.swing.JFrame {
             newBall.setLocation(player.getBallX(), player.getBallY());
             newBall.setVisible(true);
             newBall.setSize(200, 200);
+            movingObjects.add(newBall);
             this.getContentPane().add(newBall);
         }
 
+        //this.getContentPane().add(movingObjects);
         this.getContentPane().repaint();
+        //movingObjects.paintComponents(this.getContentPane().getGraphics());
 
     }
 
