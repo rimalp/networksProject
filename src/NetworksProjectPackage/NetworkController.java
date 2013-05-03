@@ -11,23 +11,24 @@ import java.io.*;
  * @author This PC
  */
 public class NetworkController extends Thread{
-    private GUITest guiTest = null;
+
     private InetAddress sessionServerAddress = null;
     private InetAddress serverAddress = null;
+    private String myIPAddress = null;
 
     private UDPClient udpClient = null;
+    
     private HashMap<InetAddress,Integer> playersInfo = null;
     private HashMap<InetAddress,PlayerData> playersData = null;
     private PlayerData myData = null;
     
     private boolean thisIsServer;
-    
     private int clientPortNumber;
     
     public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, GUITest _guiTest)
     {
+        getMyIPAddress();
         
-//        this.guiTest = _guiTest;
         playersInfo = new HashMap<InetAddress, Integer>();
         playersData = new HashMap<InetAddress, PlayerData>();
         
@@ -44,7 +45,8 @@ public class NetworkController extends Thread{
                 this.sessionServerAddress = InetAddress.getByName(_sessionServerIPAddress);
             }else
             {
-                this.sessionServerAddress = InetAddress.getByName("139.147.103.6");
+                //if I am not specified with a session server address, I will run the session server
+                this.sessionServerAddress = InetAddress.getByName(this.myIPAddress);
             }
         }catch(UnknownHostException e)
         {
@@ -52,8 +54,13 @@ public class NetworkController extends Thread{
             System.exit(1);
         }
         
+        // I start off assuming I am not the server
         this.thisIsServer = false;
+        
+        // I will create a client on the specified port
         this.createClient(clientPortNumber);
+        
+        // I will request the Server to be a server/request server address
         this.udpClient.sendRequestPacket();
     }
     
@@ -70,76 +77,44 @@ public class NetworkController extends Thread{
     
     public byte[] getBytesFromAllPlayerData()
     {
-//        byte[] buffer = new byte[(this.playersData.size()+1)*(12)];
-//        byte[] ipBuffer = new byte[4];
-//        PlayerData tempData = null;
-//        int i = 0;
-//        Iterator it = this.playersData.entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map.Entry playerInfo = (Map.Entry)it.next();
-//            ipBuffer = ((InetAddress)playerInfo.getKey()).getAddress();
-//            tempData = (PlayerData)playerInfo.getValue();
-//            buffer[12*i] = ipBuffer[0];
-//            buffer[12*i+1] = ipBuffer[1];
-//            buffer[12*i+2] = ipBuffer[2];
-//            buffer[12*i+3] = ipBuffer[3];
-//            buffer[12*i+4] = (byte)(tempData.getPlayerX()>>8);
-//            buffer[12*i+5] = (byte)(tempData.getPlayerX());
-//            buffer[12*i+6] = (byte)(tempData.getPlayerY()>>8);
-//            buffer[12*i+7] = (byte)(tempData.getPlayerY());
-//            buffer[12*i+8] = (byte)(tempData.getBallX() >> 8);
-//            buffer[12*i+9] = (byte)(tempData.getBallX());
-//            buffer[12*i+10] = (byte)(tempData.getBallY()>>8);
-//            buffer[12*i+11] = (byte)(tempData.getBallY());
-//            i++;
-//             //it.remove();
-//        }
-//        byte[] playerDataInBytes = new byte[8];
+        int sizeOfSinglePlayerData = 12;
+        byte[] playerDataInBytes = new byte[this.playersData.size()*sizeOfSinglePlayerData];
+        int index = 0;
+        PlayerData playerData = null;
+        byte[] ipAddress = new byte[4];
+        
+        for (InetAddress playerIPAddress : playersData.keySet())
+        {
+            ipAddress = playerIPAddress.getAddress();
+            playerDataInBytes[0 + index*sizeOfSinglePlayerData] = ipAddress[0];
+            playerDataInBytes[1 + index*sizeOfSinglePlayerData] = ipAddress[1];
+            playerDataInBytes[2 + index*sizeOfSinglePlayerData] = ipAddress[2];
+            playerDataInBytes[3 + index*sizeOfSinglePlayerData] = ipAddress[3];
 
-//        PlayerData tempData = null;
-
-//        Iterator it = this.playersData.entrySet().iterator();
-        //if(it.hasNext())
-        //{
-//            Map.Entry playerInfo = (Map.Entry)it.next();
-//            tempData = (PlayerData)playerInfo.getValue();
-//        this.myData.setPlayerX(this.guiTest.px);
-//        this.myData.setPlayerY(this.guiTest.py);
-//        this.myData.setBallX(this.guiTest.bx);
-//        this.myData.setBallY(this.guiTest.by);
-        byte[] playerDataInBytes = new byte[8];
-        playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
-        playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
-        playerDataInBytes[2] = (byte)(this.myData.getPlayerY()>>8);
-        playerDataInBytes[3] = (byte)(this.myData.getPlayerY());
-        playerDataInBytes[4] = (byte)(this.myData.getBallX() >> 8);
-        playerDataInBytes[5] = (byte)(this.myData.getBallX());
-        playerDataInBytes[6] = (byte)(this.myData.getBallY()>>8);
-        playerDataInBytes[7] = (byte)(this.myData.getBallY());
-        //}
+            playerData = playersData.get(playerIPAddress);
+            playerDataInBytes[4 + index*sizeOfSinglePlayerData] = (byte)(playerData.getPlayerX() >> 8);
+            playerDataInBytes[5 + index*sizeOfSinglePlayerData] = (byte)(playerData.getPlayerX());
+            playerDataInBytes[6 + index*sizeOfSinglePlayerData] = (byte)(playerData.getPlayerY() >> 8);
+            playerDataInBytes[7 + index*sizeOfSinglePlayerData] = (byte)(playerData.getPlayerY());
+            playerDataInBytes[8 + index*sizeOfSinglePlayerData] = (byte)(playerData.getBallX() >> 8);
+            playerDataInBytes[9 + index*sizeOfSinglePlayerData] = (byte)(playerData.getBallX());
+            playerDataInBytes[10 + index*sizeOfSinglePlayerData] = (byte)(playerData.getBallY() >> 8);
+            playerDataInBytes[11 + index*sizeOfSinglePlayerData] = (byte)(playerData.getBallY());
+            index ++;
+        }
         return playerDataInBytes;
     }
     
     public byte[] getBytesFromPlayerData()
     {
-        //this.myData.setPlayerX(this.guiTest.px);
-        //this.myData.setPlayerY(this.guiTest.py);
-        //this.myData.setBallX(this.guiTest.bx);
-        //this.myData.setBallY(this.guiTest.by);
         byte[] playerDataInBytes = new byte[5];
+        
         playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
         playerDataInBytes[2] = (byte)(this.myData.getPlayerY()>>8);
         playerDataInBytes[3] = (byte)(this.myData.getPlayerY());
-//        playerDataInBytes[4] = (byte)(this.myData.getBallX() >> 8);
-//        playerDataInBytes[5] = (byte)(this.myData.getBallX());
-//        playerDataInBytes[6] = (byte)(this.myData.getBallY()>>8);
-//        playerDataInBytes[7] = (byte)(this.myData.getBallY());
         playerDataInBytes[4] = (byte)(this.myData.getMousePressed() & 0x000000FF);
-        for(int i = 0; i < 5; i++)
-        {
-            System.out.println(playerDataInBytes[i]);
-        }
+
         return playerDataInBytes;
     }
     
@@ -172,9 +147,6 @@ public class NetworkController extends Thread{
     public void updatePlayerData(InetAddress playerAddress, PlayerData playerData)
     {
         this.playersData.put(playerAddress, playerData);
-
-        //update the MainController's realtimedata hashmap (static)
-        //MainController.realTimeData.setPlayerData(playerAddress, playerData);
     }
     
     public void updateHashMap(HashMap<InetAddress, PlayerData> processedPlayerData){
@@ -248,6 +220,30 @@ public class NetworkController extends Thread{
     public InetAddress getClientIPAddress()
     {
         return this.udpClient.getClientAddress();
+    }
+    
+    public void getMyIPAddress()
+    {
+        BufferedReader in = null;
+
+        try {
+            URL whatismyip = new URL("http://checkip.amazonaws.com");
+        
+            in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+            String ip = in.readLine();
+            this.myIPAddress = ip;
+        }catch(Exception e)
+        {
+            System.out.println(e);
+        }finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
     
     public static void main(String[] args)

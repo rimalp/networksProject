@@ -24,6 +24,9 @@ public class PlayerData {
     private int alive;
     private int team;
     
+    public static int SIZE_OF_BYTES_FOR_CLIENT = 8;
+    public static int SIZE_OF_BYTES_FOR_SERVER = 16;
+    
     public PlayerData(int _playerX, int _playerY)
     {
         this.playerX = _playerX;
@@ -31,6 +34,8 @@ public class PlayerData {
         this.ballX = this.playerX + 100;
         this.ballY = this.playerY + 100;
         this.alive = Constants.ALIVE;
+        this.team = Constants.TEAM1;
+        this.mousePressed = Constants.NOTPRESSED;
     }
     
     //constructor 2
@@ -40,6 +45,9 @@ public class PlayerData {
         this.playerY = _playerY;
         this.ballX = _ballX;
         this.ballY = _ballY;
+        this.alive = Constants.ALIVE;
+        this.team = Constants.TEAM1;
+        this.mousePressed = Constants.NOTPRESSED;
     }
 
     //constructor 3
@@ -52,6 +60,7 @@ public class PlayerData {
         this.ballY = _ballY;
         this.alive = _alive;
         this.team = _team;
+        this.mousePressed = Constants.NOTPRESSED;
     }
 
     public PlayerData(int _team)
@@ -66,6 +75,7 @@ public class PlayerData {
         this.ballY = this.playerY + 100;
         this.alive = Constants.ALIVE;
         this.team = _team;
+        this.mousePressed = Constants.NOTPRESSED;
     }
 
 
@@ -140,10 +150,41 @@ public class PlayerData {
     {
         return this.mousePressed;
     }
+    
+    public void setMousePressed(int _mousePressed)
+    {
+        this.mousePressed = _mousePressed;
+    }
 
+    public byte[] getBytesForClient()
+    {
+        byte[] bytesToReturn = new byte[SIZE_OF_BYTES_FOR_CLIENT];
+        
+        bytesToReturn[0] = (byte)(this.playerX>>8);
+        bytesToReturn[1] = (byte)(this.playerX);
+        bytesToReturn[2] = (byte)(this.playerY>>8);
+        bytesToReturn[3] = (byte)(this.playerY);
+        bytesToReturn[4] = (byte)(this.mousePressed & 0x000000FF);
 
-    //public InetAddress getAddress()
-   // {
-   //     return this.address;
-   // }
+        return bytesToReturn;
+    }
+    
+    public byte[] getBytesForServer()
+    {
+        byte[] bytesToReturn = new byte[SIZE_OF_BYTES_FOR_SERVER];
+        
+        bytesToReturn[0] = (byte)(this.playerX >> 8);
+        bytesToReturn[1] = (byte)(this.playerX);
+        bytesToReturn[2] = (byte)(this.playerY >> 8);
+        bytesToReturn[3] = (byte)(this.playerY);
+        bytesToReturn[4] = (byte)(this.ballX >> 8);
+        bytesToReturn[5] = (byte)(this.ballX);
+        bytesToReturn[6] = (byte)(this.ballY >> 8);
+        bytesToReturn[7] = (byte)(this.ballY);
+        bytesToReturn[8] = (byte)(this.team);
+        bytesToReturn[9] = (byte)(this.alive);
+        
+        return bytesToReturn;
+    }
+
 }

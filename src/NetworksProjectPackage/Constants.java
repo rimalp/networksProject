@@ -9,6 +9,9 @@ interface Constants
     public static final int ALIVE = 1;
     public static final int DEAD = 0;
     
+    public static final int PRESSED = 1;
+    public static final int NOTPRESSED = 0;
+    
     public static final int PLAYER1 = 10;
     public static final int PLAYER1BALL = 11;
     public static final int PLAYER2 = 20;
