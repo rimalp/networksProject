@@ -235,18 +235,20 @@ public class UDPClient extends Thread{
         //System.out.println("[I Received Packet]:"+msg);
         int playerX = ((int)msgBuffer[0] << 8)|((int)msgBuffer[1] & 0xFF);
         int playerY = ((int)msgBuffer[2] << 8)|((int)msgBuffer[3] & 0xFF);
-        int ballX = ((int)msgBuffer[4] << 8) |((int)msgBuffer[5] & 0xFF);
-        int ballY = ((int)msgBuffer[6] << 8)|((int)msgBuffer[7] & 0xFF);
+//        int ballX = ((int)msgBuffer[4] << 8) |((int)msgBuffer[5] & 0xFF);
+//        int ballY = ((int)msgBuffer[6] << 8)|((int)msgBuffer[7] & 0xFF);
+        int mousePressed = (int)msgBuffer[4];
+        
         System.out.println("playerX is:"+playerX);
         System.out.println("playerY is:"+playerY);
-        System.out.println("ballX is:"+ballX);
-        System.out.println("ballY is:"+ballY);
-        PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
-        this.networkController.updatePlayerData(address, newPlayerData);
-        if(this.networkController.isThisServer())
-        {
-            this.networkController.broadcastMessage();
-        }
+        System.out.println("mousePressed is:"+mousePressed);
+        
+        //PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
+        //this.networkController.updatePlayerData(address, newPlayerData);
+        //if(this.networkController.isThisServer())
+        //{
+        //    this.networkController.broadcastMessage();
+        //}
         return "Player Update Received";
     }
     

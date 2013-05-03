@@ -103,10 +103,10 @@ public class NetworkController extends Thread{
         //{
 //            Map.Entry playerInfo = (Map.Entry)it.next();
 //            tempData = (PlayerData)playerInfo.getValue();
-        this.myData.setPlayerX(this.guiTest.px);
-        this.myData.setPlayerY(this.guiTest.py);
-        this.myData.setBallX(this.guiTest.bx);
-        this.myData.setBallY(this.guiTest.by);
+//        this.myData.setPlayerX(this.guiTest.px);
+//        this.myData.setPlayerY(this.guiTest.py);
+//        this.myData.setBallX(this.guiTest.bx);
+//        this.myData.setBallY(this.guiTest.by);
         byte[] playerDataInBytes = new byte[8];
         playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
@@ -126,18 +126,19 @@ public class NetworkController extends Thread{
         //this.myData.setPlayerY(this.guiTest.py);
         //this.myData.setBallX(this.guiTest.bx);
         //this.myData.setBallY(this.guiTest.by);
-        byte[] playerDataInBytes = new byte[8];
+        byte[] playerDataInBytes = new byte[5];
         playerDataInBytes[0] = (byte)(this.myData.getPlayerX()>>8);
         playerDataInBytes[1] = (byte)(this.myData.getPlayerX());
         playerDataInBytes[2] = (byte)(this.myData.getPlayerY()>>8);
         playerDataInBytes[3] = (byte)(this.myData.getPlayerY());
-        playerDataInBytes[4] = (byte)(this.myData.getBallX() >> 8);
-        playerDataInBytes[5] = (byte)(this.myData.getBallX());
-        playerDataInBytes[6] = (byte)(this.myData.getBallY()>>8);
-        playerDataInBytes[7] = (byte)(this.myData.getBallY());
-        for(int i = 0; i < 8; i++)
+//        playerDataInBytes[4] = (byte)(this.myData.getBallX() >> 8);
+//        playerDataInBytes[5] = (byte)(this.myData.getBallX());
+//        playerDataInBytes[6] = (byte)(this.myData.getBallY()>>8);
+//        playerDataInBytes[7] = (byte)(this.myData.getBallY());
+        playerDataInBytes[4] = (byte)(this.myData.getMousePressed() & 0x000000FF);
+        for(int i = 0; i < 5; i++)
         {
-            //System.out.println(playerDataInBytes[i]);
+            System.out.println(playerDataInBytes[i]);
         }
         return playerDataInBytes;
     }
@@ -173,7 +174,7 @@ public class NetworkController extends Thread{
         this.playersData.put(playerAddress, playerData);
 
         //update the MainController's realtimedata hashmap (static)
-        MainController.realTimeData.setPlayerData(playerAddress, playerData);
+        //MainController.realTimeData.setPlayerData(playerAddress, playerData);
     }
     
     public void updateHashMap(HashMap<InetAddress, PlayerData> processedPlayerData){

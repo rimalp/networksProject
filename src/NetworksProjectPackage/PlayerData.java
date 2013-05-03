@@ -18,6 +18,7 @@ public class PlayerData {
     private int ballX;
     private int ballY;
     private int playerState;
+    private int mousePressed; // 0 is not pressed, 1 is pressed
 
     //some more parameters for each player
     private int alive;
@@ -133,6 +134,11 @@ public class PlayerData {
 
     public int getTeam(){
         return this.team;
+    }
+    
+    public int getMousePressed()
+    {
+        return this.mousePressed;
     }
 
 
