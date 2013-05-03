@@ -67,7 +67,17 @@ public class UDPClient extends Thread{
     public InetAddress getClientAddress()
     {
         try{
-            this.myIPAddress = InetAddress.getByName("139.147.103.11");
+            
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = null;
+
+            in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+            String ip = in.readLine();
+            System.out.println(ip);
+        
+        
+            this.myIPAddress = InetAddress.getByName(ip);
+            
         }catch(Exception e)
         {
             System.err.println(e);
@@ -410,6 +420,7 @@ public class UDPClient extends Thread{
             byte[] buffer = new byte[65535];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             //System.out.println("Ready to receive a new packet!");
+            
             try {
                 listen_socket.receive(dp);
             }
@@ -434,7 +445,7 @@ public class UDPClient extends Thread{
             {
                 this.networkController.setThisToBeServer();
                 try{
-                    this.myServerIPAddress = InetAddress.getByName("139.147.103.11");
+                    this.myServerIPAddress = this.getClientAddress();
                 }catch(Exception e)
                 {
                     System.out.println(e);

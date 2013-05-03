@@ -17,7 +17,7 @@ public class PlayerData {
     private int playerY;
     private int ballX;
     private int ballY;
-    //private int playerState;
+    private int playerState;
 
     //some more parameters for each player
     private int alive;
@@ -25,18 +25,16 @@ public class PlayerData {
     
     public PlayerData(int _playerX, int _playerY)
     {
-        //this.address = _address;
         this.playerX = _playerX;
         this.playerY = _playerY;
         this.ballX = this.playerX + 100;
         this.ballY = this.playerY + 100;
         this.alive = Constants.ALIVE;
-        //this.playerState = 
     }
     
+    //constructor 2
     public PlayerData(int _playerX, int _playerY, int _ballX, int _ballY)
     {
-        //this.address = _address;
         this.playerX = _playerX;
         this.playerY = _playerY;
         this.ballX = _ballX;
@@ -125,7 +123,8 @@ public class PlayerData {
     public void setAlive(int state){
         if(state !=Constants.ALIVE || state != Constants.DEAD)
             return;
-        else this.alive = state;
+        
+        this.alive = state;
     }
 
     public int isAlive(){
