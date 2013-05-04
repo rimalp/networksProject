@@ -302,7 +302,7 @@ public class UDPClient extends Thread{
             System.err.println(e);
         }
         
-        this.networkController.addPlayer(newClientIP, newClientListenPort);
+        this.networkController.addPlayer(newClientIP, newClientListenPort, null);
         
       	//print the error message to the output.
         //System.out.println("New Player with IP at "+newClientIP.toString().substring(1) + " at port: " + newClientListenPort);

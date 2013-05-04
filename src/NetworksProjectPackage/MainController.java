@@ -83,8 +83,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
             }
        }
 
-        //need to change the realtimedta of the networkmanager class so that it broadcasts the updates.
-        this.networkController.updateHashMap(MainController.realTimeData.getAllPlayerData());
+        this.networkController.setRealTimeData(MainController.realTimeData);
     }
 
     public void addNewPlayer(InetAddress ip, int team){

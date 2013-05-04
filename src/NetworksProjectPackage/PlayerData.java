@@ -26,6 +26,18 @@ public class PlayerData {
     
     public static int SIZE_OF_BYTES_FOR_CLIENT = 8;
     public static int SIZE_OF_BYTES_FOR_SERVER = 16;
+    public static PlayerData DEFAULT_PLAYER_DATA= new PlayerData(100,100,150,150);
+    
+    //here are the variables for ball position logic
+    final int RADIUS = 50;
+    final int DELAY = 50;
+    int frame_time = 33;
+    double Vx = 0;
+    double Vy = 0;
+    double Ax = 0;
+    double Ay = 0;
+    double angle = 0;
+    double dampingRatio = Math.pow(0.99, frame_time/5);
     
     public PlayerData(int _playerX, int _playerY)
     {
@@ -186,5 +198,58 @@ public class PlayerData {
         
         return bytesToReturn;
     }
+    
+    public boolean updateBasedOnBytesFromServer(byte[] newPlayerData)
+    {        
+        if(newPlayerData.length != SIZE_OF_BYTES_FOR_SERVER)
+        {
+            return false;
+        }
+        
+        //extract player information from the bytes passed in the parameter
+        this.playerX = ((int)newPlayerData[0] << 8) | ((int)newPlayerData[1]);
+        this.playerY = ((int)newPlayerData[2] << 8) | ((int)newPlayerData[3]);
+        this.ballX = ((int)newPlayerData[4] << 8) | ((int)newPlayerData[5]);
+        this.ballY = ((int)newPlayerData[6] << 8) | ((int)newPlayerData[7]);
+        this.team = ((int)newPlayerData[8]);
+        this.alive = ((int)newPlayerData[9]);
+        
+        return true; 
+    }
+    
+    public boolean getNextPlayerData(byte[] mousePositionUpdate)
+    {
+        
+        if(mousePositionUpdate.length != SIZE_OF_BYTES_FOR_CLIENT)
+        {
+            return false;
+        }
+        
+        this.playerX = ((int)mousePositionUpdate[0]) << 8 | ((int)mousePositionUpdate[1]);
+        this.playerY = ((int)mousePositionUpdate[2]) << 8 | ((int)mousePositionUpdate[3]);
+        this.mousePressed = (int)mousePositionUpdate[4];
+        
+        Ax = -0.001* frame_time * (this.ballX - this.playerX);
+        Ay = 0.001 * frame_time * (this.playerY - this.ballY);
+        
+        Vx += Ax;
+        
+        if (this.mousePressed == 0)
+            Vx *= dampingRatio;
+        else
+            Vx *= 0.985;
+        
+        Vy += Ay; 
+        //if (Vy > 0.001)
+        Vy *= dampingRatio;
+        
+        this.playerX += Vx;
+        this.playerY += Vy;
+        
+        return true;
+        
+    }
+    
+    
 
 }

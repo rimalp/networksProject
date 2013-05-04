@@ -82,7 +82,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
             by = this.jLabel2.getLocationOnScreen().y;
             //System.out.println("Player location: " + this.otherBall.getLocationOnScreen().getX() + "  Y: " + this.otherBall.getLocationOnScreen().getY());
             
-            this.realTimeData = this.networkController.getRealTimeData(realTimeData);
+            this.realTimeData = this.networkController.getRealTimeData();
             this.repaintAll(this.realTimeData);
             //guiController.repaintAll(this.realTimeData);
             //this.realTimeData.changePlayerData();
@@ -291,11 +291,11 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
     }//GEN-LAST:event_jPanel1MouseDragged
 
     private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
-powerThrow = true;        // TODO add your handling code here:
+        powerThrow = true;        // TODO add your handling code here:
     }//GEN-LAST:event_jPanel1MousePressed
 
     private void jPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseReleased
-powerThrow = false;        // TODO add your handling code here:
+        powerThrow = false;        // TODO add your handling code here:
     }//GEN-LAST:event_jPanel1MouseReleased
 
 

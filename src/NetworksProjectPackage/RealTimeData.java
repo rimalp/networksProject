@@ -10,6 +10,9 @@ import java.util.*;
  * @author This PC
  */
 public class RealTimeData {
+    private static final int BYTES_SIZE_PER_PLAYER_CLIENT =  4 + PlayerData.SIZE_OF_BYTES_FOR_CLIENT;
+    private static final int BYTES_SIZE_PER_PLAYER_SERVER =  4 + PlayerData.SIZE_OF_BYTES_FOR_SERVER;
+
     private HashMap<InetAddress, PlayerData> playersData = null;
     
     public RealTimeData()
@@ -49,7 +52,13 @@ public class RealTimeData {
 
     public void setPlayerData(InetAddress address, PlayerData newPlayerData)
     {
-        this.playersData.put(address, newPlayerData);
+        if(newPlayerData == null)
+        {
+            this.playersData.put(address, PlayerData.DEFAULT_PLAYER_DATA);
+        }else
+        {
+            this.playersData.put(address, newPlayerData);
+        }
     }
     
     public void setPlayerData(InetAddress address, int playerX, int playerY, int ballX, int ballY)
@@ -73,33 +82,23 @@ public class RealTimeData {
         return this.playersData; 
     }
     
-    public byte[] getBytesForClient()
+    public byte[] getBytesForClient(InetAddress clientIPAddress)
     {
-        int byteSizePerPlayer = 4 + PlayerData.SIZE_OF_BYTES_FOR_CLIENT;
-        byte[] bytesToReturn = new byte[(this.playersData.size())*byteSizePerPlayer];
-        byte[] ipAddressBuffer = null;
-        byte[] playerDataBuffer = null;
-        int index = 0;
-        PlayerData playerData = null;
+        byte[] bytesToReturn = new byte[BYTES_SIZE_PER_PLAYER_CLIENT];
+        byte[] ipAddressBuffer = new byte[4];
+        byte[] playerDataBuffer = new byte[PlayerData.SIZE_OF_BYTES_FOR_CLIENT];
         
-        for(InetAddress ipAddress : this.playersData.keySet())
+        ipAddressBuffer = clientIPAddress.getAddress();
+        playerDataBuffer = this.playersData.get(clientIPAddress).getBytesForClient();
+            
+        for (int i = 0; i < 4; i++)
         {
+            bytesToReturn[i] = ipAddressBuffer[i];
+        }
             
-            ipAddressBuffer = ipAddress.getAddress();
-            playerDataBuffer = this.playersData.get(ipAddress).getBytesForClient();
-            
-            for (int i = 0; i < 4; i++)
-            {
-                bytesToReturn[i + index*byteSizePerPlayer] = ipAddressBuffer[i];
-            }
-            
-            for (int j = 0; j < PlayerData.SIZE_OF_BYTES_FOR_CLIENT; j++)
-            {
-                bytesToReturn[4 + j + index*byteSizePerPlayer] = playerDataBuffer[j];
-            }
-            
-            index ++;
-            
+        for (int j = 0; j < PlayerData.SIZE_OF_BYTES_FOR_CLIENT; j++)
+        {
+            bytesToReturn[4 + j] = playerDataBuffer[j];
         }
         
         return bytesToReturn;
@@ -107,8 +106,7 @@ public class RealTimeData {
     
     public byte[] getBytesForServer()
     {
-        int byteSizePerPlayer = 4 + PlayerData.SIZE_OF_BYTES_FOR_SERVER;
-        byte[] bytesToReturn = new byte[(this.playersData.size())*byteSizePerPlayer];
+        byte[] bytesToReturn = new byte[(this.playersData.size())*BYTES_SIZE_PER_PLAYER_SERVER];
         byte[] ipAddressBuffer = null;
         byte[] playerDataBuffer = null;
         int index = 0;
@@ -122,12 +120,12 @@ public class RealTimeData {
             
             for (int i = 0; i < 4; i++)
             {
-                bytesToReturn[i + index*byteSizePerPlayer] = ipAddressBuffer[i];
+                bytesToReturn[i + index*BYTES_SIZE_PER_PLAYER_SERVER] = ipAddressBuffer[i];
             }
             
             for (int j = 0; j < PlayerData.SIZE_OF_BYTES_FOR_SERVER; j++)
             {
-                bytesToReturn[4 + j + index*byteSizePerPlayer] = playerDataBuffer[j];
+                bytesToReturn[4 + j + index*BYTES_SIZE_PER_PLAYER_SERVER] = playerDataBuffer[j];
             }
             
             index ++;
@@ -135,5 +133,78 @@ public class RealTimeData {
         }
         
         return bytesToReturn;
+    }
+    
+    public boolean updateBasedOnBytesFromServer(byte[] bytesFromServer)
+    {
+        if(bytesFromServer.length != (this.playersData.size())*BYTES_SIZE_PER_PLAYER_SERVER)
+        {
+            return false;
+        }
+        
+        byte[] ipBuffer = new byte[4];
+        byte[] playerData = new byte[PlayerData.SIZE_OF_BYTES_FOR_SERVER];
+        InetAddress tempIP = null;
+        
+        for(int i = 0; i < this.playersData.size(); i++)
+        {
+            for(int j = 0; j < 4; j++)
+            {
+                ipBuffer[j] = bytesFromServer[i*BYTES_SIZE_PER_PLAYER_SERVER + j];
+            }
+            
+            try
+            {
+                tempIP = InetAddress.getByAddress(ipBuffer);
+            }catch(Exception e)
+            {
+                return false;
+            }
+            
+            for(int k = 0; k < PlayerData.SIZE_OF_BYTES_FOR_SERVER; k++)
+            {
+                playerData[k] = bytesFromServer[i*BYTES_SIZE_PER_PLAYER_SERVER + k + 4];
+            }
+            
+            this.playersData.get(tempIP).updateBasedOnBytesFromServer(playerData);
+        }
+        return true;
+    }
+    
+    public boolean updateBasedOnBytesFromClient(byte[] bytesFromClient)
+    {
+        if(bytesFromClient.length != (BYTES_SIZE_PER_PLAYER_CLIENT))
+        {
+            return false;
+        }
+        
+        byte[] ipBuffer = new byte[4];
+        byte[] playerData = new byte[PlayerData.SIZE_OF_BYTES_FOR_CLIENT];
+        InetAddress tempIP = null;
+
+        for(int i = 0; i < 4; i++)
+        {
+            ipBuffer[i] = bytesFromClient[i];
+        }
+
+        try
+        {
+            tempIP = InetAddress.getByAddress(ipBuffer);
+        }catch(Exception e)
+        {
+            return false;
+        }
+
+        for(int j = 0; j < PlayerData.SIZE_OF_BYTES_FOR_SERVER; j++)
+        {
+            playerData[j] = bytesFromClient[j + 4];
+        }
+
+        if(this.playersData.get(tempIP).getNextPlayerData(playerData))
+        {
+            return true;
+        }
+        
+        return false;
     }
 }
