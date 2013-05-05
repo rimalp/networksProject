@@ -186,6 +186,7 @@ public class UDPClient extends Thread{
         String msg = new String(data);
       	try{                  
             NetworkController.serverAddress = InetAddress.getByName(msg);
+            NetworkController.realTimeData.addNewPlayer(NetworkController.myIPAddress, PlayerData.DEFAULT_PLAYER_DATA);
             this.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, this.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
         }catch(UnknownHostException e)
         {
