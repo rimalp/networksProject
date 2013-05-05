@@ -11,6 +11,10 @@ import java.lang.*;
 import java.net.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.*;
+import javax.imageio.spi.ImageReaderSpi;
 
 /**
  *
@@ -39,6 +43,8 @@ public class ClientGUIController extends javax.swing.JFrame {
         RealTimeData test = new RealTimeData();
         movingObjects = new Container();
         test.createTestPlayer();
+        this.repaintAll(test);
+        this.repaintAll(test);
 
 
     }
@@ -99,11 +105,16 @@ public class ClientGUIController extends javax.swing.JFrame {
 
         this.getContentPane().repaint();
     }
+    
 
     public void repaintAll(RealTimeData data) {
         for (int i = 0; i < movingObjects.getComponentCount(); i++)
                 {
+                    if (this.getContentPane().getComponent(i).getSize().getHeight()!=250)
+                    {
                     this.getContentPane().remove(movingObjects.getComponent(i));
+                    System.out.println("Removed Object");
+                    }
                 }
 
         HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
@@ -111,9 +122,13 @@ public class ClientGUIController extends javax.swing.JFrame {
         //paint each of the player and its ball in the screen one by one
         String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
         String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
+        String deadAnimation = "/NetworksProjectPackage/explosion2.gif";
 
         for (PlayerData player : players.values()) {
 
+            if (player.isAlive() == Constants.ALIVE)
+            {
+                System.out.println("Draw Alive Player");
             //player
             JLabel newPlayer = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
             newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
@@ -129,6 +144,19 @@ public class ClientGUIController extends javax.swing.JFrame {
             newBall.setSize(200, 200);
             movingObjects.add(newBall);
             this.getContentPane().add(newBall);
+            }
+            else if (player.isAlive() != Constants.DEAD)
+            {
+            System.out.println("Draw Dead Animation");
+            JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
+            deadPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
+            deadPlayer.setVisible(true);
+            deadPlayer.setSize(250, 250);
+            movingObjects.add(deadPlayer);
+            this.getContentPane().add(deadPlayer);
+            }
+            
+
         }
 
         //this.getContentPane().add(movingObjects);
