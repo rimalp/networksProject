@@ -95,9 +95,10 @@ public class NetworkController extends Thread{
     
     public void addPlayer(InetAddress ip, Integer portNumber, PlayerData newPlayerData)
     {
+        System.out.println("start adding player");
         this.playersInfo.put(ip, portNumber);
-        this.realTimeData.addNewPlayer(ip, newPlayerData);
-        this.broadcastNewPlayerInfo(ip,portNumber);
+        this.realTimeData.addNewPlayer(ip, PlayerData.DEFAULT_PLAYER_DATA);
+        //this.broadcastNewPlayerInfo(ip,portNumber);
     }
     
     public void broadcastNewPlayerInfo(InetAddress newPlayerIP, int newPlayerPortNum)
@@ -170,10 +171,7 @@ public class NetworkController extends Thread{
         {
             try{
                 Thread.sleep(10);
-                if(!this.thisIsServer)
-                {
-                    this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
-                }
+                this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)
             {
                 System.out.println(e);
@@ -209,7 +207,7 @@ public class NetworkController extends Thread{
         
         Scanner sc = new Scanner(System.in);
         String session_ip = sc.nextLine();
-        if(session_ip != "")
+        if(!session_ip.equals(""))
         {
             System.out.println("Started session server at " + session_ip);
             ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, session_ip);
@@ -220,7 +218,7 @@ public class NetworkController extends Thread{
         }
         
         
-        NetworkController networkController = new NetworkController("139.147.37.17", 4444, null, null);
+        NetworkController networkController = new NetworkController("139.147.103.17", 4444, null, null);
         networkController.run();
     }
     

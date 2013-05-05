@@ -81,7 +81,17 @@ public class RealTimeData {
     {
         return this.playersData; 
     }
-    
+    public void printPlayersData()
+    {
+        System.out.println("*************************Start of Printing All Players' Data*************************");
+
+        for(InetAddress ip : this.playersData.keySet())
+        {
+            System.out.println(ip.toString());
+        }
+        
+        System.out.println("*************************End of Printing All Players' Data*************************");
+    }
     public byte[] getBytesForClient(InetAddress clientIPAddress)
     {
         byte[] bytesToReturn = new byte[BYTES_SIZE_PER_PLAYER_CLIENT];
@@ -89,8 +99,10 @@ public class RealTimeData {
         byte[] playerDataBuffer = new byte[PlayerData.SIZE_OF_BYTES_FOR_CLIENT];
         
         ipAddressBuffer = clientIPAddress.getAddress();
+        printPlayersData();
+        
         playerDataBuffer = this.playersData.get(clientIPAddress).getBytesForClient();
-            
+
         for (int i = 0; i < 4; i++)
         {
             bytesToReturn[i] = ipAddressBuffer[i];
@@ -195,7 +207,7 @@ public class RealTimeData {
             return false;
         }
 
-        for(int j = 0; j < PlayerData.SIZE_OF_BYTES_FOR_SERVER; j++)
+        for(int j = 0; j < PlayerData.SIZE_OF_BYTES_FOR_CLIENT; j++)
         {
             playerData[j] = bytesFromClient[j + 4];
         }

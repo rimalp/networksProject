@@ -22,7 +22,7 @@ public class SessionServer extends Thread{
     public SessionServer(int _listen_port, String _ipAddress)
     {
         try {
-            if(ipAddress != null)
+            if(_ipAddress != null)
             {
                 ipAddress = InetAddress.getByName(_ipAddress);
             }else
