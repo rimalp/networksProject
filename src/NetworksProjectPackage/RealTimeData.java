@@ -99,7 +99,7 @@ public class RealTimeData {
         byte[] playerDataBuffer = new byte[PlayerData.SIZE_OF_BYTES_FOR_CLIENT];
         
         ipAddressBuffer = clientIPAddress.getAddress();
-        printPlayersData();
+        //printPlayersData();
         
         playerDataBuffer = this.playersData.get(clientIPAddress).getBytesForClient();
 

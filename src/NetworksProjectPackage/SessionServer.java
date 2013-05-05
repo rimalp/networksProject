@@ -164,20 +164,28 @@ public class SessionServer extends Thread{
     public void sendPacketWithServerInformation(InetAddress address, int port, String ipAddress, int portNum)
     {
         try {
-                final byte[] buffer = new byte[16+ipAddress.length()];
+                final byte[] buffer = new byte[20];
+                byte[] ipBuffer = new byte[4];
+                ipBuffer = address.getAddress();
                 for(int i = 0; i < ProtocolInfo.PROTOCOL_HEADER.length; i++)
                         buffer[i] = (byte)ProtocolInfo.PROTOCOL_HEADER[i];
                 buffer[8] = (byte)ProtocolInfo.MAJOR_VERSION_NUMBER;
                 buffer[9] = (byte)ProtocolInfo.MINOR_VERSION_NUMBER;
                 buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_SERVER_INFO>>8);
                 buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_SERVER_INFO);
-                buffer[12] = (byte)((ipAddress.length()+2)>>8);
-                buffer[13] = (byte)(ipAddress.length()+2);
+                
+                int length = 6;
+                
+                buffer[12] = (byte)(length >>8);
+                buffer[13] = (byte)(length);
+                
                 int msg_len = ipAddress.length();
-                for(int i = 0; i < msg_len; i++)
-                        buffer[14+i] = (byte)ipAddress.charAt(i);
-                buffer[buffer.length-2] = (byte)((portNum & 0x0000FF00)>> 8);
-                buffer[buffer.length-1] = (byte)((portNum & 0x000000FF));
+                for(int i = 0; i < 4; i++)
+                        buffer[14+i] = ipBuffer[i];
+                
+                buffer[18] = (byte)((portNum & 0x0000FF00)>> 8);
+                buffer[19] = (byte)((portNum & 0x000000FF));
+                
                 this.listen_socket.send(new DatagramPacket(buffer, buffer.length, address, port));
         }
         catch(IOException ioe)

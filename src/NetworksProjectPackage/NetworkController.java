@@ -95,10 +95,8 @@ public class NetworkController extends Thread{
     
     public void addPlayer(InetAddress ip, Integer portNumber, PlayerData newPlayerData)
     {
-        System.out.println("start adding player");
         this.playersInfo.put(ip, portNumber);
         this.realTimeData.addNewPlayer(ip, PlayerData.DEFAULT_PLAYER_DATA);
-        //this.broadcastNewPlayerInfo(ip,portNumber);
     }
     
     public void broadcastNewPlayerInfo(InetAddress newPlayerIP, int newPlayerPortNum)
@@ -166,15 +164,7 @@ public class NetworkController extends Thread{
     }
     
     public void run()
-    {
-        try
-        {
-            Thread.sleep(1000);
-        }catch(Exception e)
-        {
-            
-        }
-        
+    {        
         while(true)
         {
             try{
@@ -191,8 +181,8 @@ public class NetworkController extends Thread{
     {
         try{
         
-       URL whatismyip = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = null;
+            URL whatismyip = new URL("http://checkip.amazonaws.com");
+            BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
             String ip = in.readLine();
@@ -211,6 +201,7 @@ public class NetworkController extends Thread{
         {
             System.out.println(e);
         }
+        
         SessionServer ss = null;
         
         Scanner sc = new Scanner(System.in);
@@ -225,8 +216,9 @@ public class NetworkController extends Thread{
             System.out.println("no session server running");
         }
         
-        
-        NetworkController networkController = new NetworkController("139.147.103.17", 4444, null, null);
+        String portNum = sc.nextLine();
+        int portNumber = Integer.parseInt(portNum);
+        NetworkController networkController = new NetworkController("139.147.73.212", portNumber, null, null);
         networkController.run();
     }
     
