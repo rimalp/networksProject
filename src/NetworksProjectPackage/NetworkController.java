@@ -12,31 +12,44 @@ import java.io.*;
  */
 public class NetworkController extends Thread{
 
-    private InetAddress sessionServerAddress = null;
-    private InetAddress serverAddress = null;
-    private InetAddress myIPAddress = null;
+    //all the IP address
+    public static InetAddress sessionServerAddress = null;
+    public static InetAddress serverAddress = null;
+    public static InetAddress myIPAddress = null;
+    
+    //all the listening port number
+    public static int sessionServerListenPortNumber;
+    public static int serverListenPortNumber;
+    public static int clientListenPortNumber;
 
     private UDPClient udpClient = null;
     
-    private HashMap<InetAddress,Integer> playersInfo = null;
-    private RealTimeData realTimeData= null;
-    private PlayerData myData = null;
+    public static HashMap<InetAddress,Integer> playersInfo = null;
+    public static RealTimeData realTimeData= null;
+    public static PlayerData myData = null;
     
-    private boolean thisIsServer;
-    private int clientPortNumber;
+    public static boolean thisIsServer;
+
     
     public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, GUITest _guiTest)
     {
-        getMyIPAddress();
         
-        playersInfo = new HashMap<InetAddress, Integer>();
-        this.realTimeData = new RealTimeData();
-        
-        if(initialPlayerData == null)
+        if(!getMyIPAddress())
         {
-            System.out.println("Used Default Player Data");
-            this.myData = PlayerData.DEFAULT_PLAYER_DATA;
-        }else{
+            System.out.println("Cannot get my external IP.");
+            System.exit(1);
+        }
+        
+        NetworkController.sessionServerListenPortNumber = ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER;
+        NetworkController.serverListenPortNumber = ProtocolInfo.DEFAULT_SERVER_LISTEN_PORT_NUMBER;
+        NetworkController.clientListenPortNumber = ProtocolInfo.DEFAULT_CLIENT_LISTEN_PORT_NUMBER;
+        
+        NetworkController.myData = PlayerData.DEFAULT_PLAYER_DATA;
+        NetworkController.playersInfo = new HashMap<InetAddress, Integer>();
+        NetworkController.realTimeData = new RealTimeData();
+        
+        if(initialPlayerData != null)
+        {
             this.myData = initialPlayerData;
         }
         
@@ -71,12 +84,12 @@ public class NetworkController extends Thread{
         if(_portNumber < 1)
         {
             System.out.println("Used Default Client Listening Port at: "+ ProtocolInfo.DEFAULT_CLIENT_LISTEN_PORT_NUMBER);
-            this.clientPortNumber = ProtocolInfo.DEFAULT_CLIENT_LISTEN_PORT_NUMBER;
         }else
         {
-            this.clientPortNumber = _portNumber;
+            NetworkController.clientListenPortNumber = _portNumber;
         }
-        this.udpClient = new UDPClient(this.clientPortNumber, this);
+        
+        this.udpClient = new UDPClient(this);
         this.udpClient.start();
     }
     
@@ -84,6 +97,32 @@ public class NetworkController extends Thread{
     {
         this.playersInfo.put(ip, portNumber);
         this.realTimeData.addNewPlayer(ip, newPlayerData);
+        this.broadcastNewPlayerInfo(ip,portNumber);
+    }
+    
+    public void broadcastNewPlayerInfo(InetAddress newPlayerIP, int newPlayerPortNum)
+    {
+        byte[] bytesToBroadcast = new byte[6];
+        byte[] ipBuffer = new byte[4];
+        byte[] portNumBuffer = new byte[2];
+        
+        ipBuffer = newPlayerIP.getAddress();
+        portNumBuffer[1] = (byte)(newPlayerPortNum << 8);
+        portNumBuffer[0] = (byte)(newPlayerPortNum);
+        
+        for(int i = 0; i < 4; i++)
+        {
+            bytesToBroadcast[i] = ipBuffer[i];
+        }
+        
+        for(int j = 0; j < 2; j++)
+        {
+            bytesToBroadcast[4 + j] = portNumBuffer[j];
+        }
+        
+        for (InetAddress ipAddress : this.playersInfo.keySet()) {
+             this.udpClient.sendPacket(ipAddress, this.playersInfo.get(ipAddress), bytesToBroadcast, ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
+        }
     }
     
     public void broadcastMessage()
@@ -97,13 +136,8 @@ public class NetworkController extends Thread{
     {
         this.realTimeData.updateBasedOnBytesFromClient(bytesFromClient);
     }
-
-    public InetAddress getSessionServerAddress()
-    {
-        return this.sessionServerAddress;
-    }
     
-    public InetAddress getMyIPAddress()
+    public boolean getMyIPAddress()
     {
         BufferedReader in = null;
 
@@ -116,7 +150,7 @@ public class NetworkController extends Thread{
             this.myIPAddress = InetAddress.getByName(ip);
         }catch(Exception e)
         {
-            System.out.println(e);
+            return false;
         }finally {
             if (in != null) {
                 try {
@@ -127,47 +161,8 @@ public class NetworkController extends Thread{
             }
         }
         
-        return this.myIPAddress;
+        return true;
     }
-    
-    
-    
-    public InetAddress getServerAddress()
-    {
-        return this.udpClient.getServerAddress();
-    }
-    
-    public int getServerPortNumber()
-    {
-        return this.udpClient.getServerPortNumber();
-    }
-    
-    public void setRealTimeData(RealTimeData newRealTimeData)
-    {
-        this.realTimeData = newRealTimeData;
-    }
-    
-    public RealTimeData getRealTimeData()
-    {
-        return this.realTimeData;
-    }
-    
-    public void updatePlayerData(InetAddress playerAddress, PlayerData playerData)
-    {
-        this.realTimeData.setPlayerData(playerAddress, playerData);
-    }
-    
-    public boolean isThisServer()
-    {
-        return this.thisIsServer;
-    }
-    
-    public void setThisToBeServer()
-    {
-        this.thisIsServer = true;
-    }
-    
-    
     
     public void run()
     {
@@ -177,7 +172,7 @@ public class NetworkController extends Thread{
                 Thread.sleep(10);
                 if(!this.thisIsServer)
                 {
-                    this.udpClient.sendPacket(this.getServerAddress(), this.getServerPortNumber(), this.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_INFO);
+                    this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
                 }
             }catch(Exception e)
             {

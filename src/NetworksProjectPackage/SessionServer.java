@@ -194,8 +194,8 @@ public class SessionServer extends Thread{
                         buffer[i] = (byte)ProtocolInfo.PROTOCOL_HEADER[i];
                 buffer[8] = (byte)ProtocolInfo.MAJOR_VERSION_NUMBER;
                 buffer[9] = (byte)ProtocolInfo.MINOR_VERSION_NUMBER;
-                buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_CLIENT_INFO>>8);
-                buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_CLIENT_INFO);
+                buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO>>8);
+                buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
                 buffer[12] = (byte)((ipAddress.length()+2)>>8);
                 buffer[13] = (byte)(ipAddress.length()+2);
                 int msg_len = ipAddress.length();

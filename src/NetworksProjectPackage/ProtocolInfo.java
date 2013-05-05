@@ -16,8 +16,8 @@ interface ProtocolInfo {
     public final int TYPE_REQUEST = 2;
     public final int TYPE_UNICAST = 3;
     public final int TYPE_UNICAST_WITH_SERVER_INFO = 4;
-    public final int TYPE_UNICAST_WITH_CLIENT_INFO = 5;
-    public final int TYPE_UNICAST_WITH_PLAYER_INFO = 6;
+    public final int TYPE_UNICAST_WITH_NEW_PLAYER_INFO = 5;
+    public final int TYPE_UNICAST_WITH_PLAYER_DATA = 6;
     public final int TYPE_MULTICAST = 7;
 
     public static final int DEFAULT_CLIENT_LISTEN_PORT_NUMBER = 4444;

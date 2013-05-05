@@ -59,7 +59,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
      */
     public void processRealTimeData(){
         //add any new player that might have entered the game (IS THIS NEEDED??)
-        if(this.networkController.isThisServer()){
+        if(NetworkController.thisIsServer){
             HashMap<InetAddress, PlayerData> players = MainController.realTimeData.getAllPlayerData();
             //see if any of the balls touch any of the players
             ArrayList<InetAddress> toRemove = new ArrayList<InetAddress>();
@@ -83,7 +83,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
             }
        }
 
-        this.networkController.setRealTimeData(MainController.realTimeData);
+//        this.networkController.setRealTimeData(MainController.realTimeData);
     }
 
     public void addNewPlayer(InetAddress ip, int team){

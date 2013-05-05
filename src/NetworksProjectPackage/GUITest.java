@@ -82,7 +82,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
             by = this.jLabel2.getLocationOnScreen().y;
             //System.out.println("Player location: " + this.otherBall.getLocationOnScreen().getX() + "  Y: " + this.otherBall.getLocationOnScreen().getY());
             
-            this.realTimeData = this.networkController.getRealTimeData();
+//            this.realTimeData = this.networkController.getRealTimeData();
             this.repaintAll(this.realTimeData);
             //guiController.repaintAll(this.realTimeData);
             //this.realTimeData.changePlayerData();
