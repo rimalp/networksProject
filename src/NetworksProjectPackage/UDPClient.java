@@ -137,6 +137,7 @@ public class UDPClient extends Thread{
     public String processUnicastPacketWithPlayerData(InetAddress address, byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromClient(data);
+        this.networkController.broadcastMessage();
         return "Player Data Update Received";
     }
     
@@ -360,7 +361,7 @@ public class UDPClient extends Thread{
                     System.out.println(e);
                 }
             }
-            //System.out.println(status);
+            System.out.println(status);
         }
     }
 }

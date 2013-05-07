@@ -166,8 +166,8 @@ public class NetworkController extends Thread{
     
     public void run()
     {        
-        while(true)
-        {
+//        while(true)
+//        {
             try{
                 Thread.sleep(5000);
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
@@ -175,7 +175,7 @@ public class NetworkController extends Thread{
             {
                 System.out.println(e);
             }
-        }
+//        }
     }
     
     public static void main(String[] args)

@@ -149,16 +149,18 @@ public class RealTimeData {
     
     public boolean updateBasedOnBytesFromServer(byte[] bytesFromServer)
     {
-        if(bytesFromServer.length != (this.playersData.size())*BYTES_SIZE_PER_PLAYER_SERVER)
+        if((bytesFromServer.length) % RealTimeData.BYTES_SIZE_PER_PLAYER_SERVER != 0)
         {
             return false;
         }
+        
+        int currentNumOfPlayers = (bytesFromServer.length)/(RealTimeData.BYTES_SIZE_PER_PLAYER_SERVER);
         
         byte[] ipBuffer = new byte[4];
         byte[] playerData = new byte[PlayerData.SIZE_OF_BYTES_FOR_SERVER];
         InetAddress tempIP = null;
         
-        for(int i = 0; i < this.playersData.size(); i++)
+        for(int i = 0; i < currentNumOfPlayers; i++)
         {
             for(int j = 0; j < 4; j++)
             {
@@ -168,6 +170,7 @@ public class RealTimeData {
             try
             {
                 tempIP = InetAddress.getByAddress(ipBuffer);
+                
             }catch(Exception e)
             {
                 return false;
@@ -178,7 +181,14 @@ public class RealTimeData {
                 playerData[k] = bytesFromServer[i*BYTES_SIZE_PER_PLAYER_SERVER + k + 4];
             }
             
-            this.playersData.get(tempIP).updateBasedOnBytesFromServer(playerData);
+            if(this.playersData.get(tempIP) == null)
+            {
+                this.playersData.put(tempIP, PlayerData.DEFAULT_PLAYER_DATA);
+                this.playersData.get(tempIP).updateBasedOnBytesFromServer(playerData);
+            }else
+            {
+                this.playersData.get(tempIP).updateBasedOnBytesFromServer(playerData);
+            }
         }
         return true;
     }
