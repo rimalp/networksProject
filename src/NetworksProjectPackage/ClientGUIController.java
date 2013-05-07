@@ -15,6 +15,8 @@ import java.io.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.*;
 import javax.imageio.spi.ImageReaderSpi;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  *
@@ -30,22 +32,30 @@ public class ClientGUIController extends javax.swing.JFrame {
     private JLabel mmTitle;
     private mainMenu main_menu;
     private Container movingObjects;
+    
+    private MainController mainController = null;
+    private JLabel[] playerLabels = null;
+    private JLabel[] ballLabels = null;
+    private int currentNumOfPlayers = 0;
     /**
      * Creates new form ClientGUIController
      */
     //GUI controller's frame is the main area on which games are played.
     //GUIcontroller also creates and hides other forms that may be necessary to setup
     //a game.  Everything displayed on the screen is controlled by this class
-    public ClientGUIController() {
+    public ClientGUIController(MainController _mainController) {
         initComponents();
-
+        this.mainController = _mainController;
         //Create Test Data
         RealTimeData test = new RealTimeData();
         movingObjects = new Container();
+        movingObjects.addMouseListener(this.createMouseListener());
         test.createTestPlayer();
-        this.repaintAll(test);
-        this.repaintAll(test);
-
+//        this.repaintAll(test);
+//        this.repaintAll(test);
+        this.playerLabels = new JLabel[8];
+        this.ballLabels = new JLabel[8];
+        this.addMouseListener(this.createMouseListener());
 
     }
     //Moves to the main menu
@@ -102,67 +112,95 @@ public class ClientGUIController extends javax.swing.JFrame {
             currentLine.setVisible(true);
             this.getContentPane().add(currentLine);
         }
-
+        
+        this.getContentPane().addMouseListener(this.createMouseListener()); 
+        
         this.getContentPane().repaint();
+        
     }
     
 
     public void repaintAll(RealTimeData data) {
-        for (int i = 0; i < movingObjects.getComponentCount(); i++)
-                {
-                    if (this.getContentPane().getComponent(i).getSize().getHeight()!=250)
-                    {
-                    this.getContentPane().remove(movingObjects.getComponent(i));
-                    System.out.println("Removed Object");
-                    }
-                }
-
+//        for (int i = 0; i < movingObjects.getComponentCount(); i++)
+//        {
+////            if (this.getContentPane().getComponent(i).getSize().getHeight()!=250)
+////            {
+//                this.getContentPane().remove(movingObjects.getComponent(i));
+//                System.out.println("Removed Object");
+////            }
+//        }
         HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
 
         //paint each of the player and its ball in the screen one by one
-        String playerIcon = "/NetworksProjectPackage/1363852977_ball.png";
+        String playerIcon = "/Images/athlete.png";
         String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
         String deadAnimation = "/NetworksProjectPackage/explosion2.gif";
-
+        
+        int index = 0;
+        
         for (PlayerData player : players.values()) {
 
             if (player.isAlive() == Constants.ALIVE)
             {
                 System.out.println("Draw Alive Player");
-            //player
-            JLabel newPlayer = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
-            newPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
-            newPlayer.setVisible(true);
-            newPlayer.setSize(200, 200);
-            movingObjects.add(newPlayer);
-            this.getContentPane().add(newPlayer);
-
-            //ball
-            JLabel newBall = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
-            newBall.setLocation(player.getBallX(), player.getBallY());
-            newBall.setVisible(true);
-            newBall.setSize(200, 200);
-            movingObjects.add(newBall);
-            this.getContentPane().add(newBall);
-            }
-            else if (player.isAlive() != Constants.DEAD)
+                
+                //player
+                if(index >= this.currentNumOfPlayers)
+                {
+                    this.playerLabels[index] = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+                    this.playerLabels[index].addMouseListener(this.createMouseListener());
+                    this.ballLabels[index] = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+                    this.ballLabels[index].addMouseListener(this.createMouseListener());
+                }
+                
+                this.playerLabels[index].setSize(50, 50);
+                this.playerLabels[index].setLocation(player.getPlayerX() - this.playerLabels[index].getWidth()/2, player.getPlayerY() - this.playerLabels[index].getHeight()/2);
+                this.playerLabels[index].setVisible(true);
+                
+                //ball
+                this.ballLabels[index].setSize(50, 50);
+                this.ballLabels[index].setLocation(player.getBallX() - this.playerLabels[index].getWidth()/2, player.getBallY() - this.ballLabels[index].getHeight()/2);
+                this.ballLabels[index].setVisible(true);
+                
+                if(index >= this.currentNumOfPlayers)
+                {
+                    movingObjects.add(this.playerLabels[index]);
+                    this.getContentPane().add(this.playerLabels[index]);
+                    
+                    movingObjects.add(this.ballLabels[index]);
+                    this.getContentPane().add(this.ballLabels[index]);
+                }
+                
+                this.currentNumOfPlayers++;
+            
+            }else if (player.isAlive() != Constants.DEAD)
             {
-            System.out.println("Draw Dead Animation");
-            JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
-            deadPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
-            deadPlayer.setVisible(true);
-            deadPlayer.setSize(250, 250);
-            movingObjects.add(deadPlayer);
-            this.getContentPane().add(deadPlayer);
+                System.out.println("Draw Dead Animation");
+                JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
+                deadPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
+                deadPlayer.setVisible(true);
+                deadPlayer.setSize(250, 250);
+                movingObjects.add(deadPlayer);
+                this.getContentPane().add(deadPlayer);
             }
             
-
+            index++;
         }
 
         //this.getContentPane().add(movingObjects);
         this.getContentPane().repaint();
         //movingObjects.paintComponents(this.getContentPane().getGraphics());
 
+    }
+    
+    public MouseAdapter createMouseListener() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                System.out.println("mouse Moved is called*************************************************************************************");
+                NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, e.getXOnScreen(), e.getYOnScreen());
+            }
+        };
     }
 
     /**
@@ -199,7 +237,12 @@ public class ClientGUIController extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    //Create a non-modal dialog box (so game can run in background) to allow user to exit game
+    private void mouseMoved(MouseEvent e)
+    {
+        System.out.println("mouse Moved is called*************************************************************************************");
+        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, e.getXOnScreen(), e.getYOnScreen());
+    }
+        //Create a non-modal dialog box (so game can run in background) to allow user to exit game
     private void escapeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_escapeKeyPressed
         if (evt.getKeyCode() == 27) {
             final JDialog optionPaneDialog = new JDialog(this, "Leave Game?");
@@ -237,7 +280,12 @@ public class ClientGUIController extends javax.swing.JFrame {
             optionPaneDialog.setVisible(true);
         }
     }//GEN-LAST:event_escapeKeyPressed
-
+    
+    public void startNetworkController()
+    {
+        this.mainController.startNetworkController();
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -268,7 +316,7 @@ public class ClientGUIController extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ClientGUIController().setVisible(true);
+                new ClientGUIController(null).setVisible(true);
             }
         });
     }

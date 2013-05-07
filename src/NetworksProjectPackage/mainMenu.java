@@ -156,6 +156,7 @@ public class mainMenu extends javax.swing.JFrame {
         // Code to allow user to become a new host and start a new game on his computer
         //Currently this just draws the game screen without any regard for networking
         master.drawGameScreen();
+        master.startNetworkController();
     }//GEN-LAST:event_hostGameMouseClicked
 
     private void exitGameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitGameMouseClicked

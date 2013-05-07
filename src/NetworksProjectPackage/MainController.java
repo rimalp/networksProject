@@ -12,6 +12,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public static RealTimeData realTimeData = null;
     NetworkController networkController = null;
     ClientGUIController guiController = null;
+    SessionServer ss = null;
 
     //variables for the ball physics
     final int RADIUS = 50;
@@ -30,11 +31,20 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     //constructor
     public MainController()
     {
+        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.73.212");
+        ss.start();
+        
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
-        networkController = new NetworkController(null, -1, null, null);
-        guiController = new ClientGUIController();
+        networkController = new NetworkController("139.147.73.212", 4444, PlayerData.DEFAULT_PLAYER_DATA, this, null);
+        guiController = new ClientGUIController(this);
         guiController.drawMainMenu();
+    }
+    
+    public void startNetworkController()
+    {
+        this.networkController.start();
+        this.guiController.repaintAll(NetworkController.realTimeData);
     }
     
     public RealTimeData getRealTimedata()
@@ -102,28 +112,34 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public void setPlayerData(InetAddress playerAddress, PlayerData playerData){
         MainController.realTimeData.setPlayerData(playerAddress, playerData);
         //update the GUI when the player data changes
-        guiController.repaintAll(realTimeData);
+        //guiController.repaintAll(realTimeData);
         
+    }
+    
+    public void multicastReceived()
+    {
+        this.guiController.repaintAll(NetworkController.realTimeData);
     }
     
     public void run()
     {
+        
         this.guiController.drawArena();
 
-        while(true)
-        {
+//        while(true)
+//        {
             //acquire new data and call the guicontroller's repaint function
             
-            this.guiController.repaintAll(MainController.realTimeData);
+        //this.guiController.repaintAll(MainController.realTimeData);
 
 
             //then pause for a while
-            try {
-                    Thread.sleep(1000/60);
-            } catch (InterruptedException e) {
-                    System.out.println("MainController thread interrupted!");
-            }
-        }
+//            try {
+//                    Thread.sleep(1000/60);
+//            } catch (InterruptedException e) {
+//                    System.out.println("MainController thread interrupted!");
+//            }
+//        }
     }
 
 

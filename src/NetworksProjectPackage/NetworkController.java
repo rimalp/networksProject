@@ -29,11 +29,13 @@ public class NetworkController extends Thread{
     public static PlayerData myData = null;
     
     public static boolean thisIsServer;
+    
+    private MainController mainController = null;
 
     
-    public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, GUITest _guiTest)
+    public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, MainController _mainController, GUITest guiTest)
     {
-        
+        this.mainController = _mainController;
         if(!getMyIPAddress())
         {
             System.out.println("Cannot get my external IP.");
@@ -164,18 +166,26 @@ public class NetworkController extends Thread{
         return true;
     }
     
+    public void multicastReceived()
+    {
+        this.mainController.multicastReceived();
+    }
+    
     public void run()
     {        
-//        while(true)
-//        {
+        System.out.println("NetworkController Started");
+        while(true)
+        {
             try{
                 Thread.sleep(5000);
+                System.out.println("before sending player data update");
+                System.out.println(NetworkController.realTimeData.printPlayersData());
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)
             {
                 System.out.println(e);
             }
-//        }
+        }
     }
     
     public static void main(String[] args)
@@ -219,7 +229,7 @@ public class NetworkController extends Thread{
         
         String portNum = sc.nextLine();
         int portNumber = Integer.parseInt(portNum);
-        NetworkController networkController = new NetworkController("139.147.73.212", portNumber, null, null);
+        NetworkController networkController = new NetworkController("139.147.73.212", portNumber, null, null, null);
         networkController.run();
     }
     

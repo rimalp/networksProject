@@ -66,6 +66,14 @@ public class RealTimeData {
         PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
         this.playersData.put(address, newPlayerData);
     }
+    
+    public void setPlayerData(InetAddress address, int playerX, int playerY)
+    {
+        PlayerData playerData = this.playersData.get(address);
+        playerData.setPlayerX(playerX);
+        playerData.setPlayerY(playerY);
+        this.playersData.put(address, playerData);
+    }
 
     
     public PlayerData getPlayerData(InetAddress address)
@@ -81,16 +89,21 @@ public class RealTimeData {
     {
         return this.playersData; 
     }
-    public void printPlayersData()
+    public String printPlayersData()
     {
-        System.out.println("*************************Start of Printing All Players' Data*************************");
+        String str = "";
+        
+        str += "*************************Start of Printing All Players' Data*************************\n";
 
         for(InetAddress ip : this.playersData.keySet())
         {
-            System.out.println(ip.toString());
+            str += ip.toString() + "\n";
+            str += this.playersData.get(ip).toString();
         }
         
-        System.out.println("*************************End of Printing All Players' Data*************************");
+        str += "*************************End of Printing All Players' Data*************************\n";
+        
+        return str;
     }
     public byte[] getBytesForClient(InetAddress clientIPAddress)
     {

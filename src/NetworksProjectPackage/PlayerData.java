@@ -26,7 +26,7 @@ public class PlayerData {
     
     public static int SIZE_OF_BYTES_FOR_CLIENT = 8;
     public static int SIZE_OF_BYTES_FOR_SERVER = 16;
-    public static PlayerData DEFAULT_PLAYER_DATA= new PlayerData(100,100,150,150);
+    public static PlayerData DEFAULT_PLAYER_DATA= new PlayerData(300,300,450,450);
     
     //here are the variables for ball position logic
     final int RADIUS = 50;
@@ -209,8 +209,8 @@ public class PlayerData {
         //extract player information from the bytes passed in the parameter
         this.playerX = ((int)newPlayerData[0] << 8) | ((int)newPlayerData[1]);
         this.playerY = ((int)newPlayerData[2] << 8) | ((int)newPlayerData[3]);
-        this.ballX = ((int)newPlayerData[4] << 8) | ((int)newPlayerData[5]);
-        this.ballY = ((int)newPlayerData[6] << 8) | ((int)newPlayerData[7]);
+        this.ballX = (((int)newPlayerData[4] & 0x00FF) << 8) | ((int)newPlayerData[5] & 0x00FF);
+        this.ballY = (((int)newPlayerData[6] & 0x00FF) << 8) | ((int)newPlayerData[7] & 0x00FF);
         this.team = ((int)newPlayerData[8]);
         this.alive = ((int)newPlayerData[9]);
         
@@ -219,6 +219,8 @@ public class PlayerData {
     
     public boolean getNextPlayerData(byte[] mousePositionUpdate)
     {
+        
+//        this.dampingRatio = 1;
         
         if(mousePositionUpdate.length != SIZE_OF_BYTES_FOR_CLIENT)
         {
@@ -243,10 +245,32 @@ public class PlayerData {
         //if (Vy > 0.001)
         Vy *= dampingRatio;
         
-        this.playerX += Vx;
-        this.playerY += Vy;
-        
+        if(this.ballX + Vx >= 0)
+        {
+            this.ballX += Vx;
+        }
+        if(this.ballY + Vy >= 0)
+        {
+            this.ballY += Vy;
+        }
         return true;
+        
+    }
+    
+    public String toString()
+    {
+        String str = "";
+        str += "Player X: " + this.playerX + "\n";
+        str += "Player Y: " + this.playerY + "\n";
+        str += "Ball X: " + this.ballX + "\n";
+        str += "Ball Y: " + this.ballY + "\n";
+        str += "Vx: " + this.Vx + "\n";
+        str += "Vy: " + this.Vy + "\n";
+        str += "Ax: " + this.Ax + "\n";
+        str += "Ay: " + this.Ay + "\n";
+        
+        
+        return str;
         
     }
     

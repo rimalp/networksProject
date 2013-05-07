@@ -48,8 +48,8 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
      */
     public GUITest() {
         realTimeData = new RealTimeData();
-        networkController = new NetworkController(null, -1, null,this);
-        networkController.start();
+//        networkController = new NetworkController(null, -1, null,null, this);
+//        networkController.start();
         //guiController = new ClientGUIController();
         this.setVisible(true);
         //this.drawArena();
@@ -387,7 +387,7 @@ public class GUITest extends javax.swing.JFrame implements Runnable{
             java.util.logging.Logger.getLogger(GUITest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        System.out.println("lol0adefe");
+        System.out.println("lol0adeee");
         new GUITest();
                      
     }
