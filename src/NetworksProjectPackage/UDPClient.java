@@ -155,7 +155,7 @@ public class UDPClient extends Thread{
         
         ipBuffer = NetworkController.myIPAddress.getAddress();
         
-        System.out.println(NetworkController.clientListenPortNumber);
+        //System.out.println(NetworkController.clientListenPortNumber);
         
         portNumBuffer[1] = (byte)(NetworkController.clientListenPortNumber >> 8);
         portNumBuffer[0] = (byte)(NetworkController.clientListenPortNumber);
@@ -360,7 +360,7 @@ public class UDPClient extends Thread{
                     System.out.println(e);
                 }
             }
-            System.out.println(status);
+            //System.out.println(status);
         }
     }
 }

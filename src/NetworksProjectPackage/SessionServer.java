@@ -155,7 +155,7 @@ public class SessionServer extends Thread{
                 Iterator it = this.servers.entrySet().iterator();
                 Map.Entry server = (Map.Entry)it.next();
                 this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, ((InetAddress)(server.getKey())).toString().substring(1), ((Integer)(server.getValue())).intValue());  
-                this.sendPacketWithClientInformation((InetAddress)server.getKey(), (int)servers.get((InetAddress)server.getKey()), dp.getAddress().toString().substring(1), clientListenPort);
+                //this.sendPacketWithClientInformation((InetAddress)server.getKey(), (int)servers.get((InetAddress)server.getKey()), dp.getAddress().toString().substring(1), clientListenPort);
                 System.out.println("Server Info Sent");
             }
         }

@@ -95,6 +95,7 @@ public class NetworkController extends Thread{
     
     public void addPlayer(InetAddress ip, Integer portNumber, PlayerData newPlayerData)
     {
+        System.out.println("added player with IP"+ip.getHostName()+" and port number"+ portNumber);
         this.playersInfo.put(ip, portNumber);
         this.realTimeData.addNewPlayer(ip, PlayerData.DEFAULT_PLAYER_DATA);
     }
@@ -168,7 +169,7 @@ public class NetworkController extends Thread{
         while(true)
         {
             try{
-                Thread.sleep(10);
+                Thread.sleep(5000);
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)
             {
