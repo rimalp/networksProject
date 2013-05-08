@@ -14,6 +14,7 @@ public class RealTimeData {
     private static final int BYTES_SIZE_PER_PLAYER_SERVER =  4 + PlayerData.SIZE_OF_BYTES_FOR_SERVER;
 
     private HashMap<InetAddress, PlayerData> playersData = null;
+    private int isGameOver = 0;
     
     public RealTimeData()
     {
@@ -67,11 +68,12 @@ public class RealTimeData {
         this.playersData.put(address, newPlayerData);
     }
     
-    public void setPlayerData(InetAddress address, int playerX, int playerY)
+    public void setPlayerData(InetAddress address, int playerX, int playerY, int isPressed)
     {
         PlayerData playerData = this.playersData.get(address);
         playerData.setPlayerX(playerX);
         playerData.setPlayerY(playerY);
+        playerData.setMousePressed(isPressed);
         this.playersData.put(address, playerData);
     }
 
@@ -237,9 +239,56 @@ public class RealTimeData {
 
         if(this.playersData.get(tempIP).getNextPlayerData(playerData))
         {
+            for(InetAddress playerAddress: this.playersData.keySet())
+            {
+                for(InetAddress anotherPlayerAddress: this.playersData.keySet())
+                {
+                    if(playerAddress.equals(anotherPlayerAddress))
+                    {
+                        if(this.playersData.get(playerAddress).hits(this.playersData.get(anotherPlayerAddress)))
+                        {
+                            this.playersData.get(anotherPlayerAddress).setAlive(Constants.DEAD);
+                            if(this.isEveryOneDead(this.playersData.get(anotherPlayerAddress).getTeam()))
+                            {
+                                this.gameOver();
+                            }
+                        }
+                    }
+                }
+            }
             return true;
         }
         
         return false;
+    }
+    
+    public boolean isEveryOneDead(int team)
+    {
+        boolean everyoneIsDead = true;
+
+        for(InetAddress playerAddress : this.playersData.keySet())
+        {
+            if(this.playersData.get(playerAddress).getTeam() == team && this.playersData.get(playerAddress).getIsAlive() == Constants.ALIVE)
+            {
+                everyoneIsDead = false;
+            }
+        }
+        
+        return everyoneIsDead;
+    }
+    
+    public boolean setTeam(InetAddress inetAddress, int team)
+    {
+        return this.playersData.get(inetAddress).setTeam(team);
+    }
+    
+    public int isGameOver()
+    {
+        return this.isGameOver;
+    }
+    
+    public void gameOver()
+    {
+        this.isGameOver = 1;
     }
 }

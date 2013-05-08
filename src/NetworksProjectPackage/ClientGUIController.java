@@ -38,8 +38,20 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     private JLabel[] playerLabels = null;
     private JLabel[] ballLabels = null;
     private int currentNumOfPlayers = 0;
-    public static int arenaSizeX = 0;
-    public static int arenaSizeY = 0;
+    public static int minXForTEAM1 = 0;
+    public static int maxXForTEAM1 = 0;
+    public static int minYForTEAM1 = 0;
+    public static int maxYForTEAM1 = 0;
+    
+    public static int minXForTEAM2 = 0;
+    public static int maxXForTEAM2 = 0;
+    public static int minYForTEAM2 = 0;
+    public static int maxYForTEAM2 = 0;
+    
+    public static int maxXArena = 0;
+    public static int maxYArena = 0;
+    
+    
     /**
      * Creates new form ClientGUIController
      */
@@ -120,55 +132,102 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             currentLine.setVisible(true);
             this.getContentPane().add(currentLine);
         }
+        ClientGUIController.maxXForTEAM1 = this.getContentPane().getWidth()/2 -5;
+        ClientGUIController.maxYForTEAM1 = this.getContentPane().getHeight() - 10;
+        ClientGUIController.minXForTEAM2 = this.getContentPane().getWidth()/2 +5;
+        ClientGUIController.maxXForTEAM2 = this.getContentPane().getWidth();
+        ClientGUIController.maxYForTEAM2 = this.getContentPane().getHeight() - 10;
+        ClientGUIController.maxXArena = this.getContentPane().getWidth();
+        ClientGUIController.maxYArena = this.getContentPane().getHeight() -10;
         
-        ClientGUIController.arenaSizeX = this.getContentPane().getWidth();
-        ClientGUIController.arenaSizeY = this.getContentPane().getHeight()-10;
         this.repaintAll(NetworkController.realTimeData);
         
     }
     
     public void mouseMoved(MouseEvent e) {
-//        System.out.println("Mouse moved***********************************");
-//        System.out.println(e.getXOnScreen());
-//        System.out.println(e.getYOnScreen());
-//        System.out.println(e.getX());
-//        System.out.println(e.getY());
-        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, e.getXOnScreen() - 120, e.getYOnScreen()-40);
+        int team = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).getTeam();
+        int x = e.getXOnScreen() - 120;
+        int y = e.getYOnScreen() - 40;
+        if(team == Constants.TEAM1)
+        {
+            if(x > ClientGUIController.maxXForTEAM1)
+            {
+                x = ClientGUIController.maxXForTEAM1;
+            }else if(x < ClientGUIController.minXForTEAM1)
+            {
+                x = ClientGUIController.minXForTEAM1;
+            }
+            
+            if(y > ClientGUIController.maxYForTEAM1)
+            {
+                y = ClientGUIController.maxYForTEAM1;
+            }else if(y < ClientGUIController.minYForTEAM1)
+            {
+                y = ClientGUIController.minYForTEAM1;
+            }
+        }else if(team == Constants.TEAM2)
+        {
+            if(x > ClientGUIController.maxXForTEAM2)
+            {
+                x = ClientGUIController.maxXForTEAM2;
+            }else if(x < ClientGUIController.minXForTEAM2)
+            {
+                x = ClientGUIController.minXForTEAM2;
+            }
+            
+            if(y > ClientGUIController.maxYForTEAM2)
+            {
+                y = ClientGUIController.maxYForTEAM2;
+            }else if(y < ClientGUIController.minYForTEAM2)
+            {
+                y = ClientGUIController.minYForTEAM2;
+            }
+        }
+        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
         this.repaintAll(NetworkController.realTimeData);
     }
      
     public void mouseDragged(MouseEvent e) {
-        System.out.println("Mouse dragged*******************************");
-    }
-    
-    public void mousePressed(MouseEvent e)
-    {
-//        System.out.println("Mouse Pressed!************************************");
-    }
-    
-    public void mouseExited(MouseEvent e)
-    {
-        
-    }
-    
-    public void mouseEntered(MouseEvent e)
-    {
-        
-    }
-    
-    public void mouseClicked(MouseEvent e)
-    {
-        
-    }
-    
-    public void mouseReleased(MouseEvent e)
-    {
-        
-    }
-    
-    public void mouseWheelMoved(MouseEvent e)
-    {
-        
+        int team = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).getTeam();
+        int x = e.getXOnScreen() - 120;
+        int y = e.getYOnScreen() - 40;
+        if(team == Constants.TEAM1)
+        {
+            if(x > ClientGUIController.maxXForTEAM1)
+            {
+                x = ClientGUIController.maxXForTEAM1;
+            }else if(x < ClientGUIController.minXForTEAM1)
+            {
+                x = ClientGUIController.minXForTEAM1;
+            }
+            
+            if(y > ClientGUIController.maxYForTEAM1)
+            {
+                y = ClientGUIController.maxYForTEAM1;
+            }else if(y < ClientGUIController.minYForTEAM1)
+            {
+                y = ClientGUIController.minYForTEAM1;
+            }
+        }else if(team == Constants.TEAM2)
+        {
+            if(x > ClientGUIController.maxXForTEAM2)
+            {
+                x = ClientGUIController.maxXForTEAM2;
+            }else if(x < ClientGUIController.minXForTEAM2)
+            {
+                x = ClientGUIController.minXForTEAM2;
+            }
+            
+            if(y > ClientGUIController.maxYForTEAM2)
+            {
+                y = ClientGUIController.maxYForTEAM2;
+            }else if(y < ClientGUIController.minYForTEAM2)
+            {
+                y = ClientGUIController.minYForTEAM2;
+            }
+        }
+        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.PRESSED);
+        this.repaintAll(NetworkController.realTimeData);
     }
 
     public void repaintAll(RealTimeData data) {
@@ -186,7 +245,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 
             if (player.isAlive() == Constants.ALIVE)
             {
-                System.out.println("Draw Alive Player");
+//                System.out.println("Draw Alive Player");
                 
                 //player
                 if(index >= this.currentNumOfPlayers)

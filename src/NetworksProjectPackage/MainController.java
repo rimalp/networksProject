@@ -102,11 +102,8 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
 
     public static void main(String[] args)
     {
-        System.out.println("about to created main controller");
         MainController mainController = new MainController();
-        System.out.println("main controller created");
         mainController.start();
-        System.out.println("main controller started");
     }
     
     public void setPlayerData(InetAddress playerAddress, PlayerData playerData){

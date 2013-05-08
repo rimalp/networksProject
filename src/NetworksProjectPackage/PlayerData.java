@@ -173,9 +173,7 @@ public class PlayerData {
         byte[] bytesToReturn = new byte[SIZE_OF_BYTES_FOR_CLIENT];
         
         bytesToReturn[0] = (byte)((this.playerX >> 8) & 0xFF);
-        System.out.println("byte 0: " + bytesToReturn[0]);
         bytesToReturn[1] = (byte)((this.playerX) & 0xFF);
-        System.out.println("byte 1: " + bytesToReturn[1]);
         bytesToReturn[2] = (byte)((this.playerY >> 8) & 0x000000FF);
         bytesToReturn[3] = (byte)((this.playerY) & 0x000000FF);
         bytesToReturn[4] = (byte)(this.mousePressed & 0x000000FF);
@@ -238,24 +236,36 @@ public class PlayerData {
         Vx += Ax;
         
         if (this.mousePressed == 0)
+        {
+            
             Vx *= dampingRatio;
-        else
+        }else
+        {
             Vx *= 0.985;
+        }
         
         Vy += Ay; 
         //if (Vy > 0.001)
         Vy *= dampingRatio;
         
-        if(this.ballX + Vx >= 0 && this.ballX + Vx <= ClientGUIController.arenaSizeX)
+        
+        if(this.ballX + Vx >= 0 && this.ballX + Vx <= ClientGUIController.maxXArena)
         {
             this.ballX += Vx;
         }
-        if(this.ballY + Vy >= 0 && this.ballY + Vx <= ClientGUIController.arenaSizeY)
+        if(this.ballY + Vy >= 0 && this.ballY + Vy <= ClientGUIController.maxYArena)
         {
             this.ballY += Vy;
         }
+        
+        
         return true;
         
+    }
+    
+    public int getIsAlive()
+    {
+        return this.alive;
     }
     
     public String toString()
@@ -275,6 +285,17 @@ public class PlayerData {
         
     }
     
+    public boolean setTeam(int _team)
+    {
+        if(_team == Constants.TEAM1 || _team == Constants.TEAM2)
+        {
+            this.team = _team;
+            return true;
+        }else
+        {
+            return false;
+        }
+    }
     
 
 }
