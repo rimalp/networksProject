@@ -275,7 +275,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     this.currentNumOfPlayers++;
                 }
                 
-            
+                
             }else if (player.isAlive() != Constants.DEAD)
             {
                 System.out.println("Draw Dead Animation");
