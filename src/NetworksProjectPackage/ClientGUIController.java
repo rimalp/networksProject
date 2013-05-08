@@ -31,7 +31,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     private JButton joinGame;
     private JButton exitGame;
     private JLabel mmTitle;
-    private mainMenu main_menu;
+    public mainMenu main_menu;
     private Container movingObjects;
     
     private MainController mainController = null;
