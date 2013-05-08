@@ -78,7 +78,7 @@ public class NetworkController extends Thread{
         this.createClient(clientPortNumber);
         
         // I will request the Server to be a server/request server address
-        this.udpClient.sendRequestPacket();
+//        this.udpClient.sendRequestPacket();
     }
 
     public void createClient(int _portNumber)
@@ -128,7 +128,9 @@ public class NetworkController extends Thread{
     }
 
     public ArrayList<String> requestGameServers(){
-        byte[] toSend = new byte[8];
+        byte[] toSend = new byte[2];
+        toSend[0] = (byte)((NetworkController.clientListenPortNumber) >> 8);
+        toSend[1] = (byte)(NetworkController.clientListenPortNumber);
 
         this.udpClient.sendPacket(NetworkController.sessionServerAddress, NetworkController.sessionServerListenPortNumber, toSend , ProtocolInfo.TYPE_UNICAST_JOINGAME);
 

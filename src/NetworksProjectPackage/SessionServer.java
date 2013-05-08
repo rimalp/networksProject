@@ -107,7 +107,7 @@ public class SessionServer extends Thread{
 
         this.request_type = packet_type;
 
-        if(packet_type != ProtocolInfo.TYPE_REQUEST && packet_type != ProtocolInfo.TYPE_UNICAST_JOINGAME)
+        if(packet_type != ProtocolInfo.TYPE_REQUEST && packet_type != ProtocolInfo.TYPE_UNICAST_JOINGAME && packet_type != ProtocolInfo.TYPE_UNICAST_HOSTGAME)
         {
             //sendErrorPacket(dp.getAddress(), dp.getPort(), "Received non-request packet.");
             System.out.println("adfsError: " + packet_type);
@@ -131,8 +131,8 @@ public class SessionServer extends Thread{
         temp &= 0x000000FF;
         clientPort |=temp;
 
-        //System.out.println(clientPort);
-        return 4444;
+//        System.out.println(clientPort);
+        return clientPort;
     }
     
     public void run()
@@ -167,6 +167,7 @@ public class SessionServer extends Thread{
             {
                 continue;
             }
+            
             System.out.println("Client Port number:"+clientListenPort);
 
             if(this.servers.isEmpty())

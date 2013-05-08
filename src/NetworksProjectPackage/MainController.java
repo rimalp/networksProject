@@ -135,9 +135,13 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
 
         if(this.guiController.main_menu == null)
             System.out.println("mainmenu null");
-
         this.guiController.main_menu.updateServerListComboBox(ip);
 
+    }
+    
+    public HashMap<String, Integer> getActiveGameServers()
+    {
+        return this.activeGameServers;
     }
     
     public void multicastReceived()

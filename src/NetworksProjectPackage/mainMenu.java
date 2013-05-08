@@ -8,6 +8,7 @@ import java.awt.Toolkit;
 import java.awt.Dimension;
 import javax.swing.JOptionPane;
 import java.util.*;
+import java.net.*;
 
 /**
  *
@@ -80,6 +81,11 @@ public class mainMenu extends javax.swing.JFrame {
                 joinGameMouseClicked(evt);
             }
         });
+        joinGame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                joinGameActionPerformed(evt);
+            }
+        });
 
         hostGame.setBackground(new java.awt.Color(153, 153, 255));
         hostGame.setText("Host Game");
@@ -102,7 +108,7 @@ public class mainMenu extends javax.swing.JFrame {
             }
         });
 
-        mmTitle.setFont(new java.awt.Font("SimHei", 1, 48));
+        mmTitle.setFont(new java.awt.Font("SimHei", 1, 48)); // NOI18N
         mmTitle.setForeground(new java.awt.Color(204, 0, 0));
         mmTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         mmTitle.setText("Orbit");
@@ -132,17 +138,13 @@ public class mainMenu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(186, 186, 186)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(joinGame, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                        .addGap(156, 156, 156))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(hostGame, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.LEADING, 0, 177, Short.MAX_VALUE)
-                            .addComponent(exitGame, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                            .addComponent(jComboBoxJoinList, 0, 177, Short.MAX_VALUE))
-                        .addGap(156, 156, 156))))
+                    .addComponent(joinGame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                    .addComponent(hostGame, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                    .addComponent(jComboBox1, 0, 177, Short.MAX_VALUE)
+                    .addComponent(exitGame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                    .addComponent(jComboBoxJoinList, javax.swing.GroupLayout.Alignment.TRAILING, 0, 177, Short.MAX_VALUE))
+                .addGap(156, 156, 156))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -212,11 +214,40 @@ public class mainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_hostGameActionPerformed
 
     private void jComboBoxJoinListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxJoinListActionPerformed
-        System.out.println((String)this.jComboBoxJoinList.getSelectedItem());
+        
+                String text = (String)this.jComboBoxJoinList.getSelectedItem();
+                System.out.println("about to enter loop");
+                if(text == null)
+                {
+                    System.out.println("haha");
+                }else
+                {
+                    System.out.println(text);
+                }
+                if( text != null && !text.equals("Select a server address"))
+                {
+                    try{
+                        NetworkController.serverAddress = InetAddress.getByName(text);
+                        System.out.println("Server address is updated to " + NetworkController.serverAddress.toString());
+                        NetworkController.serverListenPortNumber = this.master.mainController.getActiveGameServers().get(text);
+                        System.out.println("Server port is "+ NetworkController.serverListenPortNumber);
+                    }catch(UnknownHostException e)
+                    {
+                        System.out.println(e);
+                    }
+                }
         
     }//GEN-LAST:event_jComboBoxJoinListActionPerformed
 
+    private void joinGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinGameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_joinGameActionPerformed
+
     public void updateServerListComboBox(String item){
+        if(this.jComboBoxJoinList.getItemCount() == 0)
+        {
+            this.jComboBoxJoinList.addItem("Select a server address");
+        }
         this.jComboBoxJoinList.addItem(item);
     }
 
