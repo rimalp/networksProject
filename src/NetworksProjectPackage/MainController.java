@@ -31,12 +31,12 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     //constructor
     public MainController()
     {
-        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.73.212");
+        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.37.255");
         ss.start();
         
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
-        networkController = new NetworkController("139.147.73.212", 4444, PlayerData.DEFAULT_PLAYER_DATA, this, null);
+        networkController = new NetworkController("139.147.37.255", 4444, PlayerData.DEFAULT_PLAYER_DATA, this, null);
         guiController = new ClientGUIController(this);
         guiController.drawMainMenu();
     }

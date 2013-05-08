@@ -17,12 +17,13 @@ import javax.imageio.*;
 import javax.imageio.spi.ImageReaderSpi;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseListener;
 /**
  *
  * @author Drew Jeffrey
  */
-public class ClientGUIController extends javax.swing.JFrame {
+public class ClientGUIController extends javax.swing.JFrame implements MouseMotionListener {
 
     public ArrayList<JLabel> objectList;
     private MainController controller;
@@ -37,6 +38,8 @@ public class ClientGUIController extends javax.swing.JFrame {
     private JLabel[] playerLabels = null;
     private JLabel[] ballLabels = null;
     private int currentNumOfPlayers = 0;
+    public static int arenaSizeX = 0;
+    public static int arenaSizeY = 0;
     /**
      * Creates new form ClientGUIController
      */
@@ -49,13 +52,18 @@ public class ClientGUIController extends javax.swing.JFrame {
         //Create Test Data
         RealTimeData test = new RealTimeData();
         movingObjects = new Container();
-        movingObjects.addMouseListener(this.createMouseListener());
+//        movingObjects.addMouseListener(this.createMouseListener());
+        movingObjects.addMouseMotionListener(this);
+        this.getContentPane().addMouseMotionListener(this);
+        addMouseMotionListener(this);
+        
+        
+        
         test.createTestPlayer();
 //        this.repaintAll(test);
 //        this.repaintAll(test);
         this.playerLabels = new JLabel[8];
         this.ballLabels = new JLabel[8];
-        this.addMouseListener(this.createMouseListener());
 
     }
     //Moves to the main menu
@@ -83,7 +91,7 @@ public class ClientGUIController extends javax.swing.JFrame {
         int h = this.getSize().height;
         int x = (dim.width - w) / 2;
         int y = (dim.height - h) / 2;
-
+        
         // Move the window
         this.setLocation(x, y);
     }
@@ -113,22 +121,58 @@ public class ClientGUIController extends javax.swing.JFrame {
             this.getContentPane().add(currentLine);
         }
         
-        this.getContentPane().addMouseListener(this.createMouseListener()); 
-        
-        this.getContentPane().repaint();
+        ClientGUIController.arenaSizeX = this.getContentPane().getWidth();
+        ClientGUIController.arenaSizeY = this.getContentPane().getHeight()-10;
+        this.repaintAll(NetworkController.realTimeData);
         
     }
     
+    public void mouseMoved(MouseEvent e) {
+//        System.out.println("Mouse moved***********************************");
+//        System.out.println(e.getXOnScreen());
+//        System.out.println(e.getYOnScreen());
+//        System.out.println(e.getX());
+//        System.out.println(e.getY());
+        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, e.getXOnScreen() - 120, e.getYOnScreen()-40);
+        this.repaintAll(NetworkController.realTimeData);
+    }
+     
+    public void mouseDragged(MouseEvent e) {
+        System.out.println("Mouse dragged*******************************");
+    }
+    
+    public void mousePressed(MouseEvent e)
+    {
+//        System.out.println("Mouse Pressed!************************************");
+    }
+    
+    public void mouseExited(MouseEvent e)
+    {
+        
+    }
+    
+    public void mouseEntered(MouseEvent e)
+    {
+        
+    }
+    
+    public void mouseClicked(MouseEvent e)
+    {
+        
+    }
+    
+    public void mouseReleased(MouseEvent e)
+    {
+        
+    }
+    
+    public void mouseWheelMoved(MouseEvent e)
+    {
+        
+    }
 
     public void repaintAll(RealTimeData data) {
-//        for (int i = 0; i < movingObjects.getComponentCount(); i++)
-//        {
-////            if (this.getContentPane().getComponent(i).getSize().getHeight()!=250)
-////            {
-//                this.getContentPane().remove(movingObjects.getComponent(i));
-//                System.out.println("Removed Object");
-////            }
-//        }
+
         HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
 
         //paint each of the player and its ball in the screen one by one
@@ -148,9 +192,9 @@ public class ClientGUIController extends javax.swing.JFrame {
                 if(index >= this.currentNumOfPlayers)
                 {
                     this.playerLabels[index] = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
-                    this.playerLabels[index].addMouseListener(this.createMouseListener());
+                    this.playerLabels[index].addMouseMotionListener(this);
                     this.ballLabels[index] = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
-                    this.ballLabels[index].addMouseListener(this.createMouseListener());
+                    this.ballLabels[index].addMouseMotionListener(this);
                 }
                 
                 this.playerLabels[index].setSize(50, 50);
@@ -192,16 +236,6 @@ public class ClientGUIController extends javax.swing.JFrame {
         //movingObjects.paintComponents(this.getContentPane().getGraphics());
 
     }
-    
-    public MouseAdapter createMouseListener() {
-        return new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                System.out.println("mouse Moved is called*************************************************************************************");
-                NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, e.getXOnScreen(), e.getYOnScreen());
-            }
-        };
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -237,11 +271,7 @@ public class ClientGUIController extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void mouseMoved(MouseEvent e)
-    {
-        System.out.println("mouse Moved is called*************************************************************************************");
-        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, e.getXOnScreen(), e.getYOnScreen());
-    }
+    
         //Create a non-modal dialog box (so game can run in background) to allow user to exit game
     private void escapeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_escapeKeyPressed
         if (evt.getKeyCode() == 27) {
