@@ -12,7 +12,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public static RealTimeData realTimeData = null;
     NetworkController networkController = null;
     ClientGUIController guiController = null;
-    SessionServer ss = null;
+    static SessionServer ss = null;
      private HashMap<InetAddress, Integer> activeGameServers;
 
     //variables for the ball physics
@@ -32,8 +32,6 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     //constructor
     public MainController()
     {
-//        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
-//        ss.start();
         
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
@@ -104,11 +102,19 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
 
     public static void main(String[] args)
     {
+        
         System.out.println("about to created main controller");
         MainController mainController = new MainController();
         System.out.println("main controller created");
         mainController.start();
         System.out.println("main controller started");
+        
+        Scanner sc = new Scanner(System.in);
+        if(sc.nextLine().equals("Yes"))
+        {
+            ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
+            ss.start();
+        }
     }
     
     public void setPlayerData(InetAddress playerAddress, PlayerData playerData){

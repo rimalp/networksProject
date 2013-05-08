@@ -35,8 +35,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     private Container movingObjects;
     
     public MainController mainController = null;
-    private JLabel[] playerLabels = null;
-    private JLabel[] ballLabels = null;
+    private HashMap<InetAddress, JLabel> playerLabels = null;
+    private HashMap<InetAddress, JLabel> ballLabels = null;
     private int currentNumOfPlayers = 0;
     public static int minXForTEAM1 = 0;
     public static int maxXForTEAM1 = 0;
@@ -74,8 +74,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         test.createTestPlayer();
 //        this.repaintAll(test);
 //        this.repaintAll(test);
-        this.playerLabels = new JLabel[8];
-        this.ballLabels = new JLabel[8];
+        this.playerLabels = new HashMap<InetAddress, JLabel>();
+        this.ballLabels = new HashMap<InetAddress, JLabel>();
 
     }
     //Moves to the main menu
@@ -232,7 +232,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 
     public void repaintAll(RealTimeData data) {
 
-        HashMap<InetAddress, PlayerData> players = data.getAllPlayerData();
+        HashMap<InetAddress, PlayerData> playersData = data.getAllPlayerData();
 
         //paint each of the player and its ball in the screen one by one
         String playerIcon = "/Images/athlete.png";
@@ -241,53 +241,54 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         
         int index = 0;
         
-        for (PlayerData player : players.values()) {
+        for (InetAddress ipAddress : playersData.keySet()) {
+            PlayerData playerData = playersData.get(ipAddress);
 
-            if (player.isAlive() == Constants.ALIVE)
+            if (playerData.isAlive() == Constants.ALIVE)
             {
 //                System.out.println("Draw Alive Player");
                 
                 //player
-                if(index >= this.currentNumOfPlayers)
+                if(this.playerLabels.get(ipAddress) == null)
                 {
-                    this.playerLabels[index] = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
-                    this.playerLabels[index].addMouseMotionListener(this);
-                    this.ballLabels[index] = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
-                    this.ballLabels[index].addMouseMotionListener(this);
+                    JLabel newPlayerLabel = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+                    newPlayerLabel.addMouseMotionListener(this);
+                    this.playerLabels.put(ipAddress, newPlayerLabel);
+                    
+                    JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+                    newBallLabel.addMouseMotionListener(this);
+                    this.ballLabels.put(ipAddress, newBallLabel);
+                    
+                    movingObjects.add(this.playerLabels.get(ipAddress));
+                    this.getContentPane().add(this.playerLabels.get(ipAddress));
+                    
+                    movingObjects.add(this.ballLabels.get(ipAddress));
+                    this.getContentPane().add(this.ballLabels.get(ipAddress));
                 }
                 
-                this.playerLabels[index].setSize(50, 50);
-                this.playerLabels[index].setLocation(player.getPlayerX() - this.playerLabels[index].getWidth()/2, player.getPlayerY() - this.playerLabels[index].getHeight()/2);
-                this.playerLabels[index].setVisible(true);
+                this.playerLabels.get(ipAddress).setSize(50, 50);
+                this.playerLabels.get(ipAddress).setLocation(playerData.getPlayerX() - this.playerLabels.get(ipAddress).getWidth()/2, playerData.getPlayerY() - this.playerLabels.get(ipAddress).getHeight()/2);
+                this.playerLabels.get(ipAddress).setVisible(true);
                 
                 //ball
-                this.ballLabels[index].setSize(50, 50);
-                this.ballLabels[index].setLocation(player.getBallX() - this.playerLabels[index].getWidth()/2, player.getBallY() - this.ballLabels[index].getHeight()/2);
-                this.ballLabels[index].setVisible(true);
-                
-                if(index >= this.currentNumOfPlayers)
-                {
-                    movingObjects.add(this.playerLabels[index]);
-                    this.getContentPane().add(this.playerLabels[index]);
-                    
-                    movingObjects.add(this.ballLabels[index]);
-                    this.getContentPane().add(this.ballLabels[index]);
-                    this.currentNumOfPlayers++;
-                }
+                this.ballLabels.get(ipAddress).setSize(50, 50);
+                this.ballLabels.get(ipAddress).setLocation(playerData.getBallX() - this.ballLabels.get(ipAddress).getWidth()/2, playerData.getBallY() - this.ballLabels.get(ipAddress).getHeight()/2);
+                this.ballLabels.get(ipAddress).setVisible(true);
                 
                 
-            }else if (player.isAlive() != Constants.DEAD)
+                
+                
+            }else if (playersData.get(ipAddress).isAlive() != Constants.DEAD)
             {
                 System.out.println("Draw Dead Animation");
                 JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
-                deadPlayer.setLocation(player.getPlayerX(), player.getPlayerY());
+                deadPlayer.setLocation(playersData.get(ipAddress).getPlayerX(), playersData.get(ipAddress).getPlayerY());
                 deadPlayer.setVisible(true);
                 deadPlayer.setSize(250, 250);
                 movingObjects.add(deadPlayer);
                 this.getContentPane().add(deadPlayer);
             }
             
-            index++;
         }
 
         //this.getContentPane().add(movingObjects);
