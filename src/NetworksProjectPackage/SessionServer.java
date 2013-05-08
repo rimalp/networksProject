@@ -17,7 +17,9 @@ public class SessionServer extends Thread{
     private int listen_port;
     private InetAddress ipAddress = null;
     private ProtocolInfo protocolInfo = null;
-    private HashMap<InetAddress,Integer> servers = null;
+    private HashMap<InetAddress,ServerData> servers = null;
+
+    private int request_type;
     
     public SessionServer(int _listen_port, String _ipAddress)
     {
@@ -50,10 +52,25 @@ public class SessionServer extends Thread{
         }
         
         //this.protocolInfo = new ProtocolInfo();
-        this.servers = new HashMap<InetAddress, Integer>();
+        this.servers = new HashMap<InetAddress, ServerData>();
+
+        //test data
+        ServerData newServer1 = new ServerData(4444, "", Constants.MAX_PLAYERS);
+        ServerData newServer2 = new ServerData(4444, "", Constants.MAX_PLAYERS);
+        String ip1 = "127.188.5.6";
+        String ip2 = "127.188.5.7";
+
+        try{
+        this.servers.put(InetAddress.getByName(ip1), newServer1);
+        this.servers.put(InetAddress.getByName(ip2), newServer2);
+        }catch(Exception e){
+            System.out.println("Exception in testing data in sessionserver");
+        }
+
     }
     
-    
+
+
     public int processRequest(byte[] payload)
     {
         boolean error = false;
@@ -88,10 +105,12 @@ public class SessionServer extends Thread{
 
         int packet_type = (int) ((payload[10] << 8) | payload[11]);
 
-        if(packet_type != ProtocolInfo.TYPE_REQUEST)
+        this.request_type = packet_type;
+
+        if(packet_type != ProtocolInfo.TYPE_REQUEST && packet_type != ProtocolInfo.TYPE_UNICAST_JOINGAME)
         {
             //sendErrorPacket(dp.getAddress(), dp.getPort(), "Received non-request packet.");
-            System.out.println("Error");
+            System.out.println("adfsError: " + packet_type);
             return -1;
         }
 
@@ -99,6 +118,9 @@ public class SessionServer extends Thread{
         {
             System.out.println("Error");
         }
+
+
+
 
         System.out.println("Received Request");
         int clientPort = (int)payload[14];
@@ -108,8 +130,9 @@ public class SessionServer extends Thread{
         int temp = (int)(payload[15]);
         temp &= 0x000000FF;
         clientPort |=temp;
+
         //System.out.println(clientPort);
-        return clientPort;
+        return 4444;
     }
     
     public void run()
@@ -148,38 +171,58 @@ public class SessionServer extends Thread{
 
             if(this.servers.isEmpty())
             {
+                //create a new serverdata wrapper class
+                ServerData newServer = new ServerData(clientListenPort, "", Constants.MAX_PLAYERS);
+
                 this.sendPacket(dp.getAddress(), clientListenPort, "No server's running.");
-                this.servers.put(dp.getAddress(), clientListenPort);
-            }else
+                this.servers.put(dp.getAddress(), newServer);
+            }
+
+            else if(this.request_type == ProtocolInfo.TYPE_UNICAST_JOINGAME)
             {
-                Iterator it = this.servers.entrySet().iterator();
-                Map.Entry server = (Map.Entry)it.next();
-                this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, ((InetAddress)(server.getKey())).toString().substring(1), ((Integer)(server.getValue())).intValue());  
-                //this.sendPacketWithClientInformation((InetAddress)server.getKey(), (int)servers.get((InetAddress)server.getKey()), dp.getAddress().toString().substring(1), clientListenPort);
-                System.out.println("Server Info Sent");
+                for(InetAddress serverIps: this.servers.keySet()){
+                    System.out.println("Serverdata.tostrint(): " + serverIps.toString());
+                    this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, serverIps, this.servers.get(serverIps).port, ProtocolInfo.TYPE_UNICAST_JOINGAME );
+                    System.out.println("Server Info Sent");
+
+                }
+
+//                Iterator it = this.servers.entrySet().iterator();
+//                Map.Entry server = (Map.Entry)it.next();
+//                this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, ((InetAddress)(server.getKey())).toString().substring(1), ((Integer)(server.getValue())).intValue());
+//                //this.sendPacketWithClientInformation((InetAddress)server.getKey(), (int)servers.get((InetAddress)server.getKey()), dp.getAddress().toString().substring(1), clientListenPort);
+//                System.out.println("Server Info Sent");
             }
         }
     }
-    
-    public void sendPacketWithServerInformation(InetAddress address, int port, String ipAddress, int portNum)
+
+
+
+    public void sendPacketWithServerInformation(InetAddress address, int port, InetAddress ipAddress, int portNum, int type)
     {
         try {
                 final byte[] buffer = new byte[20];
                 byte[] ipBuffer = new byte[4];
-                ipBuffer = address.getAddress();
+                if(type != ProtocolInfo.TYPE_UNICAST_JOINGAME)
+                    ipBuffer = address.getAddress();
+                else{
+                    ipBuffer = ipAddress.getAddress();
+                }
+
                 for(int i = 0; i < ProtocolInfo.PROTOCOL_HEADER.length; i++)
                         buffer[i] = (byte)ProtocolInfo.PROTOCOL_HEADER[i];
                 buffer[8] = (byte)ProtocolInfo.MAJOR_VERSION_NUMBER;
                 buffer[9] = (byte)ProtocolInfo.MINOR_VERSION_NUMBER;
-                buffer[10] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_SERVER_INFO>>8);
-                buffer[11] = (byte)(ProtocolInfo.TYPE_UNICAST_WITH_SERVER_INFO);
+                buffer[10] = (byte)(type>>8);
+                buffer[11] = (byte)(type);
                 
                 int length = 6;
                 
                 buffer[12] = (byte)(length >>8);
                 buffer[13] = (byte)(length);
                 
-                int msg_len = ipAddress.length();
+//                int msg_len = ipAddress.length();
+
                 for(int i = 0; i < 4; i++)
                         buffer[14+i] = ipBuffer[i];
                 

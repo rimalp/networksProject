@@ -7,6 +7,7 @@ package NetworksProjectPackage;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import javax.swing.JOptionPane;
+import java.util.*;
 
 /**
  *
@@ -30,6 +31,7 @@ public class mainMenu extends javax.swing.JFrame {
         master = controller;
         putWindowInCenter();
         this.jTextField1.setVisible(false);
+        this.jComboBoxJoinList.setVisible(false);
     }
 
     public void putWindowInCenter() {
@@ -55,12 +57,16 @@ public class mainMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jComboBox2 = new javax.swing.JComboBox();
         joinGame = new javax.swing.JButton();
         hostGame = new javax.swing.JButton();
         exitGame = new javax.swing.JButton();
         mmTitle = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
         jTextField1 = new javax.swing.JTextField();
+        jComboBoxJoinList = new javax.swing.JComboBox();
+
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 51, 255));
@@ -96,7 +102,7 @@ public class mainMenu extends javax.swing.JFrame {
             }
         });
 
-        mmTitle.setFont(new java.awt.Font("SimHei", 1, 48)); // NOI18N
+        mmTitle.setFont(new java.awt.Font("SimHei", 1, 48));
         mmTitle.setForeground(new java.awt.Color(204, 0, 0));
         mmTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         mmTitle.setText("Orbit");
@@ -108,41 +114,54 @@ public class mainMenu extends javax.swing.JFrame {
             }
         });
 
+        jComboBoxJoinList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select active server" }));
+        jComboBoxJoinList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxJoinListActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(168, 168, 168)
+                .addComponent(mmTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                .addGap(169, 169, 169))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(186, 186, 186)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(joinGame, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                        .addGap(156, 156, 156))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(joinGame, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                            .addComponent(exitGame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(hostGame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(mmTitle, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE))
-                        .addGap(168, 168, 168))))
+                            .addComponent(hostGame, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.LEADING, 0, 177, Short.MAX_VALUE)
+                            .addComponent(exitGame, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+                            .addComponent(jComboBoxJoinList, 0, 177, Short.MAX_VALUE))
+                        .addGap(156, 156, 156))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(35, 35, 35)
                 .addComponent(mmTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(joinGame)
+                .addGap(4, 4, 4)
+                .addComponent(jComboBoxJoinList, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(hostGame)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exitGame)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addContainerGap(56, Short.MAX_VALUE))
         );
 
         pack();
@@ -150,6 +169,18 @@ public class mainMenu extends javax.swing.JFrame {
 
     private void joinGameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_joinGameMouseClicked
         // Code to allow user to join an existing game
+        //ask networkcontroller to contact the sessionserver to get a list of hosting servers
+
+       this.jComboBoxJoinList.removeAllItems();
+
+       master.requestGameServers();
+
+
+        this.jComboBoxJoinList.setVisible(true);
+
+        //this.jComboBoxJoinList.add
+
+
     }//GEN-LAST:event_joinGameMouseClicked
 
     private void hostGameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_hostGameMouseClicked
@@ -179,6 +210,15 @@ public class mainMenu extends javax.swing.JFrame {
     private void hostGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hostGameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_hostGameActionPerformed
+
+    private void jComboBoxJoinListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxJoinListActionPerformed
+        System.out.println((String)this.jComboBoxJoinList.getSelectedItem());
+        
+    }//GEN-LAST:event_jComboBoxJoinListActionPerformed
+
+    public void updateServerListComboBox(String item){
+        this.jComboBoxJoinList.addItem(item);
+    }
 
     /**
      * @param args the command line arguments
@@ -218,6 +258,8 @@ public class mainMenu extends javax.swing.JFrame {
     private javax.swing.JButton exitGame;
     private javax.swing.JButton hostGame;
     private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JComboBox jComboBoxJoinList;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton joinGame;
     private javax.swing.JLabel mmTitle;

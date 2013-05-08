@@ -30,7 +30,7 @@ public class NetworkController extends Thread{
     
     public static boolean thisIsServer;
     
-    private MainController mainController = null;
+    public MainController mainController = null;
 
     
     public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, MainController _mainController, GUITest guiTest)
@@ -126,7 +126,16 @@ public class NetworkController extends Thread{
              this.udpClient.sendPacket(ipAddress, this.playersInfo.get(ipAddress), bytesToBroadcast, ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
         }
     }
-    
+
+    public ArrayList<String> requestGameServers(){
+        byte[] toSend = new byte[8];
+
+        this.udpClient.sendPacket(NetworkController.sessionServerAddress, NetworkController.sessionServerListenPortNumber, toSend , ProtocolInfo.TYPE_UNICAST_JOINGAME);
+
+
+        return null;
+    }
+
     public void broadcastMessage()
     {
         for (InetAddress ipAddress : this.playersInfo.keySet()) {
@@ -170,14 +179,16 @@ public class NetworkController extends Thread{
     {
         this.mainController.multicastReceived();
     }
-    
+
+
+
     public void run()
     {        
         System.out.println("NetworkController Started");
         while(true)
         {
             try{
-                Thread.sleep(5000);
+                Thread.sleep(100);
                 System.out.println("before sending player data update");
                 System.out.println(NetworkController.realTimeData.printPlayersData());
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);

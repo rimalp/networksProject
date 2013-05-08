@@ -8,6 +8,7 @@ interface Constants
 
     public static final int ALIVE = 1;
     public static final int DEAD = 0;
+    public static final int STOP_ANIMATION = 100;
     
     public static final int PRESSED = 1;
     public static final int NOTPRESSED = 0;
@@ -20,6 +21,8 @@ interface Constants
     public static final int PLAYER3BALL = 31;
     public static final int PLAYER4 = 40;
     public static final int PLAYER4BALL = 41;
+
+    public static final int MAX_PLAYERS = 4;
 
 }
 

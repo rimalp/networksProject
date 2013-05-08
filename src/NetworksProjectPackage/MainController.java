@@ -13,6 +13,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     NetworkController networkController = null;
     ClientGUIController guiController = null;
     SessionServer ss = null;
+     private HashMap<String, Integer> activeGameServers;
 
     //variables for the ball physics
     final int RADIUS = 50;
@@ -31,14 +32,15 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     //constructor
     public MainController()
     {
-        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.73.212");
+        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
         ss.start();
         
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
-        networkController = new NetworkController("139.147.73.212", 4444, PlayerData.DEFAULT_PLAYER_DATA, this, null);
+        networkController = new NetworkController("139.147.30.243", 4444, PlayerData.DEFAULT_PLAYER_DATA, this, null);
         guiController = new ClientGUIController(this);
         guiController.drawMainMenu();
+        activeGameServers = new HashMap<String, Integer>();
     }
     
     public void startNetworkController()
@@ -114,6 +116,28 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
         //update the GUI when the player data changes
         //guiController.repaintAll(realTimeData);
         
+    }
+
+
+    public void requestGameServers(){
+        this.networkController.requestGameServers();
+    }
+
+
+
+    public void addHostServerInMainMenu(String ip, int port){
+        if(this.activeGameServers == null)
+            this.activeGameServers = new HashMap<String, Integer>();
+        this.activeGameServers.put(ip, port);
+
+        if(this.guiController == null)
+            System.out.println("GuiController null");
+
+        if(this.guiController.main_menu == null)
+            System.out.println("mainmenu null");
+
+        this.guiController.main_menu.updateServerListComboBox(ip);
+
     }
     
     public void multicastReceived()

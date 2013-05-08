@@ -102,6 +102,7 @@ public class UDPClient extends Thread{
                 if(data.length > 14)
                 {
                     return processPacketWithServerInformation(dataBuffer);
+
                 }
                 break;
             case ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO:
@@ -122,12 +123,20 @@ public class UDPClient extends Thread{
                     return processMulticastPacket(dataBuffer);
                 }
                 break;
+            case ProtocolInfo.TYPE_UNICAST_JOINGAME:
+                if(data.length > 14){
+                    return processPacketWithHostServersInformation(dataBuffer);
+                }
+
+                break;
             default: 
                 System.out.println("Unknown Packet Type");
         }
         return "";
     }
-    
+
+
+
     public String processMulticastPacket(byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromServer(data);
@@ -178,7 +187,42 @@ public class UDPClient extends Thread{
         
         return bytesToReturn;
     }
-    
+
+
+    public String processPacketWithHostServersInformation(byte[] data){
+        int myServerListenPort = 0;
+        myServerListenPort = 0;
+        myServerListenPort += (data[4] << 8);
+        myServerListenPort += data[5];
+
+        byte[] ipBuffer = new byte[4];
+        ipBuffer[0] = data[0];
+        ipBuffer[1] = data[1];
+        ipBuffer[2] = data[2];
+        ipBuffer[3] = data[3];
+
+
+        NetworkController.serverListenPortNumber = myServerListenPort;
+
+        //construct a string from all the byte in the data section, which is the error message
+
+
+        //update the main menu combobox items
+        InetAddress inet = null;
+        try{
+         inet = InetAddress.getByAddress(ipBuffer);
+//         newIp = inet.getHostAddress();
+        }catch(Exception e){
+            System.out.println("Exception in converting sessionserver");
+            return "Cannot find server address";
+        }
+        if(inet != null){
+        String newIp = inet.toString();
+        this.networkController.mainController.addHostServerInMainMenu(newIp, myServerListenPort);
+        }
+        return "Received Server Information";
+    }
+    //rimalp
     public String processPacketWithServerInformation(byte[] data)
     {
         int myServerListenPort = 0;
@@ -196,6 +240,20 @@ public class UDPClient extends Thread{
         NetworkController.serverListenPortNumber = myServerListenPort;
         
         //construct a string from all the byte in the data section, which is the error message
+
+
+        //update the main menu combobox items
+        InetAddress inet = null;
+        try{
+         inet = InetAddress.getByAddress(ipBuffer);
+//         newIp = inet.getHostAddress();
+        }catch(Exception e){System.out.println("Exception in converting sessionserver");}
+        if(inet != null){
+        String newIp = inet.toString();
+        System.out.println("udpclient server: " + newIp);
+        this.networkController.mainController.addHostServerInMainMenu(newIp, myServerListenPort);
+        }
+
         String msg = new String(data);
       	try{                  
             System.out.println(myServerListenPort);
@@ -275,6 +333,10 @@ public class UDPClient extends Thread{
         data_to_send[11] = (byte)(type);
         data_to_send[12] = (byte)(msg.length >> 8);
         data_to_send[13] = (byte)(msg.length);
+        //add my port number
+        System.out.println("Client listening port number is:>>> " + NetworkController.clientListenPortNumber);
+        data_to_send[14] = (byte) (NetworkController.clientListenPortNumber >> 8);
+        data_to_send[15] = (byte) (NetworkController.clientListenPortNumber);
         
         for (int i = 0; i < msg.length; i++)
         {
