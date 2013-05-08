@@ -49,6 +49,8 @@ public class NetworkController extends Thread{
         NetworkController.myData = PlayerData.DEFAULT_PLAYER_DATA;
         NetworkController.playersInfo = new HashMap<InetAddress, Integer>();
         NetworkController.realTimeData = new RealTimeData();
+        NetworkController.realTimeData.addNewPlayer(myIPAddress, myData);
+        NetworkController.realTimeData.getPlayerData(myIPAddress).setTeam(Constants.TEAM2);
         
         if(initialPlayerData != null)
         {
@@ -186,11 +188,12 @@ public class NetworkController extends Thread{
 
     public void run()
     {        
+        this.udpClient.sendPacket(serverAddress, NetworkController.serverListenPortNumber, this.udpClient.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
         System.out.println("NetworkController Started");
         while(true)
         {
             try{
-                Thread.sleep(100);
+                Thread.sleep(50);
                 System.out.println("before sending player data update");
                 System.out.println(NetworkController.realTimeData.printPlayersData());
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);

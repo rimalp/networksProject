@@ -272,10 +272,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     
                     movingObjects.add(this.ballLabels[index]);
                     this.getContentPane().add(this.ballLabels[index]);
+                    this.currentNumOfPlayers++;
                 }
-                
-                this.currentNumOfPlayers++;
-            
+                            
             }else if (player.isAlive() != Constants.DEAD)
             {
                 System.out.println("Draw Dead Animation");
