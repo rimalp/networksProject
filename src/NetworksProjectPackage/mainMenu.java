@@ -227,10 +227,13 @@ public class mainMenu extends javax.swing.JFrame {
                 if( text != null && !text.equals("Select a server address"))
                 {
                     try{
-                        NetworkController.serverAddress = InetAddress.getByName(text);
+                        InetAddress ip = InetAddress.getByName(text.substring(1, text.length()));
+                        NetworkController.serverAddress = ip;
                         System.out.println("Server address is updated to " + NetworkController.serverAddress.toString());
-                        NetworkController.serverListenPortNumber = this.master.mainController.getActiveGameServers().get(text);
+                        NetworkController.serverListenPortNumber = this.master.mainController.getActiveGameServers().get(ip);
                         System.out.println("Server port is "+ NetworkController.serverListenPortNumber);
+                        master.drawGameScreen();
+                        master.startNetworkController();
                     }catch(UnknownHostException e)
                     {
                         System.out.println(e);
@@ -243,12 +246,12 @@ public class mainMenu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_joinGameActionPerformed
 
-    public void updateServerListComboBox(String item){
+    public void updateServerListComboBox(InetAddress ip){
         if(this.jComboBoxJoinList.getItemCount() == 0)
         {
             this.jComboBoxJoinList.addItem("Select a server address");
         }
-        this.jComboBoxJoinList.addItem(item);
+        this.jComboBoxJoinList.addItem(ip.toString());
     }
 
     /**

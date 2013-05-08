@@ -217,8 +217,8 @@ public class UDPClient extends Thread{
             return "Cannot find server address";
         }
         if(inet != null){
-        String newIp = inet.toString();
-        this.networkController.mainController.addHostServerInMainMenu(newIp, myServerListenPort);
+//        String newIp = inet.toString();
+        this.networkController.mainController.addHostServerInMainMenu(inet, myServerListenPort);
         }
         return "Received Server Information";
     }
@@ -251,7 +251,7 @@ public class UDPClient extends Thread{
         if(inet != null){
         String newIp = inet.toString();
         System.out.println("udpclient server: " + newIp);
-        this.networkController.mainController.addHostServerInMainMenu(newIp, myServerListenPort);
+        this.networkController.mainController.addHostServerInMainMenu(inet, myServerListenPort);
         }
 
         String msg = new String(data);
