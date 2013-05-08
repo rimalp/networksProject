@@ -241,7 +241,7 @@ public class PlayerData {
             Vx *= dampingRatio;
         }else
         {
-            Vx *= 0.985;
+            Vx *= 0.9999;
         }
         
         Vy += Ay; 

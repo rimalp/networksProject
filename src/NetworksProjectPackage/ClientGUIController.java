@@ -184,7 +184,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         }
         NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
-        this.repaintAll(NetworkController.realTimeData);
+//        this.repaintAll(NetworkController.realTimeData);
     }
      
     public void mouseDragged(MouseEvent e) {
@@ -272,9 +272,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     
                     movingObjects.add(this.ballLabels[index]);
                     this.getContentPane().add(this.ballLabels[index]);
+                    this.currentNumOfPlayers++;
                 }
                 
-                this.currentNumOfPlayers++;
             
             }else if (player.isAlive() != Constants.DEAD)
             {

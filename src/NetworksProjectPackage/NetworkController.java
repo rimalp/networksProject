@@ -49,6 +49,9 @@ public class NetworkController extends Thread{
         NetworkController.myData = PlayerData.DEFAULT_PLAYER_DATA;
         NetworkController.playersInfo = new HashMap<InetAddress, Integer>();
         NetworkController.realTimeData = new RealTimeData();
+        NetworkController.realTimeData.addNewPlayer(myIPAddress, myData);
+        NetworkController.serverAddress = NetworkController.myIPAddress;
+        NetworkController.serverListenPortNumber = NetworkController.clientListenPortNumber;
         
         if(initialPlayerData != null)
         {
@@ -72,13 +75,15 @@ public class NetworkController extends Thread{
         }
         
         // I start off assuming I am not the server
-        this.thisIsServer = false;
+        this.thisIsServer = true;
         
         // I will create a client on the specified port
         this.createClient(clientPortNumber);
         
         // I will request the Server to be a server/request server address
 //        this.udpClient.sendRequestPacket();
+        
+        
     }
 
     public void createClient(int _portNumber)
@@ -187,12 +192,14 @@ public class NetworkController extends Thread{
     public void run()
     {        
         System.out.println("NetworkController Started");
+        this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, this.udpClient.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
+        NetworkController.realTimeData.getPlayerData(myIPAddress).setTeam(Constants.TEAM2);
         while(true)
         {
             try{
-                Thread.sleep(100);
+                Thread.sleep(50);
                 System.out.println("before sending player data update");
-                System.out.println(NetworkController.realTimeData.printPlayersData());
+                //System.out.println(NetworkController.realTimeData.printPlayersData());
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)
             {

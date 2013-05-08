@@ -149,8 +149,8 @@ public class UDPClient extends Thread{
     public String processUnicastPacketWithPlayerData(InetAddress address, byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromClient(data);
-        System.out.println("After receiving palyer data");
-        System.out.println(NetworkController.realTimeData.printPlayersData());
+        //System.out.println("After receiving palyer data");
+        //System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.broadcastMessage();
         return "Player Data Update Received";
     }

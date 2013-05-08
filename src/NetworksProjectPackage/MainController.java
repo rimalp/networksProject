@@ -32,8 +32,8 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     //constructor
     public MainController()
     {
-        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
-        ss.start();
+//        ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
+//        ss.start();
         
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
