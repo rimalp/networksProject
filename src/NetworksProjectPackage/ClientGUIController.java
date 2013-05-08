@@ -375,6 +375,11 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         this.mainController.startNetworkController();
     }
     
+    public void requestGameServers()
+    {
+        this.mainController.requestGameServers();
+    }
+    
     /**
      * @param args the command line arguments
      */
