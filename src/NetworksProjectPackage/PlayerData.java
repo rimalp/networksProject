@@ -6,7 +6,7 @@ package NetworksProjectPackage;
 import java.awt.Point;
 import java.net.*;
 import java.util.*;
-
+import java.nio.*;
 /**
  *
  * @author This PC
@@ -172,10 +172,10 @@ public class PlayerData {
     {
         byte[] bytesToReturn = new byte[SIZE_OF_BYTES_FOR_CLIENT];
         
-        bytesToReturn[0] = (byte)(this.playerX>>8);
-        bytesToReturn[1] = (byte)(this.playerX);
-        bytesToReturn[2] = (byte)(this.playerY>>8);
-        bytesToReturn[3] = (byte)(this.playerY);
+        bytesToReturn[0] = (byte)((this.playerX >> 8) & 0xFF);
+        bytesToReturn[1] = (byte)((this.playerX) & 0xFF);
+        bytesToReturn[2] = (byte)((this.playerY >> 8) & 0x000000FF);
+        bytesToReturn[3] = (byte)((this.playerY) & 0x000000FF);
         bytesToReturn[4] = (byte)(this.mousePressed & 0x000000FF);
 
         return bytesToReturn;
@@ -206,11 +206,11 @@ public class PlayerData {
             return false;
         }
         
-        //extract player information from the bytes passed in the parameter
-        this.playerX = ((int)newPlayerData[0] << 8) | ((int)newPlayerData[1]);
-        this.playerY = ((int)newPlayerData[2] << 8) | ((int)newPlayerData[3]);
-        this.ballX = (((int)newPlayerData[4] & 0x00FF) << 8) | ((int)newPlayerData[5] & 0x00FF);
-        this.ballY = (((int)newPlayerData[6] & 0x00FF) << 8) | ((int)newPlayerData[7] & 0x00FF);
+        this.playerX = ((int)newPlayerData[0] & 0x000000FF) << 8 | ((int)newPlayerData[1] & 0x000000FF);
+        this.playerY = ((int)newPlayerData[2] & 0x000000FF) << 8 | ((int)newPlayerData[3] & 0x000000FF);
+        
+        this.ballX = (((int)newPlayerData[4] & 0x000000FF) << 8) | ((int)newPlayerData[5] & 0x000000FF);
+        this.ballY = (((int)newPlayerData[6] & 0x000000FF) << 8) | ((int)newPlayerData[7] & 0x000000FF);
         this.team = ((int)newPlayerData[8]);
         this.alive = ((int)newPlayerData[9]);
         
@@ -219,16 +219,15 @@ public class PlayerData {
     
     public boolean getNextPlayerData(byte[] mousePositionUpdate)
     {
-        
-//        this.dampingRatio = 1;
-        
+                
         if(mousePositionUpdate.length != SIZE_OF_BYTES_FOR_CLIENT)
         {
             return false;
         }
         
-        this.playerX = ((int)mousePositionUpdate[0]) << 8 | ((int)mousePositionUpdate[1]);
-        this.playerY = ((int)mousePositionUpdate[2]) << 8 | ((int)mousePositionUpdate[3]);
+        this.playerX = ((int)mousePositionUpdate[0] & 0x000000FF) << 8 | ((int)mousePositionUpdate[1] & 0x000000FF);
+        this.playerY = ((int)mousePositionUpdate[2] & 0x000000FF) << 8 | ((int)mousePositionUpdate[3] & 0x000000FF);
+        
         this.mousePressed = (int)mousePositionUpdate[4];
         
         Ax = -0.001* frame_time * (this.ballX - this.playerX);
@@ -237,24 +236,36 @@ public class PlayerData {
         Vx += Ax;
         
         if (this.mousePressed == 0)
+        {
+            
             Vx *= dampingRatio;
-        else
+        }else
+        {
             Vx *= 0.985;
+        }
         
         Vy += Ay; 
         //if (Vy > 0.001)
         Vy *= dampingRatio;
         
-        if(this.ballX + Vx >= 0)
+        
+        if(this.ballX + Vx >= 0 && this.ballX + Vx <= ClientGUIController.maxXArena)
         {
             this.ballX += Vx;
         }
-        if(this.ballY + Vy >= 0)
+        if(this.ballY + Vy >= 0 && this.ballY + Vy <= ClientGUIController.maxYArena)
         {
             this.ballY += Vy;
         }
+        
+        
         return true;
         
+    }
+    
+    public int getIsAlive()
+    {
+        return this.alive;
     }
     
     public String toString()
@@ -274,6 +285,17 @@ public class PlayerData {
         
     }
     
+    public boolean setTeam(int _team)
+    {
+        if(_team == Constants.TEAM1 || _team == Constants.TEAM2)
+        {
+            this.team = _team;
+            return true;
+        }else
+        {
+            return false;
+        }
+    }
     
 
 }
