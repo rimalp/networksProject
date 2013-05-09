@@ -21,8 +21,6 @@ public class SoundController {
     private static Sequencer midiPlayer;
             
     public SoundController() {
-       loadExplosionSound("explode.wav");
-        startMidi("backmusic.mid");
     }
     
       public void startMidi(String midFilename) {
@@ -42,6 +40,20 @@ public class SoundController {
          e.printStackTrace();
       }
       }
+      
+      public void stopMidi()
+      {
+          if (midiPlayer.isRunning()) midiPlayer.stop();
+      }
+      
+      public void toggleMidi()
+      {
+          if (midiPlayer != null && midiPlayer.isRunning())
+              stopMidi();
+          else
+              startMidi("backmusic.mid");
+      }
+      
    
 
     public void loadExplosionSound(String explodeFilename) {
@@ -62,6 +74,7 @@ public class SoundController {
 
     public static void main(String[] args) {
         SoundController sound = new SoundController();
+        sound.toggleMidi();
         //sound.playExplosion();
     }
 }
