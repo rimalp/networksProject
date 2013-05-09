@@ -274,12 +274,18 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 //                    newPlayerLabel.addMouseMotionListener(this);
                     this.playerLabels.put(ipAddress, newPlayerLabel);
                     
-                    JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
-//                    newBallLabel.addMouseMotionListener(this);
-                    this.ballLabels.put(ipAddress, newBallLabel);
                     
                     movingObjects.add(this.playerLabels.get(ipAddress));
                     this.getContentPane().add(this.playerLabels.get(ipAddress));
+                    
+                    
+                }
+                
+                if(this.ballLabels.get(ipAddress) == null)
+                {
+                    JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+//                       newBallLabel.addMouseMotionListener(this);
+                    this.ballLabels.put(ipAddress, newBallLabel);
                     
                     movingObjects.add(this.ballLabels.get(ipAddress));
                     this.getContentPane().add(this.ballLabels.get(ipAddress));

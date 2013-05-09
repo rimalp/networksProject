@@ -203,7 +203,7 @@ public class NetworkController extends Thread{
         while(true)
         {
             try{
-                Thread.sleep(10);
+                Thread.sleep(20);
                 //System.out.println("before sending player data update");
                 //System.out.println(NetworkController.realTimeData.printPlayersData());
                 
