@@ -85,7 +85,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             cursorImg, new Point(0, 0), "blank cursor");
 
         // Set the blank cursor to the JFrame.
-        //this.getContentPane().setCursor(blankCursor);
+        this.getContentPane().setCursor(blankCursor);
 
         
 //        
