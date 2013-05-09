@@ -179,6 +179,7 @@ public class mainMenu extends javax.swing.JFrame {
         master.drawGameScreen();
         NetworkController.myData.setExiting(Constants.NOT_EXITING);
         master.startNetworkController();
+        master.mainController.guiController.drawArena();
         
     }//GEN-LAST:event_hostGameMouseClicked
 
@@ -215,6 +216,7 @@ public class mainMenu extends javax.swing.JFrame {
                         master.drawGameScreen();
                         NetworkController.myData.setExiting(Constants.NOT_EXITING);
                         master.startNetworkController();
+                        master.mainController.guiController.drawArena();
 
                     }catch(UnknownHostException e)
                     {
