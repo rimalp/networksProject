@@ -31,13 +31,14 @@ public class PlayerData {
     //here are the variables for ball position logic
     final int RADIUS = 50;
     final int DELAY = 50;
-    int frame_time = 33;
+    int frame_time = 20;
+    
     double Vx = 0;
     double Vy = 0;
     double Ax = 0;
     double Ay = 0;
     double angle = 0;
-    double dampingRatio = Math.pow(0.99, frame_time/5);
+    double dampingRatio = Math.pow(0.99, frame_time/4);
     
     public PlayerData(int _playerX, int _playerY)
     {

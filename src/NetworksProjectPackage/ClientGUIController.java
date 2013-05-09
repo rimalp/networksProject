@@ -59,6 +59,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     //GUIcontroller also creates and hides other forms that may be necessary to setup
     //a game.  Everything displayed on the screen is controlled by this class
     public ClientGUIController(MainController _mainController) {
+        
+        
         initComponents();
         this.mainController = _mainController;
         //Create Test Data
@@ -67,11 +69,22 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 //        movingObjects.addMouseListener(this.createMouseListener());
         movingObjects.addMouseMotionListener(this);
         this.getContentPane().addMouseMotionListener(this);
-        addMouseMotionListener(this);
+//        addMouseMotionListener(this);
         
         
+                // Transparent 16 x 16 pixel cursor image.
+        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+
+        // Create a new blank cursor.
+        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+            cursorImg, new Point(0, 0), "blank cursor");
+
+        // Set the blank cursor to the JFrame.
+        //this.getContentPane().setCursor(blankCursor);
+
         
-        test.createTestPlayer();
+//        
+//        test.createTestPlayer();
 //        this.repaintAll(test);
 //        this.repaintAll(test);
         this.playerLabels = new HashMap<InetAddress, JLabel>();
@@ -132,13 +145,15 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             currentLine.setVisible(true);
             this.getContentPane().add(currentLine);
         }
-        ClientGUIController.maxXForTEAM1 = this.getContentPane().getWidth()/2 -5;
-        ClientGUIController.maxYForTEAM1 = this.getContentPane().getHeight() - 10;
-        ClientGUIController.minXForTEAM2 = this.getContentPane().getWidth()/2 +5;
-        ClientGUIController.maxXForTEAM2 = this.getContentPane().getWidth();
-        ClientGUIController.maxYForTEAM2 = this.getContentPane().getHeight() - 10;
-        ClientGUIController.maxXArena = this.getContentPane().getWidth();
-        ClientGUIController.maxYArena = this.getContentPane().getHeight() -10;
+        ClientGUIController.minYForTEAM1 = 20;
+        ClientGUIController.minYForTEAM2 = 20;
+        ClientGUIController.maxXForTEAM1 = this.getContentPane().getWidth()/2 - 15;
+        ClientGUIController.maxYForTEAM1 = this.getContentPane().getHeight() - 30;
+        ClientGUIController.minXForTEAM2 = this.getContentPane().getWidth()/2 +15;
+        ClientGUIController.maxXForTEAM2 = this.getContentPane().getWidth() - 30;
+        ClientGUIController.maxYForTEAM2 = this.getContentPane().getHeight() - 30;
+        ClientGUIController.maxXArena = this.getContentPane().getWidth() - 30;
+        ClientGUIController.maxYArena = this.getContentPane().getHeight() -30;
         
         this.repaintAll(NetworkController.realTimeData, false);
         
@@ -146,8 +161,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     
     public void mouseMoved(MouseEvent e) {
         int team = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).getTeam();
-        int x = e.getXOnScreen() - 120;
-        int y = e.getYOnScreen() - 40;
+        int x = e.getX();
+        int y = e.getY();
+        
         if(team == Constants.TEAM1)
         {
             if(x > ClientGUIController.maxXForTEAM1)
@@ -189,8 +205,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
      
     public void mouseDragged(MouseEvent e) {
         int team = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).getTeam();
-        int x = e.getXOnScreen() - 120;
-        int y = e.getYOnScreen() - 40;
+        int x = e.getX();
+        int y = e.getY();
+        
         if(team == Constants.TEAM1)
         {
             if(x > ClientGUIController.maxXForTEAM1)
@@ -253,11 +270,11 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 if(this.playerLabels.get(ipAddress) == null)
                 {
                     JLabel newPlayerLabel = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
-                    newPlayerLabel.addMouseMotionListener(this);
+//                    newPlayerLabel.addMouseMotionListener(this);
                     this.playerLabels.put(ipAddress, newPlayerLabel);
                     
                     JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
-                    newBallLabel.addMouseMotionListener(this);
+//                    newBallLabel.addMouseMotionListener(this);
                     this.ballLabels.put(ipAddress, newBallLabel);
                     
                     movingObjects.add(this.playerLabels.get(ipAddress));
