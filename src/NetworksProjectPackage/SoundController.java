@@ -43,7 +43,7 @@ public class SoundController {
       
       public void stopMidi()
       {
-          if (midiPlayer.isRunning()) midiPlayer.stop();
+          if (midiPlayer != null && midiPlayer.isRunning()) midiPlayer.stop();
       }
       
       public void toggleMidi()
