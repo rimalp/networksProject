@@ -297,8 +297,10 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         HashMap<InetAddress, PlayerData> playersData = data.getAllPlayerData();
 
         //paint each of the player and its ball in the screen one by one
-        String playerIcon = "/Images/athlete.png";
-        String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
+        String playerIconTeamOne = "/NetworksProjectPackage/athlete.png";
+        String playerIconTeamTwo = "/NetworksProjectPackage/athleteblue.png";
+        String ballIconTeamOne = "/NetworksProjectPackage/redBall.png";
+        String ballIconTeamTwo = "/NetworksProjectPackage/blueBall.png";
         String deadAnimation = "/NetworksProjectPackage/explosion2.gif";
         
         this.jLabel1.setText(""+NetworkController.realTimeData.getScore(Constants.TEAM1));
@@ -313,14 +315,13 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 if(this.playerJustDied.get(ipAddress) != null && this.playerJustDied.get(ipAddress).intValue() == 1)
                 {
                     this.playerJustDied.put(ipAddress, 0);
-                    this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIcon)));
                 }
 //                System.out.println("Draw Alive Player");
                 
                 //player
                 if(this.playerLabels.get(ipAddress) == null)
                 {
-                    JLabel newPlayerLabel = new JLabel(new ImageIcon(getClass().getResource(playerIcon)));
+                    JLabel newPlayerLabel = new JLabel(new ImageIcon(getClass().getResource(playerIconTeamOne)));
 //                    newPlayerLabel.addMouseMotionListener(this);
                     this.playerLabels.put(ipAddress, newPlayerLabel);
                     
@@ -331,15 +332,31 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     
                 }
                 
+                if(playerData.getTeam() == Constants.TEAM1)
+                {
+                    this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIconTeamOne)));
+                }else if(playerData.getTeam() == Constants.TEAM2)
+                {
+                    this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIconTeamTwo)));
+                } 
+                
                 if(this.ballLabels.get(ipAddress) == null)
                 {
-                    JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIcon)));
+                    JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIconTeamOne)));
 //                       newBallLabel.addMouseMotionListener(this);
                     this.ballLabels.put(ipAddress, newBallLabel);
                     
                     movingObjects.add(this.ballLabels.get(ipAddress));
                     this.getContentPane().add(this.ballLabels.get(ipAddress));
                 }
+                
+                if(playerData.getTeam() == Constants.TEAM1)
+                {
+                    this.ballLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(ballIconTeamOne)));
+                }else if(playerData.getTeam() == Constants.TEAM2)
+                {
+                    this.ballLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(ballIconTeamTwo)));
+                } 
                 
                 if(!isBasedOnPacketFromServer || !ipAddress.equals(NetworkController.myIPAddress))
                 {
@@ -410,8 +427,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         });
 
+        jButton1.setBackground(new java.awt.Color(255, 0, 0));
         jButton1.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
-        jButton1.setText("Team 1");
+        jButton1.setText("Team RED");
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -419,8 +437,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         });
 
+        jButton2.setBackground(new java.awt.Color(0, 153, 255));
         jButton2.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
-        jButton2.setText("Team 2");
+        jButton2.setText("Team BLUE");
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -449,7 +468,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

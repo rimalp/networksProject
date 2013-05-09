@@ -31,7 +31,6 @@ public class mainMenu extends javax.swing.JFrame {
         initComponents();
         master = controller;
         putWindowInCenter();
-        this.jTextField1.setVisible(false);
         this.jComboBoxJoinList.setVisible(false);
     }
 
@@ -63,8 +62,6 @@ public class mainMenu extends javax.swing.JFrame {
         hostGame = new javax.swing.JButton();
         exitGame = new javax.swing.JButton();
         mmTitle = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
-        jTextField1 = new javax.swing.JTextField();
         jComboBoxJoinList = new javax.swing.JComboBox();
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -113,13 +110,6 @@ public class mainMenu extends javax.swing.JFrame {
         mmTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         mmTitle.setText("Orbit");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Automatic Connection", "Manual Connection" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-
         jComboBoxJoinList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select active server" }));
         jComboBoxJoinList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -140,8 +130,6 @@ public class mainMenu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(joinGame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
                     .addComponent(hostGame, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, 0, 177, Short.MAX_VALUE)
                     .addComponent(exitGame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
                     .addComponent(jComboBoxJoinList, javax.swing.GroupLayout.Alignment.TRAILING, 0, 177, Short.MAX_VALUE))
                 .addGap(156, 156, 156))
@@ -159,11 +147,7 @@ public class mainMenu extends javax.swing.JFrame {
                 .addComponent(hostGame)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exitGame)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addContainerGap(110, Short.MAX_VALUE))
         );
 
         pack();
@@ -202,16 +186,6 @@ public class mainMenu extends javax.swing.JFrame {
             System.exit(0);
         }
     }//GEN-LAST:event_exitGameMouseClicked
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        if(this.jComboBox1.getSelectedIndex() == 0)
-        {
-            this.jTextField1.setVisible(false);
-        }else
-        {
-            this.jTextField1.setVisible(true);
-        }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void hostGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hostGameActionPerformed
         // TODO add your handling code here:
@@ -295,10 +269,8 @@ public class mainMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitGame;
     private javax.swing.JButton hostGame;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JComboBox jComboBoxJoinList;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JButton joinGame;
     private javax.swing.JLabel mmTitle;
     // End of variables declaration//GEN-END:variables

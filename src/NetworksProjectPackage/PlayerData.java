@@ -245,6 +245,20 @@ public class PlayerData {
         this.playerX = ((int)mousePositionUpdate[0] & 0x000000FF) << 8 | ((int)mousePositionUpdate[1] & 0x000000FF);
         this.playerY = ((int)mousePositionUpdate[2] & 0x000000FF) << 8 | ((int)mousePositionUpdate[3] & 0x000000FF);
         
+        if(this.team == Constants.TEAM2)
+        {
+            if(this.playerX >= ClientGUIController.minXForTEAM1 && this.playerX <= ClientGUIController.maxXForTEAM1)
+            {
+                this.team = Constants.TEAM1;
+            }
+        }else if(this.team == Constants.TEAM1)
+        {
+           if(this.playerX >= ClientGUIController.minXForTEAM2 && this.playerX <= ClientGUIController.maxXForTEAM2)
+            {
+                this.team = Constants.TEAM2;
+            } 
+        }
+        
         this.mousePressed = (int)mousePositionUpdate[4];
         
         Ax = -0.001* frame_time * (this.ballX - this.playerX);
