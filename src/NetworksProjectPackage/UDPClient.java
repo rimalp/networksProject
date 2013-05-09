@@ -47,6 +47,9 @@ public class UDPClient extends Thread{
         
     }
     
+    
+    
+    
     //process the packet received from the server
     public String processPacket(InetAddress clientAddress, byte[] data)
     {
@@ -127,7 +130,11 @@ public class UDPClient extends Thread{
                 if(data.length > 14){
                     return processPacketWithHostServersInformation(dataBuffer);
                 }
-
+            case ProtocolInfo.TYPE_UNICAST_EXITGAME:
+                if(data.length > 14)
+                {
+                    return processPacketWithPlayerExitInfo(clientAddress);
+                }
                 break;
             default: 
                 System.out.println("Unknown Packet Type");
@@ -135,7 +142,11 @@ public class UDPClient extends Thread{
         return "";
     }
 
-
+    public String processPacketWithPlayerExitInfo(InetAddress clientAddress)
+    {
+        NetworkController.realTimeData.getPlayerData(clientAddress).setExiting(Constants.EXITING);
+        return "One Player is Exiting";
+    }
 
     public String processMulticastPacket(byte[] data)
     {

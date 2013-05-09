@@ -313,7 +313,14 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         for (InetAddress ipAddress : playersData.keySet()) {
             
             PlayerData playerData = playersData.get(ipAddress);
-
+            if(playerData.getExiting() == Constants.EXITING)
+            {
+                this.getContentPane().remove(this.playerLabels.get(ipAddress));
+                this.getContentPane().remove(this.ballLabels.get(ipAddress));
+                this.playerLabels.remove(ipAddress);
+                this.ballLabels.remove(ipAddress);
+            }else
+            {
             if (playerData.isAlive() == Constants.ALIVE)
             {
                 if(this.playerJustDied.get(ipAddress) != null && this.playerJustDied.get(ipAddress).intValue() == 1)
@@ -397,6 +404,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 //                deadPlayer.setVisible(true);
                 
             }
+        }
             
         }
 
@@ -419,6 +427,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setForeground(new java.awt.Color(255, 102, 0));
@@ -459,12 +469,22 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         jLabel2.setText("0");
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
+        jButton3.setText("Sound Off");
+
+        jButton4.setText("Exit");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(98, 98, 98)
+                .addComponent(jButton3)
+                .addGap(23, 23, 23)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
@@ -472,7 +492,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addComponent(jButton4)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -482,7 +504,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     .addComponent(jLabel1)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(jButton4)
+                    .addComponent(jButton3))
                 .addContainerGap(258, Short.MAX_VALUE))
         );
 
@@ -538,6 +562,11 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).setTeam(Constants.TEAM2);
         this.repaintAll(NetworkController.realTimeData, false);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        byte[] emptyMsg = new byte[2];
+        this.mainController.networkController.getUDPClient().sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, emptyMsg, ProtocolInfo.TYPE_UNICAST_EXITGAME);
+    }//GEN-LAST:event_jButton4ActionPerformed
     
     public void startNetworkController()
     {
@@ -586,6 +615,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables

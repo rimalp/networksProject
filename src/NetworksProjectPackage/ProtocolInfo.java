@@ -21,6 +21,7 @@ interface ProtocolInfo {
     public final int TYPE_MULTICAST = 7;
     public final int TYPE_UNICAST_JOINGAME = 8;
     public final int TYPE_UNICAST_HOSTGAME = 9;
+    public final int TYPE_UNICAST_EXITGAME = 10;
 
     public static final int DEFAULT_CLIENT_LISTEN_PORT_NUMBER = 4444;
     public static final int DEFAULT_SERVER_LISTEN_PORT_NUMBER = 5555;

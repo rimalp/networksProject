@@ -23,6 +23,7 @@ public class PlayerData {
     //some more parameters for each player
     private int alive;
     private int team;
+    private int exiting = Constants.NOT_EXITING;
     
     public static int SIZE_OF_BYTES_FOR_CLIENT = 8;
     public static int SIZE_OF_BYTES_FOR_SERVER = 16;
@@ -139,6 +140,11 @@ public class PlayerData {
             this.timeToRevive = MAXIMUM_WAIT_BEFORE_REVIVAL;
         }
     }
+    
+    public void setExiting(int status)
+    {
+        this.exiting = status;
+    }
 
     public void setPlayerX(int x){
         this.playerX = x;
@@ -180,6 +186,11 @@ public class PlayerData {
     {
         this.mousePressed = _mousePressed;
     }
+    
+    public int getExiting()
+    {
+        return this.exiting;
+    }
 
     public byte[] getBytesForClient()
     {
@@ -210,6 +221,7 @@ public class PlayerData {
         bytesToReturn[9] = (byte)(this.alive);
         bytesToReturn[10] = (byte)(NetworkController.realTimeData.getScore(Constants.TEAM1));
         bytesToReturn[11] = (byte)(NetworkController.realTimeData.getScore(Constants.TEAM2));
+        bytesToReturn[12] = (byte)(this.exiting);
         
         return bytesToReturn;
     }
@@ -230,6 +242,7 @@ public class PlayerData {
         this.alive = ((int)newPlayerData[9]);
         NetworkController.realTimeData.setScore(Constants.TEAM1, ((int)newPlayerData[10]));
         NetworkController.realTimeData.setScore(Constants.TEAM2, ((int)newPlayerData[11]));
+        this.exiting = ((int)(newPlayerData[12]));
         
         return true; 
     }

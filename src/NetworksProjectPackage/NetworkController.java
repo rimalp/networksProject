@@ -85,7 +85,9 @@ public class NetworkController extends Thread{
         
         
     }
-
+    
+    
+    
     public void createClient(int _portNumber)
     {
         if(_portNumber < 1)
@@ -154,6 +156,17 @@ public class NetworkController extends Thread{
         for (InetAddress ipAddress : this.playersInfo.keySet()) {
              this.udpClient.sendPacket(ipAddress, this.playersInfo.get(ipAddress), this.realTimeData.getBytesForServer(), ProtocolInfo.TYPE_MULTICAST);
         }
+        
+        for (InetAddress ipAddress : this.playersInfo.keySet()) {
+            if(NetworkController.realTimeData.getPlayerData(ipAddress).getExiting() == Constants.EXITING)
+            {
+                this.playersInfo.remove(ipAddress);
+                NetworkController.realTimeData.removePlayer(ipAddress);
+            }
+            
+        }
+        
+        
     }
     
     public void processClientMessage(byte[] bytesFromClient)
@@ -203,7 +216,7 @@ public class NetworkController extends Thread{
         System.out.println("NetworkController Started");
         this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, this.udpClient.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
         NetworkController.realTimeData.getPlayerData(myIPAddress).setTeam(Constants.TEAM2);
-        while(true)
+        while(NetworkController.myData != null && NetworkController.myData.getExiting() == Constants.NOT_EXITING)
         {
             try{
                 Thread.sleep(20);

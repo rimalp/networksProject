@@ -24,6 +24,9 @@ interface Constants
     public static final int PLAYER4BALL = 41;
 
     public static final int MAX_PLAYERS = 4;
+    
+    public static final int EXITING = 1;
+    public static final int NOT_EXITING = 0;
 
 }
 

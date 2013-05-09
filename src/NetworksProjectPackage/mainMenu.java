@@ -177,7 +177,9 @@ public class mainMenu extends javax.swing.JFrame {
         byteBuffer[1] = (byte)(NetworkController.clientListenPortNumber);
         master.mainController.networkController.getUDPClient().sendPacket(NetworkController.sessionServerAddress, NetworkController.sessionServerListenPortNumber, byteBuffer, ProtocolInfo.TYPE_UNICAST_HOSTGAME);
         master.drawGameScreen();
+        NetworkController.myData.setExiting(Constants.NOT_EXITING);
         master.startNetworkController();
+        
     }//GEN-LAST:event_hostGameMouseClicked
 
     private void exitGameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitGameMouseClicked
@@ -211,7 +213,9 @@ public class mainMenu extends javax.swing.JFrame {
                         NetworkController.serverListenPortNumber = this.master.mainController.getActiveGameServers().get(ip);
                         System.out.println("Server port is "+ NetworkController.serverListenPortNumber);
                         master.drawGameScreen();
+                        NetworkController.myData.setExiting(Constants.NOT_EXITING);
                         master.startNetworkController();
+
                     }catch(UnknownHostException e)
                     {
                         System.out.println(e);

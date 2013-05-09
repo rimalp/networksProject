@@ -352,4 +352,9 @@ public class RealTimeData {
     {
         return this.playersData.get(inetAddress).setTeam(team);
     }
+    
+    public void removePlayer(InetAddress ip)
+    {
+        this.playersData.remove(ip);
+    }
 }
