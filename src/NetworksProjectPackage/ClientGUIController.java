@@ -35,6 +35,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     private Container movingObjects;
     
     public MainController mainController = null;
+    private SoundController soundController = null;
     private HashMap<InetAddress, JLabel> playerLabels = null;
     private HashMap<InetAddress, JLabel> ballLabels = null;
     private HashMap<InetAddress, Integer> playerJustDied = null;
@@ -68,6 +69,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         
         initComponents();
         this.mainController = _mainController;
+        this.soundController = new SoundController();
         //Create Test Data
         RealTimeData test = new RealTimeData();
         movingObjects = new Container();
@@ -103,12 +105,14 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     public void drawMainMenu() {
         main_menu = new mainMenu(this);
         main_menu.setVisible(true);
+        soundController.stopMidi();
         this.setVisible(false);
     }
     //Moves to the game screen
 
     public void drawGameScreen() {
         main_menu.setVisible(false);
+        soundController.startMidi("backmusic.mid");
         this.putWindowInCenter();
         this.setVisible(true);
     }
@@ -483,6 +487,11 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         jButton3.setText("Sound Off");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Exit");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -578,8 +587,13 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         byte[] emptyMsg = new byte[2];
+        soundController.stopMidi();
         this.mainController.networkController.getUDPClient().sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, emptyMsg, ProtocolInfo.TYPE_UNICAST_EXITGAME);
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    soundController.toggleMidi();
+    }//GEN-LAST:event_jButton3ActionPerformed
     
     public void startNetworkController()
     {
