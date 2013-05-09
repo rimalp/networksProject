@@ -326,6 +326,10 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     this.ballLabels.remove(ipAddress);
                 }
                 
+                this.getContentPane().removeAll();
+                this.main_menu.setVisible(true);
+                
+                this.setVisible(false);
             }else
             {
             if (playerData.isAlive() == Constants.ALIVE)
