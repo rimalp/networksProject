@@ -166,8 +166,12 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         ClientGUIController.minXArena = 16;
         
         this.jButton1.setSize(300, 50);
+        this.jButton1.setOpaque(true);
+        this.jButton1.setBorderPainted(false);
         this.jButton1.setLocation(this.getContentPane().getWidth()/2 - 300, 0);
         this.jButton2.setSize(300, 50);
+        this.jButton2.setOpaque(true);
+        this.jButton2.setBorderPainted(false);
         this.jButton2.setLocation(this.getContentPane().getWidth()/2, 0);
         this.jLabel1.setSize(200,50);
         this.jLabel1.setLocation(this.getContentPane().getWidth()/2 - 500,0);
