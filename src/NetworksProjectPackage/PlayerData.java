@@ -26,7 +26,7 @@ public class PlayerData {
     
     public static int SIZE_OF_BYTES_FOR_CLIENT = 8;
     public static int SIZE_OF_BYTES_FOR_SERVER = 16;
-    public static PlayerData DEFAULT_PLAYER_DATA= new PlayerData(300,300,450,450);
+//    public static PlayerData DEFAULT_PLAYER_DATA= new PlayerData(300,300,450,450);
     
     //here are the variables for ball position logic
     final int RADIUS = 50;

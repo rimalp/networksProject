@@ -141,16 +141,18 @@ public class UDPClient extends Thread{
     {
         NetworkController.realTimeData.updateBasedOnBytesFromServer(data);
         System.out.println("After received multicast packet");
+//        System.out.println(NetworkController.realTimeData.printPlayersData());
         System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.multicastReceived();
+        
         return "Multicast Message received";
     }
     
     public String processUnicastPacketWithPlayerData(InetAddress address, byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromClient(data);
-        //System.out.println("After receiving palyer data");
-        //System.out.println(NetworkController.realTimeData.printPlayersData());
+        System.out.println("After receiving palyer data");
+        System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.broadcastMessage();
         return "Player Data Update Received";
     }
@@ -261,8 +263,8 @@ public class UDPClient extends Thread{
             NetworkController.serverAddress = InetAddress.getByAddress(ipBuffer);
             
             System.out.println(NetworkController.serverAddress.getHostAddress());
-            
-            NetworkController.realTimeData.addNewPlayer(NetworkController.myIPAddress, PlayerData.DEFAULT_PLAYER_DATA);
+            PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
+            NetworkController.realTimeData.addNewPlayer(NetworkController.myIPAddress, defaultPlayerData);
             this.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, this.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
         }catch(UnknownHostException e)
         {
@@ -334,7 +336,7 @@ public class UDPClient extends Thread{
         data_to_send[12] = (byte)(msg.length >> 8);
         data_to_send[13] = (byte)(msg.length);
         //add my port number
-        System.out.println("Client listening port number is:>>> " + NetworkController.clientListenPortNumber);
+
         data_to_send[14] = (byte) (NetworkController.clientListenPortNumber >> 8);
         data_to_send[15] = (byte) (NetworkController.clientListenPortNumber);
         

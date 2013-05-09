@@ -184,7 +184,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         }
         NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
-//        this.repaintAll(NetworkController.realTimeData);
+        this.repaintAll(NetworkController.realTimeData);
     }
      
     public void mouseDragged(MouseEvent e) {
@@ -242,6 +242,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         int index = 0;
         
         for (InetAddress ipAddress : playersData.keySet()) {
+            
             PlayerData playerData = playersData.get(ipAddress);
 
             if (playerData.isAlive() == Constants.ALIVE)

@@ -46,7 +46,7 @@ public class NetworkController extends Thread{
         NetworkController.serverListenPortNumber = ProtocolInfo.DEFAULT_SERVER_LISTEN_PORT_NUMBER;
         NetworkController.clientListenPortNumber = ProtocolInfo.DEFAULT_CLIENT_LISTEN_PORT_NUMBER;
         
-        NetworkController.myData = PlayerData.DEFAULT_PLAYER_DATA;
+        NetworkController.myData = new PlayerData(300,300,450,450);
         NetworkController.playersInfo = new HashMap<InetAddress, Integer>();
         NetworkController.realTimeData = new RealTimeData();
         NetworkController.realTimeData.addNewPlayer(myIPAddress, myData);
@@ -104,7 +104,13 @@ public class NetworkController extends Thread{
     {
         System.out.println("added player with IP"+ip.getHostName()+" and port number"+ portNumber);
         this.playersInfo.put(ip, portNumber);
-        this.realTimeData.addNewPlayer(ip, PlayerData.DEFAULT_PLAYER_DATA);
+        if(newPlayerData == null)
+        {
+            newPlayerData = new PlayerData(300,300,450,450);
+        }else
+        {
+            this.realTimeData.addNewPlayer(ip, newPlayerData);
+        }
     }
     
     public void broadcastNewPlayerInfo(InetAddress newPlayerIP, int newPlayerPortNum)
@@ -197,9 +203,10 @@ public class NetworkController extends Thread{
         while(true)
         {
             try{
-                Thread.sleep(50);
+                Thread.sleep(5000);
                 System.out.println("before sending player data update");
-                //System.out.println(NetworkController.realTimeData.printPlayersData());
+                System.out.println(NetworkController.realTimeData.printPlayersData());
+                
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)
             {

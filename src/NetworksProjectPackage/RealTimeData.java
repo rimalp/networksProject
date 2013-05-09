@@ -55,7 +55,8 @@ public class RealTimeData {
     {
         if(newPlayerData == null)
         {
-            this.playersData.put(address, PlayerData.DEFAULT_PLAYER_DATA);
+            PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
+            this.playersData.put(address, defaultPlayerData);
         }else
         {
             this.playersData.put(address, newPlayerData);
@@ -198,7 +199,8 @@ public class RealTimeData {
             
             if(this.playersData.get(tempIP) == null)
             {
-                this.playersData.put(tempIP, PlayerData.DEFAULT_PLAYER_DATA);
+                PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
+                this.playersData.put(tempIP, defaultPlayerData);
                 this.playersData.get(tempIP).updateBasedOnBytesFromServer(playerData);
             }else
             {
@@ -227,6 +229,7 @@ public class RealTimeData {
         try
         {
             tempIP = InetAddress.getByAddress(ipBuffer);
+            System.out.println("IP From Buffer" + tempIP);
         }catch(Exception e)
         {
             return false;
@@ -236,7 +239,13 @@ public class RealTimeData {
         {
             playerData[j] = bytesFromClient[j + 4];
         }
-
+        
+        if(this.playersData.get(tempIP) == null)
+        {
+            PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
+            this.playersData.put(tempIP, defaultPlayerData);
+        }
+        
         if(this.playersData.get(tempIP).getNextPlayerData(playerData))
         {
             for(InetAddress playerAddress: this.playersData.keySet())

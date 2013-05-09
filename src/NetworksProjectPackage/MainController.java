@@ -35,7 +35,8 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
         
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
-        networkController = new NetworkController("139.147.30.243", 4444, PlayerData.DEFAULT_PLAYER_DATA, this, null);
+        PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
+        networkController = new NetworkController("139.147.30.243", 4444, defaultPlayerData, this, null);
         guiController = new ClientGUIController(this);
         guiController.drawMainMenu();
         activeGameServers = new HashMap<InetAddress, Integer>();
@@ -70,7 +71,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public void processRealTimeData(){
         //add any new player that might have entered the game (IS THIS NEEDED??)
         if(NetworkController.thisIsServer){
-            HashMap<InetAddress, PlayerData> players = MainController.realTimeData.getAllPlayerData();
+            HashMap<InetAddress, PlayerData> players = realTimeData.getAllPlayerData();
             //see if any of the balls touch any of the players
             ArrayList<InetAddress> toRemove = new ArrayList<InetAddress>();
             for(InetAddress ip1: players.keySet()){
@@ -97,7 +98,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     }
 
     public void addNewPlayer(InetAddress ip, int team){
-        MainController.realTimeData.addNewPlayer(ip, new PlayerData(team));
+        realTimeData.addNewPlayer(ip, new PlayerData(team));
     }
 
     public static void main(String[] args)
@@ -118,7 +119,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     }
     
     public void setPlayerData(InetAddress playerAddress, PlayerData playerData){
-        MainController.realTimeData.setPlayerData(playerAddress, playerData);
+        realTimeData.setPlayerData(playerAddress, playerData);
         //update the GUI when the player data changes
         //guiController.repaintAll(realTimeData);
         
