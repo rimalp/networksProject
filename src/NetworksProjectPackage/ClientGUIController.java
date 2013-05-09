@@ -340,6 +340,10 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(deadAnimation)));
                     
                 }
+                
+                this.ballLabels.get(ipAddress).setVisible(false);
+                this.ballLabels.get(ipAddress).setLocation(this.playerLabels.get(ipAddress).getLocation());
+                
 //                deadPlayer.setLocation(playersData.get(ipAddress).getPlayerX(), playersData.get(ipAddress).getPlayerY());
 //                deadPlayer.setVisible(true);
                 

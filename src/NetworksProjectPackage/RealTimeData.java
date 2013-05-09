@@ -253,7 +253,8 @@ public class RealTimeData {
             {
                 for(InetAddress anotherPlayerAddress: NetworkController.realTimeData.getAllPlayerData().keySet())
                 {
-                    if(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive() == Constants.ALIVE &&
+                    if(NetworkController.realTimeData.getAllPlayerData().get(playerAddress).isAlive() == Constants.ALIVE &&
+                            NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive() == Constants.ALIVE &&
                             !playerAddress.equals(anotherPlayerAddress) && 
                             NetworkController.realTimeData.getAllPlayerData().get(playerAddress).getTeam() != NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).getTeam())
                     {
