@@ -267,7 +267,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     this.getContentPane().add(this.ballLabels.get(ipAddress));
                 }
                 
-                if(!isBasedOnPacketFromServer)
+                if(!isBasedOnPacketFromServer || !ipAddress.equals(NetworkController.myIPAddress))
                 {
                     this.playerLabels.get(ipAddress).setSize(50, 50);
                     this.playerLabels.get(ipAddress).setLocation(playerData.getPlayerX() - this.playerLabels.get(ipAddress).getWidth()/2, playerData.getPlayerY() - this.playerLabels.get(ipAddress).getHeight()/2);
