@@ -57,7 +57,7 @@ public class SessionServer extends Thread{
         //test data
         ServerData newServer1 = new ServerData(4444, "", Constants.MAX_PLAYERS);
         ServerData newServer2 = new ServerData(4444, "", Constants.MAX_PLAYERS);
-        String ip1 = "139.147.37.17";
+        String ip1 = "139.147.103.6";
         String ip2 = "127.188.5.7";
 
         try{
