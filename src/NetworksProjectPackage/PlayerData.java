@@ -135,6 +135,7 @@ public class PlayerData {
         if(this.timeToRevive == 0)
         {
             this.alive = Constants.ALIVE;
+            this.timeToRevive = 800;
         }
     }
 
@@ -269,7 +270,10 @@ public class PlayerData {
             this.ballY += Vy;
         }
         
-        
+        if(this.alive == Constants.DEAD)
+        {
+            this.keepDying();
+        }
         return true;
         
     }
