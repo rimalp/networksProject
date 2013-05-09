@@ -147,6 +147,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         }
         ClientGUIController.minYForTEAM1 = 20;
         ClientGUIController.minYForTEAM2 = 20;
+        ClientGUIController.minXForTEAM1 = 20;
         ClientGUIController.maxXForTEAM1 = this.getContentPane().getWidth()/2 - 15;
         ClientGUIController.maxYForTEAM1 = this.getContentPane().getHeight() - 30;
         ClientGUIController.minXForTEAM2 = this.getContentPane().getWidth()/2 +15;
