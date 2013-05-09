@@ -203,9 +203,9 @@ public class NetworkController extends Thread{
         while(true)
         {
             try{
-                Thread.sleep(50);
-                System.out.println("before sending player data update");
-                System.out.println(NetworkController.realTimeData.printPlayersData());
+                Thread.sleep(10);
+                //System.out.println("before sending player data update");
+                //System.out.println(NetworkController.realTimeData.printPlayersData());
                 
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)

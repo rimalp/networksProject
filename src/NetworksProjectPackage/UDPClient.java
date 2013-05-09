@@ -140,9 +140,9 @@ public class UDPClient extends Thread{
     public String processMulticastPacket(byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromServer(data);
-        System.out.println("After received multicast packet");
+        //System.out.println("After received multicast packet");
 //        System.out.println(NetworkController.realTimeData.printPlayersData());
-        System.out.println(NetworkController.realTimeData.printPlayersData());
+        //System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.multicastReceived();
         
         return "Multicast Message received";
@@ -151,8 +151,8 @@ public class UDPClient extends Thread{
     public String processUnicastPacketWithPlayerData(InetAddress address, byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromClient(data);
-        System.out.println("After receiving palyer data");
-        System.out.println(NetworkController.realTimeData.printPlayersData());
+        //System.out.println("After receiving palyer data");
+        //System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.broadcastMessage();
         return "Player Data Update Received";
     }
@@ -430,7 +430,7 @@ public class UDPClient extends Thread{
                     System.out.println(e);
                 }
             }
-            System.out.println(status);
+//            System.out.println(status);
         }
     }
 }

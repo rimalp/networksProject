@@ -229,7 +229,7 @@ public class RealTimeData {
         try
         {
             tempIP = InetAddress.getByAddress(ipBuffer);
-            System.out.println("IP From Buffer" + tempIP);
+            //System.out.println("IP From Buffer" + tempIP);
         }catch(Exception e)
         {
             return false;
