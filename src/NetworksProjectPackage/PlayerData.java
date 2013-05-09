@@ -39,7 +39,8 @@ public class PlayerData {
     double Ay = 0;
     double angle = 0;
     double dampingRatio = Math.pow(0.99, frame_time/4);
-    int timeToRevive = 800;
+    final int MAXIMUM_WAIT_BEFORE_REVIVAL = 100;
+    int timeToRevive = MAXIMUM_WAIT_BEFORE_REVIVAL;
     
     public PlayerData(int _playerX, int _playerY)
     {
@@ -135,7 +136,7 @@ public class PlayerData {
         if(this.timeToRevive == 0)
         {
             this.alive = Constants.ALIVE;
-            this.timeToRevive = 800;
+            this.timeToRevive = MAXIMUM_WAIT_BEFORE_REVIVAL;
         }
     }
 
