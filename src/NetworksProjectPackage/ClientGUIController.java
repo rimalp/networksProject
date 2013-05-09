@@ -37,6 +37,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     public MainController mainController = null;
     private HashMap<InetAddress, JLabel> playerLabels = null;
     private HashMap<InetAddress, JLabel> ballLabels = null;
+    private HashMap<InetAddress, Integer> playerJustDied = null;
     private int currentNumOfPlayers = 0;
     public static int minXForTEAM1 = 0;
     public static int maxXForTEAM1 = 0;
@@ -50,6 +51,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     
     public static int maxXArena = 0;
     public static int maxYArena = 0;
+    
+    
     
     
     /**
@@ -89,7 +92,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 //        this.repaintAll(test);
         this.playerLabels = new HashMap<InetAddress, JLabel>();
         this.ballLabels = new HashMap<InetAddress, JLabel>();
-
+        this.playerJustDied = new HashMap<InetAddress, Integer>();
+        
+        
     }
     //Moves to the main menu
 
@@ -161,7 +166,10 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     }
     
     public void mouseMoved(MouseEvent e) {
-        int team = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).getTeam();
+        PlayerData playerData = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress);
+        int team = playerData.getTeam();
+        int state = playerData.isAlive();
+        
         int x = e.getX();
         int y = e.getY();
         
@@ -200,12 +208,18 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 y = ClientGUIController.minYForTEAM2;
             }
         }
-        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
+        if(state == Constants.ALIVE)
+        {
+            NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
+        }
         this.repaintAll(NetworkController.realTimeData, false);
     }
      
     public void mouseDragged(MouseEvent e) {
-        int team = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).getTeam();
+        PlayerData playerData = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress);
+        int team = playerData.getTeam();
+        int state = playerData.isAlive();
+        
         int x = e.getX();
         int y = e.getY();
         
@@ -244,7 +258,10 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 y = ClientGUIController.minYForTEAM2;
             }
         }
-        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.PRESSED);
+        if(state == Constants.ALIVE)
+        {
+            NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.PRESSED);
+        }
         this.repaintAll(NetworkController.realTimeData, false);
     }
 
@@ -265,6 +282,11 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 
             if (playerData.isAlive() == Constants.ALIVE)
             {
+                if(this.playerJustDied.get(ipAddress) != null && this.playerJustDied.get(ipAddress).intValue() == 1)
+                {
+                    this.playerJustDied.put(ipAddress, 0);
+                    this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIcon)));
+                }
 //                System.out.println("Draw Alive Player");
                 
                 //player
@@ -309,12 +331,19 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }else if (playersData.get(ipAddress).isAlive() == Constants.DEAD)
             {
                 System.out.println("Draw Dead Animation");
-                JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
-                deadPlayer.setLocation(playersData.get(ipAddress).getPlayerX(), playersData.get(ipAddress).getPlayerY());
-                deadPlayer.setVisible(true);
-                deadPlayer.setSize(250, 250);
-                movingObjects.add(deadPlayer);
-                this.getContentPane().add(deadPlayer);
+//                JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
+                
+                playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(deadAnimation)));
+                if(this.playerJustDied.get(ipAddress) == null || this.playerJustDied.get(ipAddress).intValue() == 0)
+                {
+                    this.playerJustDied.put(ipAddress, 1);
+                    playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(deadAnimation)));
+                    playerLabels.get(ipAddress).setSize(250, 250);
+
+                }
+//                deadPlayer.setLocation(playersData.get(ipAddress).getPlayerX(), playersData.get(ipAddress).getPlayerY());
+//                deadPlayer.setVisible(true);
+                
             }
             
         }

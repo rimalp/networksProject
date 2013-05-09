@@ -39,6 +39,7 @@ public class PlayerData {
     double Ay = 0;
     double angle = 0;
     double dampingRatio = Math.pow(0.99, frame_time/4);
+    int timeToRevive = 800;
     
     public PlayerData(int _playerX, int _playerY)
     {
@@ -128,7 +129,14 @@ public class PlayerData {
         return this.ballY;
     }
 
-
+    public void keepDying()
+    {
+        this.timeToRevive--;
+        if(this.timeToRevive == 0)
+        {
+            this.alive = Constants.ALIVE;
+        }
+    }
 
     public void setPlayerX(int x){
         this.playerX = x;
