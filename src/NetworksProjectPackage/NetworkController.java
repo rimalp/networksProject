@@ -193,7 +193,10 @@ public class NetworkController extends Thread{
         this.mainController.multicastReceived();
     }
 
-
+    public UDPClient getUDPClient()
+    {
+        return this.udpClient;
+    }
 
     public void run()
     {        

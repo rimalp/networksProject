@@ -24,6 +24,16 @@ public class ServerData {
         //update player count
         this.currentPlayers++;
     }
+    
+    public void addPlayer()
+    {
+        this.currentPlayers++;
+    }
+    
+    public void exitPlayer()
+    {
+        this.currentPlayers--;
+    }
 
 
 }

@@ -42,6 +42,8 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
         activeGameServers = new HashMap<InetAddress, Integer>();
     }
     
+    
+    
     public void startNetworkController()
     {
         this.networkController.start();

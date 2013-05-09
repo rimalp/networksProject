@@ -190,7 +190,6 @@ public class UDPClient extends Thread{
         return bytesToReturn;
     }
 
-
     public String processPacketWithHostServersInformation(byte[] data){
         int myServerListenPort = 0;
         myServerListenPort = 0;

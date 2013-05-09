@@ -18,6 +18,7 @@ public class SessionServer extends Thread{
     private InetAddress ipAddress = null;
     private ProtocolInfo protocolInfo = null;
     private HashMap<InetAddress,ServerData> servers = null;
+    
 
     private int request_type;
     
@@ -61,7 +62,7 @@ public class SessionServer extends Thread{
         String ip2 = "127.188.5.7";
 
         try{
-        this.servers.put(InetAddress.getByName(ip1), newServer1);
+        //this.servers.put(InetAddress.getByName(ip1), newServer1);
 //        this.servers.put(InetAddress.getByName(ip2), newServer2);
         }catch(Exception e){
             System.out.println("Exception in testing data in sessionserver");
@@ -170,16 +171,22 @@ public class SessionServer extends Thread{
             
             System.out.println("Client Port number:"+clientListenPort);
 
-            if(this.servers.isEmpty())
+//            if(this.servers.isEmpty())
+//            {
+//                //create a new serverdata wrapper class
+//                ServerData newServer = new ServerData(clientListenPort, "", Constants.MAX_PLAYERS);
+//
+//                this.sendPacket(dp.getAddress(), clientListenPort, "No server's running.");
+//                this.servers.put(dp.getAddress(), newServer);
+//            }
+            if(this.request_type == ProtocolInfo.TYPE_UNICAST_HOSTGAME)
             {
-                //create a new serverdata wrapper class
-                ServerData newServer = new ServerData(clientListenPort, "", Constants.MAX_PLAYERS);
-
-                this.sendPacket(dp.getAddress(), clientListenPort, "No server's running.");
-                this.servers.put(dp.getAddress(), newServer);
-            }
-
-            else if(this.request_type == ProtocolInfo.TYPE_UNICAST_JOINGAME)
+                String sessionName = "Room ";
+                sessionName += this.servers.size()+1;
+                ServerData serverData = new ServerData(clientListenPort, sessionName, 8);
+                this.servers.put(dp.getAddress(), serverData);
+                System.out.println("New server added");
+            }else if(this.request_type == ProtocolInfo.TYPE_UNICAST_JOINGAME)
             {
                 for(InetAddress serverIps: this.servers.keySet()){
                     System.out.println("Serverdata.tostrint(): " + serverIps.toString());

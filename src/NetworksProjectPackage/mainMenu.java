@@ -188,6 +188,10 @@ public class mainMenu extends javax.swing.JFrame {
     private void hostGameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_hostGameMouseClicked
         // Code to allow user to become a new host and start a new game on his computer
         //Currently this just draws the game screen without any regard for networking
+        byte[] byteBuffer = new byte[2];
+        byteBuffer[0] = (byte)((NetworkController.clientListenPortNumber) >> 8);
+        byteBuffer[1] = (byte)(NetworkController.clientListenPortNumber);
+        master.mainController.networkController.getUDPClient().sendPacket(NetworkController.sessionServerAddress, NetworkController.sessionServerListenPortNumber, byteBuffer, ProtocolInfo.TYPE_UNICAST_HOSTGAME);
         master.drawGameScreen();
         master.startNetworkController();
     }//GEN-LAST:event_hostGameMouseClicked
