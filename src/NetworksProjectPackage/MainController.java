@@ -45,7 +45,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     public void startNetworkController()
     {
         this.networkController.start();
-        this.guiController.repaintAll(NetworkController.realTimeData);
+        this.guiController.repaintAll(NetworkController.realTimeData, false);
     }
     
     public RealTimeData getRealTimedata()
@@ -153,7 +153,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     
     public void multicastReceived()
     {
-        this.guiController.repaintAll(NetworkController.realTimeData);
+        this.guiController.repaintAll(NetworkController.realTimeData, true);
     }
     
     public void run()
