@@ -158,10 +158,11 @@ public class NetworkController extends Thread{
         }
         
         for (InetAddress ipAddress : this.playersInfo.keySet()) {
-            if(NetworkController.realTimeData.getPlayerData(ipAddress).getExiting() == Constants.EXITING)
+    
+            if(NetworkController.realTimeData.getPlayerData(ipAddress) != null && NetworkController.playersInfo.get(ipAddress) != null && NetworkController.realTimeData.getPlayerData(ipAddress).getExiting() == Constants.EXITING)
             {
-                this.playersInfo.remove(ipAddress);
                 NetworkController.realTimeData.removePlayer(ipAddress);
+                NetworkController.playersInfo.remove(ipAddress);
             }
             
         }
