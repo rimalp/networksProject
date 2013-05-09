@@ -36,7 +36,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
         PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
-        networkController = new NetworkController("139.147.103.11", 4444, defaultPlayerData, this, null);
+        networkController = new NetworkController("139.147.30.243", 4444, defaultPlayerData, this, null);
         guiController = new ClientGUIController(this);
         guiController.drawMainMenu();
         activeGameServers = new HashMap<InetAddress, Integer>();
@@ -115,7 +115,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
         Scanner sc = new Scanner(System.in);
         if(sc.nextLine().equals("Yes"))
         {
-            ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.103.11");
+            ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
             ss.start();
         }
     }
