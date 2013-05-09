@@ -14,7 +14,9 @@ public class RealTimeData {
     private static final int BYTES_SIZE_PER_PLAYER_SERVER =  4 + PlayerData.SIZE_OF_BYTES_FOR_SERVER;
 
     private HashMap<InetAddress, PlayerData> playersData = null;
-    private int isGameOver = 0;
+    private int scoreForTeam1 = 0;
+    private int scoreForTeam2 = 0;
+    
     
     public RealTimeData()
     {
@@ -24,6 +26,59 @@ public class RealTimeData {
     public RealTimeData(HashMap<InetAddress, PlayerData> newPlayersData)
     {
         this.playersData = newPlayersData;
+    }
+    
+    public void score(int team)
+    {
+        if(team == Constants.TEAM1)
+        {
+            this.scoreForTeam1++;
+        }else if(team == Constants.TEAM2)
+        {
+            this.scoreForTeam2++;
+        }
+    }
+    
+    public int getScore(int team)
+    {
+        if(team == Constants.TEAM1)
+        {
+            return scoreForTeam1;
+        }else if(team == Constants.TEAM2)
+        {
+            return scoreForTeam2;
+        }
+        return 0;
+    }
+    
+    public void setScore(int team, int newScore)
+    {
+        if(team == Constants.TEAM1)
+        {
+            this.scoreForTeam1 = newScore;
+        }else if(team == Constants.TEAM2)
+        {
+            this.scoreForTeam2 = newScore;
+        }
+    }
+    
+    public void resetScore()
+    {
+        this.scoreForTeam1 = 0;
+        this.scoreForTeam2 = 0;
+    }
+    
+    public int isGameOver()
+    {
+        if(this.scoreForTeam1 >= 11)
+        {
+            return Constants.TEAM1;
+        }else if(this.scoreForTeam2 >= 11)
+        {
+            return Constants.TEAM2;
+        }else{
+            return Constants.INVALID_TEAM;
+        }
     }
 
     //some test methods for simulation
@@ -260,12 +315,13 @@ public class RealTimeData {
                     {
                         if(NetworkController.realTimeData.getAllPlayerData().get(playerAddress).hits(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress)) && NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive() == Constants.ALIVE)
                         {
-                            System.out.println("Some one Died!!!");
                             NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).setAlive(Constants.DEAD);
-                            System.out.println(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive());
-                            if(this.isEveryOneDead(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).getTeam()))
+                            if(NetworkController.realTimeData.getAllPlayerData().get(playerAddress).getTeam() == Constants.TEAM1)
                             {
-                                this.gameOver();
+                                NetworkController.realTimeData.setScore(Constants.TEAM1, NetworkController.realTimeData.getScore(Constants.TEAM1)+1);
+                            }else if(NetworkController.realTimeData.getAllPlayerData().get(playerAddress).getTeam() == Constants.TEAM2)
+                            {
+                                NetworkController.realTimeData.setScore(Constants.TEAM2, NetworkController.realTimeData.getScore(Constants.TEAM2)+1);
                             }
                         }
                     }
@@ -295,15 +351,5 @@ public class RealTimeData {
     public boolean setTeam(InetAddress inetAddress, int team)
     {
         return this.playersData.get(inetAddress).setTeam(team);
-    }
-    
-    public int isGameOver()
-    {
-        return this.isGameOver;
-    }
-    
-    public void gameOver()
-    {
-        this.isGameOver = 1;
     }
 }

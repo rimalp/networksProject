@@ -49,6 +49,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     public static int minYForTEAM2 = 0;
     public static int maxYForTEAM2 = 0;
     
+    public static int minYArena = 0;
+    public static int minXArena = 0;
     public static int maxXArena = 0;
     public static int maxYArena = 0;
     
@@ -133,8 +135,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         JLabel currentWall;
         JLabel currentLine;
         for (int i = 0; i <= this.getWidth() - 17; i += 16) {
-            for (int j = 0; j <= this.getHeight() - 16; j += 16) {
-                if ((i < 1 || j < 1) || (i > this.getWidth() - 33 || j > this.getHeight() - 49)) {
+            for (int j = 50; j <= this.getHeight() - 16; j += 16) {
+                if ((i < 1 || j < 51) || (i > this.getWidth() - 33 || j > this.getHeight() - 49)) {
                     currentWall = new JLabel(new ImageIcon(getClass().getResource(wallImage)));
                     currentWall.setSize(16, 16);
                     currentWall.setLocation(i, j);
@@ -143,24 +145,34 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 }
             }
         }
-        for (int i = 0; i <= this.getHeight() - 16; i += 16) {
+        for (int i = 50; i <= this.getHeight() - 16; i += 16) {
             currentLine = new JLabel(new ImageIcon(getClass().getResource(lineImage)));
             currentLine.setSize(6, 16);
             currentLine.setLocation(this.getWidth() / 2 - 3, i);
             currentLine.setVisible(true);
             this.getContentPane().add(currentLine);
         }
-        ClientGUIController.minYForTEAM1 = 20;
-        ClientGUIController.minYForTEAM2 = 20;
-        ClientGUIController.minXForTEAM1 = 20;
-        ClientGUIController.maxXForTEAM1 = this.getContentPane().getWidth()/2 - 15;
-        ClientGUIController.maxYForTEAM1 = this.getContentPane().getHeight() - 30;
-        ClientGUIController.minXForTEAM2 = this.getContentPane().getWidth()/2 +15;
-        ClientGUIController.maxXForTEAM2 = this.getContentPane().getWidth() - 30;
-        ClientGUIController.maxYForTEAM2 = this.getContentPane().getHeight() - 30;
-        ClientGUIController.maxXArena = this.getContentPane().getWidth() - 30;
-        ClientGUIController.maxYArena = this.getContentPane().getHeight() -30;
+        ClientGUIController.minYForTEAM1 = 82;
+        ClientGUIController.minYForTEAM2 = 82;
+        ClientGUIController.minXForTEAM1 = 32;
+        ClientGUIController.maxXForTEAM1 = this.getContentPane().getWidth()/2 - 24;
+        ClientGUIController.maxYForTEAM1 = this.getContentPane().getHeight() - 32;
+        ClientGUIController.minXForTEAM2 = this.getContentPane().getWidth()/2 + 24;
+        ClientGUIController.maxXForTEAM2 = this.getContentPane().getWidth() - 32;
+        ClientGUIController.maxYForTEAM2 = this.getContentPane().getHeight() - 32;
+        ClientGUIController.maxXArena = this.getContentPane().getWidth() - 32;
+        ClientGUIController.maxYArena = this.getContentPane().getHeight() -32;
+        ClientGUIController.minYArena = 66;
+        ClientGUIController.minXArena = 16;
         
+        this.jButton1.setSize(300, 50);
+        this.jButton1.setLocation(this.getContentPane().getWidth()/2 - 300, 0);
+        this.jButton2.setSize(300, 50);
+        this.jButton2.setLocation(this.getContentPane().getWidth()/2, 0);
+        this.jLabel1.setSize(200,50);
+        this.jLabel1.setLocation(this.getContentPane().getWidth()/2 - 500,0);
+        this.jLabel2.setSize(200,50);
+        this.jLabel2.setLocation(this.getContentPane().getWidth()/2 + 300,0);
         this.repaintAll(NetworkController.realTimeData, false);
         
     }
@@ -271,6 +283,17 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
 
     public void repaintAll(RealTimeData data, boolean isBasedOnPacketFromServer) {
 
+        this.jButton1.setSize(200, 50);
+        this.jButton1.setLocation(this.getContentPane().getWidth()/2 - 200, 0);
+        this.jButton2.setSize(200, 50);
+        this.jButton2.setLocation(this.getContentPane().getWidth()/2, 0);
+        this.jLabel1.setSize(200,50);
+        this.jLabel1.setLocation(this.getContentPane().getWidth()/2 - 400,0);
+        this.jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        this.jLabel2.setSize(200,50);
+        this.jLabel2.setLocation(this.getContentPane().getWidth()/2 + 200,0);
+        this.jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
         HashMap<InetAddress, PlayerData> playersData = data.getAllPlayerData();
 
         //paint each of the player and its ball in the screen one by one
@@ -278,7 +301,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         String ballIcon = "/NetworksProjectPackage/1363853010_Green Ball.png";
         String deadAnimation = "/NetworksProjectPackage/explosion2.gif";
         
-        int index = 0;
+        this.jLabel1.setText(""+NetworkController.realTimeData.getScore(Constants.TEAM1));
+        this.jLabel2.setText(""+NetworkController.realTimeData.getScore(Constants.TEAM2));
         
         for (InetAddress ipAddress : playersData.keySet()) {
             
@@ -319,13 +343,13 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 
                 if(!isBasedOnPacketFromServer || !ipAddress.equals(NetworkController.myIPAddress))
                 {
-                    this.playerLabels.get(ipAddress).setSize(50, 50);
+                    this.playerLabels.get(ipAddress).setSize(32, 32);
                     this.playerLabels.get(ipAddress).setLocation(playerData.getPlayerX() - this.playerLabels.get(ipAddress).getWidth()/2, playerData.getPlayerY() - this.playerLabels.get(ipAddress).getHeight()/2);
                     this.playerLabels.get(ipAddress).setVisible(true);
                 }
                 
                 //ball
-                this.ballLabels.get(ipAddress).setSize(50, 50);
+                this.ballLabels.get(ipAddress).setSize(32, 32);
                 this.ballLabels.get(ipAddress).setLocation(playerData.getBallX() - this.ballLabels.get(ipAddress).getWidth()/2, playerData.getBallY() - this.ballLabels.get(ipAddress).getHeight()/2);
                 this.ballLabels.get(ipAddress).setVisible(true);
                 
@@ -370,6 +394,11 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setForeground(new java.awt.Color(255, 102, 0));
         setMaximizedBounds(new java.awt.Rectangle(0, 0, 1014, 764));
@@ -381,15 +410,57 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         });
 
+        jButton1.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
+        jButton1.setText("Team 1");
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
+        jButton2.setText("Team 2");
+        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
+        jLabel1.setText("0");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jLabel2.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
+        jLabel2.setText("0");
+        jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(98, 98, 98)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addGap(38, 38, 38)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel1)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2)
+                    .addComponent(jLabel2))
+                .addContainerGap(258, Short.MAX_VALUE))
         );
 
         pack();
@@ -434,6 +505,16 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             optionPaneDialog.setVisible(true);
         }
     }//GEN-LAST:event_escapeKeyPressed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).setTeam(Constants.TEAM1);
+        this.repaintAll(NetworkController.realTimeData, false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress).setTeam(Constants.TEAM2);
+        this.repaintAll(NetworkController.realTimeData, false);
+    }//GEN-LAST:event_jButton2ActionPerformed
     
     public void startNetworkController()
     {
@@ -480,5 +561,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }

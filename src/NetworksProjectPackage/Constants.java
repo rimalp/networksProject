@@ -5,6 +5,7 @@ interface Constants
 
     public static final int TEAM1 = 1;
     public static final int TEAM2 = 2;
+    public static final int INVALID_TEAM = -1;
 
     public static final int ALIVE = 1;
     public static final int DEAD = 0;

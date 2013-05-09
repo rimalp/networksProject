@@ -208,6 +208,8 @@ public class PlayerData {
         bytesToReturn[7] = (byte)(this.ballY);
         bytesToReturn[8] = (byte)(this.team);
         bytesToReturn[9] = (byte)(this.alive);
+        bytesToReturn[10] = (byte)(NetworkController.realTimeData.getScore(Constants.TEAM1));
+        bytesToReturn[11] = (byte)(NetworkController.realTimeData.getScore(Constants.TEAM2));
         
         return bytesToReturn;
     }
@@ -226,6 +228,8 @@ public class PlayerData {
         this.ballY = (((int)newPlayerData[6] & 0x000000FF) << 8) | ((int)newPlayerData[7] & 0x000000FF);
         this.team = ((int)newPlayerData[8]);
         this.alive = ((int)newPlayerData[9]);
+        NetworkController.realTimeData.setScore(Constants.TEAM1, ((int)newPlayerData[10]));
+        NetworkController.realTimeData.setScore(Constants.TEAM2, ((int)newPlayerData[11]));
         
         return true; 
     }
@@ -262,13 +266,31 @@ public class PlayerData {
         Vy *= dampingRatio;
         
         
-        if(this.ballX + Vx >= 0 && this.ballX + Vx <= ClientGUIController.maxXArena)
+        if(this.ballX + Vx >= ClientGUIController.minXArena && this.ballX + Vx <= ClientGUIController.maxXArena)
         {
             this.ballX += Vx;
         }
-        if(this.ballY + Vy >= 0 && this.ballY + Vy <= ClientGUIController.maxYArena)
+        else if(this.ballX + Vx <= ClientGUIController.minXArena)
+        {
+            this.ballX = ClientGUIController.minXArena;
+            Vx = 0;
+        }else if(this.ballX + Vx >= ClientGUIController.maxXArena)
+        {
+            this.ballX = ClientGUIController.maxXArena;
+            Vx = 0;
+        }
+        
+        if(this.ballY + Vy >= ClientGUIController.minYArena && this.ballY + Vy <= ClientGUIController.maxYArena)
         {
             this.ballY += Vy;
+        }else if(this.ballY <= ClientGUIController.minYArena)
+        {
+            this.ballY = ClientGUIController.minYArena;
+            Vy = 0;
+        }else if(this.ballY >= ClientGUIController.maxYArena)
+        {
+            this.ballY = ClientGUIController.maxYArena;
+            Vy = 0;
         }
         
         if(this.alive == Constants.DEAD)
@@ -303,6 +325,18 @@ public class PlayerData {
     
     public boolean setTeam(int _team)
     {
+        if(this.team != _team)
+        {
+            if(_team == Constants.TEAM1)
+            {
+                this.playerX = 200;
+                this.playerY = 300;
+            }else if(_team == Constants.TEAM2)
+            {
+                this.playerX = 700;
+                this.playerY = 300;
+            }
+        }
         if(_team == Constants.TEAM1 || _team == Constants.TEAM2)
         {
             this.team = _team;
