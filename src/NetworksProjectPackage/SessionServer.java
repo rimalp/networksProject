@@ -144,6 +144,7 @@ public class SessionServer extends Thread{
             byte[] buffer = new byte[65535];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {
+                System.out.println("Waiting for a packet");
                 listen_socket.receive(dp);
             }
             catch(IOException ioe)

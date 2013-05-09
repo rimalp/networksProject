@@ -353,6 +353,10 @@ public class UDPClient extends Thread{
         //Try sending the packet. Let the user know when an exception has occurred.
         try{
             clientSocket.send(sendPacket);  
+            if(type == ProtocolInfo.TYPE_UNICAST_HOSTGAME)
+            {
+                System.out.println("A packet is just sent from UDP Client");
+            }
         }catch(IOException e)
         {
             System.out.println("IO Exception has occured while sending the request packet");
