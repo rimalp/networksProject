@@ -315,10 +315,17 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             PlayerData playerData = playersData.get(ipAddress);
             if(playerData.getExiting() == Constants.EXITING)
             {
-                this.getContentPane().remove(this.playerLabels.get(ipAddress));
-                this.getContentPane().remove(this.ballLabels.get(ipAddress));
-                this.playerLabels.remove(ipAddress);
-                this.ballLabels.remove(ipAddress);
+                if(this.playerLabels.get(ipAddress) != null)
+                {
+                    this.getContentPane().remove(this.playerLabels.get(ipAddress));
+                    this.playerLabels.remove(ipAddress);
+                }
+                if(this.ballLabels.get(ipAddress) != null)
+                {
+                    this.getContentPane().remove(this.ballLabels.get(ipAddress));
+                    this.ballLabels.remove(ipAddress);
+                }
+                
             }else
             {
             if (playerData.isAlive() == Constants.ALIVE)

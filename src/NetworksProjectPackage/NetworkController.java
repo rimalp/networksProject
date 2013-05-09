@@ -163,6 +163,7 @@ public class NetworkController extends Thread{
             {
                 NetworkController.realTimeData.removePlayer(ipAddress);
                 NetworkController.playersInfo.remove(ipAddress);
+                break;
             }
             
         }
