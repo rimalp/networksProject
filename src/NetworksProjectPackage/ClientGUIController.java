@@ -306,7 +306,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 
                 
                 
-            }else if (playersData.get(ipAddress).isAlive() != Constants.DEAD)
+            }else if (playersData.get(ipAddress).isAlive() == Constants.DEAD)
             {
                 System.out.println("Draw Dead Animation");
                 JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));

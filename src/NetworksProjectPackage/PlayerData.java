@@ -102,7 +102,7 @@ public class PlayerData {
             //kaboom
             return true;
         }else{
-            System.out.println(ballCenter.distance(otherPlayerCenter));
+//            System.out.println(ballCenter.distance(otherPlayerCenter));
         }
 
         return false;
@@ -147,7 +147,7 @@ public class PlayerData {
     }
 
     public void setAlive(int state){
-        if(state !=Constants.ALIVE || state != Constants.DEAD)
+        if(state !=Constants.ALIVE && state != Constants.DEAD)
             return;
         
         this.alive = state;

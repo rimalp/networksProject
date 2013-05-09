@@ -246,21 +246,23 @@ public class RealTimeData {
             this.playersData.put(tempIP, defaultPlayerData);
         }
         
-        System.out.println("hahaahahahaah");
+//        System.out.println("hahaahahahaah");
         if(this.playersData.get(tempIP).getNextPlayerData(playerData))
         {
-            for(InetAddress playerAddress: this.playersData.keySet())
+            for(InetAddress playerAddress: NetworkController.realTimeData.getAllPlayerData().keySet())
             {
-                for(InetAddress anotherPlayerAddress: this.playersData.keySet())
+                for(InetAddress anotherPlayerAddress: NetworkController.realTimeData.getAllPlayerData().keySet())
                 {
-                    if(this.playersData.get(anotherPlayerAddress).isAlive() == Constants.ALIVE &&
+                    if(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive() == Constants.ALIVE &&
                             !playerAddress.equals(anotherPlayerAddress) && 
-                            this.playersData.get(playerAddress).getTeam() != this.playersData.get(anotherPlayerAddress).getTeam())
+                            NetworkController.realTimeData.getAllPlayerData().get(playerAddress).getTeam() != NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).getTeam())
                     {
-                        if(this.playersData.get(playerAddress).hits(this.playersData.get(anotherPlayerAddress)))
+                        if(NetworkController.realTimeData.getAllPlayerData().get(playerAddress).hits(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress)) && NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive() == Constants.ALIVE)
                         {
-                            this.playersData.get(anotherPlayerAddress).setAlive(Constants.DEAD);
-                            if(this.isEveryOneDead(this.playersData.get(anotherPlayerAddress).getTeam()))
+                            System.out.println("Some one Died!!!");
+                            NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).setAlive(Constants.DEAD);
+                            System.out.println(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).isAlive());
+                            if(this.isEveryOneDead(NetworkController.realTimeData.getAllPlayerData().get(anotherPlayerAddress).getTeam()))
                             {
                                 this.gameOver();
                             }

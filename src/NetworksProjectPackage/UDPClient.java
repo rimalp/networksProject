@@ -355,7 +355,7 @@ public class UDPClient extends Thread{
             clientSocket.send(sendPacket);  
             if(type == ProtocolInfo.TYPE_UNICAST_HOSTGAME)
             {
-                System.out.println("A packet is just sent from UDP Client");
+                System.out.println("A packet is just sent from UDP Client to "+ targetAddress.toString() + " at port " +targetPort);
             }
         }catch(IOException e)
         {
