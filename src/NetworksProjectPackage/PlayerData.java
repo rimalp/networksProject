@@ -95,12 +95,14 @@ public class PlayerData {
     //see if this player's ball hits the other player itself
     public boolean hits(PlayerData other)
     {
-        Point ballCenter = new Point (this.ballX + 100, this.ballY + 100);
-        Point otherPlayerCenter = new Point(other.getPlayerX()+100, other.getPlayerY()+100);
+        Point ballCenter = new Point (this.ballX, this.ballY);
+        Point otherPlayerCenter = new Point(other.getPlayerX(), other.getPlayerY());
 
-        if(ballCenter.distance(otherPlayerCenter) < 200){
+        if(ballCenter.distance(otherPlayerCenter) < 50){
             //kaboom
             return true;
+        }else{
+            System.out.println(ballCenter.distance(otherPlayerCenter));
         }
 
         return false;

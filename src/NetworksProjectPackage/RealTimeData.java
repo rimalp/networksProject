@@ -253,13 +253,13 @@ public class RealTimeData {
             {
                 for(InetAddress anotherPlayerAddress: this.playersData.keySet())
                 {
-                    System.out.println("Checking hits!!!!!!!!!!!!!");
-                    if(!playerAddress.equals(anotherPlayerAddress))
+                    if(this.playersData.get(anotherPlayerAddress).isAlive() == Constants.ALIVE &&
+                            !playerAddress.equals(anotherPlayerAddress) && 
+                            this.playersData.get(playerAddress).getTeam() != this.playersData.get(anotherPlayerAddress).getTeam())
                     {
                         if(this.playersData.get(playerAddress).hits(this.playersData.get(anotherPlayerAddress)))
                         {
                             this.playersData.get(anotherPlayerAddress).setAlive(Constants.DEAD);
-                            System.out.println("One Player Died!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                             if(this.isEveryOneDead(this.playersData.get(anotherPlayerAddress).getTeam()))
                             {
                                 this.gameOver();
