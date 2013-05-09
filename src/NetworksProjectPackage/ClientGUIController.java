@@ -208,11 +208,13 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 y = ClientGUIController.minYForTEAM2;
             }
         }
+        
+        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
+        
         if(state == Constants.ALIVE)
         {
-            NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
+            this.repaintAll(NetworkController.realTimeData, false);
         }
-        this.repaintAll(NetworkController.realTimeData, false);
     }
      
     public void mouseDragged(MouseEvent e) {
@@ -258,11 +260,13 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 y = ClientGUIController.minYForTEAM2;
             }
         }
+        
+        NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.PRESSED);
+        
         if(state == Constants.ALIVE)
         {
-            NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.PRESSED);
+            this.repaintAll(NetworkController.realTimeData, false);
         }
-        this.repaintAll(NetworkController.realTimeData, false);
     }
 
     public void repaintAll(RealTimeData data, boolean isBasedOnPacketFromServer) {

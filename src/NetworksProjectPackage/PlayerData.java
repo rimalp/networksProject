@@ -39,7 +39,7 @@ public class PlayerData {
     double Ay = 0;
     double angle = 0;
     double dampingRatio = Math.pow(0.99, frame_time/4);
-    final int MAXIMUM_WAIT_BEFORE_REVIVAL = 60;
+    final int MAXIMUM_WAIT_BEFORE_REVIVAL = 80;
     int timeToRevive = MAXIMUM_WAIT_BEFORE_REVIVAL;
     
     public PlayerData(int _playerX, int _playerY)
@@ -100,7 +100,7 @@ public class PlayerData {
         Point ballCenter = new Point (this.ballX, this.ballY);
         Point otherPlayerCenter = new Point(other.getPlayerX(), other.getPlayerY());
 
-        if(ballCenter.distance(otherPlayerCenter) < 50){
+        if(ballCenter.distance(otherPlayerCenter) < 30){
             //kaboom
             return true;
         }else{
