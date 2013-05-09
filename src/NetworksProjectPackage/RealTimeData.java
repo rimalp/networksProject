@@ -298,6 +298,7 @@ public class RealTimeData {
         if(this.playersData.get(tempIP) == null)
         {
             PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
+            defaultPlayerData.setExiting(Constants.NOT_EXITING);
             this.playersData.put(tempIP, defaultPlayerData);
         }
         
