@@ -5,8 +5,8 @@
 package NetworksProjectPackage;
 
 /**
- *
- * @author This PC
+ * This class controls the sound effect(background music) in the game
+ * @author Drew Jeffery
  */
 import java.io.*;
 import java.net.URL;
@@ -20,6 +20,9 @@ public class SoundController {
     //private AudioClip explodeClip;
     private static Sequencer midiPlayer;
             
+    /**
+     * constructor
+     */
     public SoundController() {
     }
     

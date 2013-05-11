@@ -6,7 +6,7 @@
 package NetworksProjectPackage;
 
 /**
- *
+ * This class wraps everything the client needs to know about a game server
  * @author prabhat
  */
 public class ServerData {
@@ -16,6 +16,13 @@ public class ServerData {
     public int currentPlayers;
     public int maxPlayers;
 
+    /**
+     * constructor
+     * 
+     * @param _port
+     * @param _name
+     * @param _max 
+     */
     public ServerData(int _port, String _name, int _max){
         this.port = _port;
         this.name = _name;
@@ -25,11 +32,18 @@ public class ServerData {
         this.currentPlayers++;
     }
     
+    /**
+     * add a new player
+     * deprecated
+     */
     public void addPlayer()
     {
         this.currentPlayers++;
     }
     
+    /**
+     * deprecated
+     */
     public void exitPlayer()
     {
         this.currentPlayers--;

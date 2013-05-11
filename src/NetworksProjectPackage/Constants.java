@@ -1,5 +1,9 @@
 package NetworksProjectPackage;
 
+/**
+ * Here are the constants that will be used throughout the game
+ * @author Drew Jeffrey
+ */
 interface Constants
 {
 

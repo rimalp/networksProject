@@ -38,13 +38,13 @@ public class mainMenu extends javax.swing.JFrame {
         // Get the size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
-// Determine the new location of the window
+        // Determine the new location of the window
         int w = this.getSize().width;
         int h = this.getSize().height;
         int x = (dim.width - w) / 2;
         int y = (dim.height - h) / 2;
 
-// Move the window
+        // Move the window
         this.setLocation(x, y);
     }
 
@@ -157,15 +157,12 @@ public class mainMenu extends javax.swing.JFrame {
         // Code to allow user to join an existing game
         //ask networkcontroller to contact the sessionserver to get a list of hosting servers
 
-       this.jComboBoxJoinList.removeAllItems();
+        this.jComboBoxJoinList.removeAllItems();
 
-       master.requestGameServers();
+        master.requestGameServers();
 
 
         this.jComboBoxJoinList.setVisible(true);
-
-        //this.jComboBoxJoinList.add
-
 
     }//GEN-LAST:event_joinGameMouseClicked
 
@@ -196,33 +193,24 @@ public class mainMenu extends javax.swing.JFrame {
 
     private void jComboBoxJoinListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxJoinListActionPerformed
         
-                String text = (String)this.jComboBoxJoinList.getSelectedItem();
-                System.out.println("about to enter loop");
-                if(text == null)
-                {
-                    System.out.println("haha");
-                }else
-                {
-                    System.out.println(text);
-                }
-                if( text != null && !text.equals("Select a server address"))
-                {
-                    try{
-                        InetAddress ip = InetAddress.getByName(text.substring(1, text.length()));
-                        NetworkController.serverAddress = ip;
-                        System.out.println("Server address is updated to " + NetworkController.serverAddress.toString());
-                        NetworkController.serverListenPortNumber = this.master.mainController.getActiveGameServers().get(ip);
-                        System.out.println("Server port is "+ NetworkController.serverListenPortNumber);
-                        master.drawGameScreen();
-                        NetworkController.myData.setExiting(Constants.NOT_EXITING);
-                        master.startNetworkController();
-                        master.mainController.guiController.drawArena();
+        String text = (String)this.jComboBoxJoinList.getSelectedItem();
 
-                    }catch(UnknownHostException e)
-                    {
-                        System.out.println(e);
-                    }
-                }
+        if( text != null && !text.equals("Select a server address"))
+        {
+            try{
+                InetAddress ip = InetAddress.getByName(text.substring(1, text.length()));
+                NetworkController.serverAddress = ip;
+                NetworkController.serverListenPortNumber = this.master.mainController.getActiveGameServers().get(ip);
+                master.drawGameScreen();
+                NetworkController.myData.setExiting(Constants.NOT_EXITING);
+                master.startNetworkController();
+                master.mainController.guiController.drawArena();
+
+            }catch(UnknownHostException e)
+            {
+                System.out.println(e);
+            }
+        }
         
     }//GEN-LAST:event_jComboBoxJoinListActionPerformed
 

@@ -6,10 +6,12 @@ package NetworksProjectPackage;
 import java.net.*;
 import java.util.*;
 /**
- *
+ * The RealTimeData class wraps all the PlayerData together(in a map)
+ * It is all the data need for the client to repaint their screen
  * @author This PC
  */
 public class RealTimeData {
+    
     private static final int BYTES_SIZE_PER_PLAYER_CLIENT =  4 + PlayerData.SIZE_OF_BYTES_FOR_CLIENT;
     private static final int BYTES_SIZE_PER_PLAYER_SERVER =  4 + PlayerData.SIZE_OF_BYTES_FOR_SERVER;
 
@@ -17,17 +19,28 @@ public class RealTimeData {
     private int scoreForTeam1 = 0;
     private int scoreForTeam2 = 0;
     
-    
+    /**
+     * constructor
+     */
     public RealTimeData()
     {
         playersData = new HashMap<InetAddress, PlayerData>();
     }
     
+    
+    /**
+     * another constructor
+     * @param newPlayersData 
+     */
     public RealTimeData(HashMap<InetAddress, PlayerData> newPlayersData)
     {
         this.playersData = newPlayersData;
     }
     
+    /**
+     * increment the score for one team
+     * @param team 
+     */
     public void score(int team)
     {
         if(team == Constants.TEAM1)
@@ -39,6 +52,11 @@ public class RealTimeData {
         }
     }
     
+    /**
+     * retrieve the score for one team
+     * @param team
+     * @return 
+     */
     public int getScore(int team)
     {
         if(team == Constants.TEAM1)
@@ -51,6 +69,11 @@ public class RealTimeData {
         return 0;
     }
     
+    /**
+     * set the score for one team
+     * @param team
+     * @param newScore 
+     */
     public void setScore(int team, int newScore)
     {
         if(team == Constants.TEAM1)
@@ -62,12 +85,19 @@ public class RealTimeData {
         }
     }
     
+    /**
+     * reset the score
+     */
     public void resetScore()
     {
         this.scoreForTeam1 = 0;
         this.scoreForTeam2 = 0;
     }
     
+    /**
+     * deprecated function
+     * @return 
+     */
     public int isGameOver()
     {
         if(this.scoreForTeam1 >= 11)
@@ -81,7 +111,9 @@ public class RealTimeData {
         }
     }
 
-    //some test methods for simulation
+    /**
+     * this function is for testing only
+     */
     public void createTestPlayer(){
         PlayerData pd = new PlayerData(400, 400);
         try{
@@ -90,7 +122,10 @@ public class RealTimeData {
             //System.out.println("Exception getting localhost");
         }
     }
-
+    
+    /**
+     * this function is for testing only
+     */
     public void changePlayerData(){
 
         try{
@@ -105,7 +140,12 @@ public class RealTimeData {
         }
 
     }
-
+    
+    /**
+     * update one player's data
+     * @param address the ip address of that player
+     * @param newPlayerData  the PlayerData of that new player
+     */
     public void setPlayerData(InetAddress address, PlayerData newPlayerData)
     {
         if(newPlayerData == null)
@@ -118,12 +158,27 @@ public class RealTimeData {
         }
     }
     
+    /**
+     * update one player data
+     * @param address the ip address of that player data
+     * @param playerX
+     * @param playerY
+     * @param ballX
+     * @param ballY 
+     */
     public void setPlayerData(InetAddress address, int playerX, int playerY, int ballX, int ballY)
     {
         PlayerData newPlayerData = new PlayerData(playerX, playerY, ballX, ballY);
         this.playersData.put(address, newPlayerData);
     }
     
+    /**
+     * update one player data
+     * @param address the ip address of that player data
+     * @param playerX
+     * @param playerY
+     * @param isPressed 
+     */
     public void setPlayerData(InetAddress address, int playerX, int playerY, int isPressed)
     {
         PlayerData playerData = this.playersData.get(address);
@@ -133,20 +188,38 @@ public class RealTimeData {
         this.playersData.put(address, playerData);
     }
 
-    
+    /**
+     * retrieve a player's data
+     * @param address the ip of that player
+     * @return 
+     */
     public PlayerData getPlayerData(InetAddress address)
     {
         return this.playersData.get(address);
     }
 
+    /**
+     * add a new player to the game
+     * @param ip
+     * @param playerData 
+     */
     public void addNewPlayer(InetAddress ip, PlayerData playerData){
         this.playersData.put(ip, playerData);
     }
-
+    
+    /**
+     * retrieve the hashmap that stores all the player data
+     * @return 
+     */
     public HashMap<InetAddress, PlayerData> getAllPlayerData()
     {
         return this.playersData; 
     }
+    
+    /**
+     * convert this RealTimeData into string format
+     * @return 
+     */
     public String printPlayersData()
     {
         String str = "";
@@ -163,6 +236,12 @@ public class RealTimeData {
         
         return str;
     }
+    
+    /**
+     * retrieve that byte needed for the client to send to the server
+     * @param clientIPAddress
+     * @return 
+     */
     public byte[] getBytesForClient(InetAddress clientIPAddress)
     {
         byte[] bytesToReturn = new byte[BYTES_SIZE_PER_PLAYER_CLIENT];
@@ -170,7 +249,6 @@ public class RealTimeData {
         byte[] playerDataBuffer = new byte[PlayerData.SIZE_OF_BYTES_FOR_CLIENT];
         
         ipAddressBuffer = clientIPAddress.getAddress();
-        //printPlayersData();
         
         playerDataBuffer = this.playersData.get(clientIPAddress).getBytesForClient();
 
@@ -187,6 +265,10 @@ public class RealTimeData {
         return bytesToReturn;
     }
     
+    /**
+     * retrieve the bytes needed for server to broadcast
+     * @return 
+     */
     public byte[] getBytesForServer()
     {
         byte[] bytesToReturn = new byte[(this.playersData.size())*BYTES_SIZE_PER_PLAYER_SERVER];
@@ -218,6 +300,11 @@ public class RealTimeData {
         return bytesToReturn;
     }
     
+    /**
+     * client call this function to process broadcast messages from server
+     * @param bytesFromServer
+     * @return 
+     */
     public boolean updateBasedOnBytesFromServer(byte[] bytesFromServer)
     {
         if((bytesFromServer.length) % RealTimeData.BYTES_SIZE_PER_PLAYER_SERVER != 0)
@@ -265,6 +352,11 @@ public class RealTimeData {
         return true;
     }
     
+    /**
+     * server calls this function to update based on data received from client(unicast)
+     * @param bytesFromClient
+     * @return 
+     */
     public boolean updateBasedOnBytesFromClient(byte[] bytesFromClient)
     {
         if(bytesFromClient.length != (BYTES_SIZE_PER_PLAYER_CLIENT))
@@ -284,7 +376,6 @@ public class RealTimeData {
         try
         {
             tempIP = InetAddress.getByAddress(ipBuffer);
-            //System.out.println("IP From Buffer" + tempIP);
         }catch(Exception e)
         {
             return false;
@@ -302,7 +393,6 @@ public class RealTimeData {
             this.playersData.put(tempIP, defaultPlayerData);
         }
         
-//        System.out.println("hahaahahahaah");
         if(this.playersData.get(tempIP).getNextPlayerData(playerData))
         {
             for(InetAddress playerAddress: NetworkController.realTimeData.getAllPlayerData().keySet())
@@ -334,6 +424,11 @@ public class RealTimeData {
         return false;
     }
     
+    /**
+     * deprecated
+     * @param team
+     * @return 
+     */
     public boolean isEveryOneDead(int team)
     {
         boolean everyoneIsDead = true;
@@ -349,11 +444,21 @@ public class RealTimeData {
         return everyoneIsDead;
     }
     
+    /**
+     * set team for a particular player
+     * @param inetAddress
+     * @param team
+     * @return 
+     */
     public boolean setTeam(InetAddress inetAddress, int team)
     {
         return this.playersData.get(inetAddress).setTeam(team);
     }
     
+    /**
+     * remove a particular player
+     * @param ip 
+     */
     public void removePlayer(InetAddress ip)
     {
         this.playersData.remove(ip);

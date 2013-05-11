@@ -6,9 +6,10 @@ package NetworksProjectPackage;
 import java.net.*;
 import java.util.*;
 import java.io.*;
+
 /**
- *
- * @author This PC
+ * The network controller is in charge of network aspect of the game
+ * @author Siyuan Wang
  */
 public class NetworkController extends Thread{
 
@@ -22,18 +23,27 @@ public class NetworkController extends Thread{
     public static int serverListenPortNumber;
     public static int clientListenPortNumber;
 
+    //UDP Client is NetworkController's minion in sending and receiving packet
     private UDPClient udpClient = null;
     
+    //The following data are the only copy shared across all the controllers
     public static HashMap<InetAddress,Integer> playersInfo = null;
     public static RealTimeData realTimeData= null;
     public static PlayerData myData = null;
     
+    //This variable is deprecated
     public static boolean thisIsServer;
     
     public MainController mainController = null;
 
-    
-    public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, MainController _mainController, GUITest guiTest)
+    /**
+     * Constructor
+     * @param _sessionServerIPAddress
+     * @param clientPortNumber
+     * @param initialPlayerData
+     * @param _mainController 
+     */
+    public NetworkController(String _sessionServerIPAddress, int clientPortNumber, PlayerData initialPlayerData, MainController _mainController)
     {
         this.mainController = _mainController;
         if(!getMyIPAddress())
@@ -62,11 +72,11 @@ public class NetworkController extends Thread{
             
             if(_sessionServerIPAddress != null)
             {
-                this.sessionServerAddress = InetAddress.getByName(_sessionServerIPAddress);
+                NetworkController.sessionServerAddress = InetAddress.getByName(_sessionServerIPAddress);
             }else
             {
-                System.out.println("Session Server IP is not given.  Program exits");
-                System.exit(1);
+                System.out.println("used my own IP as session server addresss");
+                NetworkController.sessionServerAddress = NetworkController.myIPAddress;
             }
         }catch(UnknownHostException e)
         {
@@ -80,14 +90,13 @@ public class NetworkController extends Thread{
         // I will create a client on the specified port
         this.createClient(clientPortNumber);
         
-        // I will request the Server to be a server/request server address
-//        this.udpClient.sendRequestPacket();
-        
-        
     }
     
     
-    
+    /**
+     * Instantiate my UDPClient
+     * @param _portNumber listen port for this client machine
+     */
     public void createClient(int _portNumber)
     {
         if(_portNumber < 1)
@@ -102,9 +111,15 @@ public class NetworkController extends Thread{
         this.udpClient.start();
     }
     
+    /**
+     * add a player to RealTimeData
+     * @param ip
+     * @param portNumber
+     * @param newPlayerData 
+     */
     public void addPlayer(InetAddress ip, Integer portNumber, PlayerData newPlayerData)
     {
-        System.out.println("added player with IP"+ip.getHostName()+" and port number"+ portNumber);
+
         this.playersInfo.put(ip, portNumber);
         if(newPlayerData == null)
         {
@@ -115,6 +130,11 @@ public class NetworkController extends Thread{
         }
     }
     
+    /**
+     * This function is deprecated
+     * @param newPlayerIP
+     * @param newPlayerPortNum 
+     */
     public void broadcastNewPlayerInfo(InetAddress newPlayerIP, int newPlayerPortNum)
     {
         byte[] bytesToBroadcast = new byte[6];
@@ -140,6 +160,10 @@ public class NetworkController extends Thread{
         }
     }
 
+    /**
+     * Request to retrieve a list of game servers
+     * @return the list of game servers in ArrayList format
+     */
     public ArrayList<String> requestGameServers(){
         byte[] toSend = new byte[2];
         toSend[0] = (byte)((NetworkController.clientListenPortNumber) >> 8);
@@ -147,10 +171,12 @@ public class NetworkController extends Thread{
 
         this.udpClient.sendPacket(NetworkController.sessionServerAddress, NetworkController.sessionServerListenPortNumber, toSend , ProtocolInfo.TYPE_UNICAST_JOINGAME);
 
-
         return null;
     }
 
+    /**
+     * broadcast the current RealTimeData to all the clients in the game
+     */
     public void broadcastMessage()
     {
         for (InetAddress ipAddress : this.playersInfo.keySet()) {
@@ -171,11 +197,19 @@ public class NetworkController extends Thread{
         
     }
     
+    /**
+     * When the server receives a packet from any client, it will call this function to process the packet
+     * @param bytesFromClient only the data section of the packet
+     */
     public void processClientMessage(byte[] bytesFromClient)
     {
         this.realTimeData.updateBasedOnBytesFromClient(bytesFromClient);
     }
     
+    /**
+     * This function uses the amazon service to retrieve my external IP
+     * @return 
+     */
     public boolean getMyIPAddress()
     {
         BufferedReader in = null;
@@ -203,28 +237,39 @@ public class NetworkController extends Thread{
         return true;
     }
     
+    /**
+     * This function will inform the MainController that the multicast has been received
+     */
     public void multicastReceived()
     {
         this.mainController.multicastReceived();
     }
 
+    
+    /**
+     * Retrieved an UDP Client
+     * @return 
+     */
     public UDPClient getUDPClient()
     {
         return this.udpClient;
     }
 
+    /**
+     * When the thread starts, send to the server about the new player information
+     * Set the default team to be team2
+     * 
+     * Then unless the user decides to exit, you will be sending the server an player 
+     * data update packet every 20 millisec
+     */
     public void run()
     {        
-        System.out.println("NetworkController Started");
         this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, this.udpClient.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
         NetworkController.realTimeData.getPlayerData(myIPAddress).setTeam(Constants.TEAM2);
         while(NetworkController.myData != null && NetworkController.myData.getExiting() == Constants.NOT_EXITING)
         {
             try{
                 Thread.sleep(20);
-                //System.out.println("before sending player data update");
-                //System.out.println(NetworkController.realTimeData.printPlayersData());
-                
                 this.udpClient.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, NetworkController.realTimeData.getBytesForClient(this.myIPAddress), ProtocolInfo.TYPE_UNICAST_WITH_PLAYER_DATA);
             }catch(Exception e)
             {
@@ -233,6 +278,10 @@ public class NetworkController extends Thread{
         }
     }
     
+    /**
+     * This function is only used in testing
+     * @param args 
+     */
     public static void main(String[] args)
     {
         try{
@@ -242,7 +291,6 @@ public class NetworkController extends Thread{
         try {
             in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
             String ip = in.readLine();
-            System.out.println(ip);
         } finally {
             if (in != null) {
                 try {
@@ -267,14 +315,11 @@ public class NetworkController extends Thread{
             System.out.println("Started session server at " + session_ip);
             ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, session_ip);
             ss.start();
-        }else
-        {
-            System.out.println("no session server running");
         }
         
         String portNum = sc.nextLine();
         int portNumber = Integer.parseInt(portNum);
-        NetworkController networkController = new NetworkController("139.147.73.212", portNumber, null, null, null);
+        NetworkController networkController = new NetworkController("139.147.73.212", portNumber, null, null);
         networkController.run();
     }
     

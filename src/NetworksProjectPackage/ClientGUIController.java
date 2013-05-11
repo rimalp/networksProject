@@ -19,27 +19,38 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseListener;
+
 /**
- *
+ * The ClientGUIController is in charge of manipulating GUI components, including updating
+ * GUI and process events from GUI
+ * 
  * @author Drew Jeffrey
  */
 public class ClientGUIController extends javax.swing.JFrame implements MouseMotionListener {
-
+    
+    //GUI Components on the game screen 
     public ArrayList<JLabel> objectList;
     private MainController controller;
     private JButton hostGame;
     private JButton joinGame;
     private JButton exitGame;
     private JLabel mmTitle;
-    public mainMenu main_menu;
     private Container movingObjects;
-    
-    public MainController mainController = null;
-    private SoundController soundController = null;
     private HashMap<InetAddress, JLabel> playerLabels = null;
     private HashMap<InetAddress, JLabel> ballLabels = null;
+    
+    //The welcome screen
+    public mainMenu main_menu;
+    
+    //controllers
+    public MainController mainController = null;
+    private SoundController soundController = null;
+    
+    //a map keeping track of who just died
     private HashMap<InetAddress, Integer> playerJustDied = null;
-    private int currentNumOfPlayers = 0;
+    
+    
+    // boundaries for different teams
     public static int minXForTEAM1 = 0;
     public static int maxXForTEAM1 = 0;
     public static int minYForTEAM1 = 0;
@@ -68,48 +79,36 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         
         
         initComponents();
+        
+        //instantiate controllers
         this.mainController = _mainController;
         this.soundController = new SoundController();
-        //Create Test Data
-        RealTimeData test = new RealTimeData();
+        
+        //instantiate GUI Components
         movingObjects = new Container();
-//        movingObjects.addMouseListener(this.createMouseListener());
-        movingObjects.addMouseMotionListener(this);
-        this.getContentPane().addMouseMotionListener(this);
-//        addMouseMotionListener(this);
-        
-        
-                // Transparent 16 x 16 pixel cursor image.
-        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-
-        // Create a new blank cursor.
-        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-            cursorImg, new Point(0, 0), "blank cursor");
-
-        // Set the blank cursor to the JFrame.
-       // this.getContentPane().setCursor(blankCursor);
-
-        
-//        
-//        test.createTestPlayer();
-//        this.repaintAll(test);
-//        this.repaintAll(test);
         this.playerLabels = new HashMap<InetAddress, JLabel>();
         this.ballLabels = new HashMap<InetAddress, JLabel>();
         this.playerJustDied = new HashMap<InetAddress, Integer>();
         
-        
-    }
-    //Moves to the main menu
+        //add listener for mouse motion
+        movingObjects.addMouseMotionListener(this);
+        this.getContentPane().addMouseMotionListener(this);
 
+    }
+    
+    /**
+     * draw the main menu(the start up screen)
+     */
     public void drawMainMenu() {
         main_menu = new mainMenu(this);
         main_menu.setVisible(true);
         soundController.stopMidi();
         this.setVisible(false);
     }
-    //Moves to the game screen
 
+    /**
+     * draw the game screen
+     */
     public void drawGameScreen() {
         main_menu.setVisible(false);
         soundController.startMidi("backmusic.mid");
@@ -117,7 +116,9 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         this.setVisible(true);
     }
 
-    //Automatically moves the frame to the center of the screen
+    /**
+     * Move the game screen to the middle of the screen
+     */
     public void putWindowInCenter() {
         // Get the size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -132,12 +133,16 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         this.setLocation(x, y);
     }
 
-    //Draws the walls around the game and a center dividing line
+    /**
+     * Draws the walls around the game and a center dividing line
+     */
     public void drawArena() {
         String wallImage = "/NetworksProjectPackage/wall.gif";
         String lineImage = "/NetworksProjectPackage/line.gif";
         JLabel currentWall;
         JLabel currentLine;
+        
+        //draw all the walls
         for (int i = 0; i <= this.getWidth() - 17; i += 16) {
             for (int j = 50; j <= this.getHeight() - 16; j += 16) {
                 if ((i < 1 || j < 51) || (i > this.getWidth() - 33 || j > this.getHeight() - 49)) {
@@ -149,6 +154,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                 }
             }
         }
+        
+        //draw the separation line between the two teams
         for (int i = 50; i <= this.getHeight() - 16; i += 16) {
             currentLine = new JLabel(new ImageIcon(getClass().getResource(lineImage)));
             currentLine.setSize(6, 16);
@@ -156,6 +163,8 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             currentLine.setVisible(true);
             this.getContentPane().add(currentLine);
         }
+        
+        //set boundaries for two teams
         ClientGUIController.minYForTEAM1 = 82;
         ClientGUIController.minYForTEAM2 = 82;
         ClientGUIController.minXForTEAM1 = 32;
@@ -169,6 +178,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         ClientGUIController.minYArena = 66;
         ClientGUIController.minXArena = 16;
         
+        //configure buttons
         this.jButton1.setSize(300, 50);
         this.jButton1.setOpaque(true);
         this.jButton1.setBorderPainted(false);
@@ -181,18 +191,31 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         this.jLabel1.setLocation(this.getContentPane().getWidth()/2 - 500,0);
         this.jLabel2.setSize(200,50);
         this.jLabel2.setLocation(this.getContentPane().getWidth()/2 + 300,0);
+        
+        //repain the entire screen
         this.repaintAll(NetworkController.realTimeData, false);
         
     }
     
+    /**
+     * This function defines the mouseMoved event.  This will be triggered
+     * whenever mouse is moved on the content pane
+     * @param e 
+     */
     public void mouseMoved(MouseEvent e) {
+        
+        //only get my own player data
         PlayerData playerData = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress);
+        
+        //get more information about the player
         int team = playerData.getTeam();
         int state = playerData.isAlive();
         
+        //get your mouse coordinate relative to the game screen
         int x = e.getX();
         int y = e.getY();
         
+        //don't the player move out of bound
         if(team == Constants.TEAM1)
         {
             if(x > ClientGUIController.maxXForTEAM1)
@@ -229,22 +252,35 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         }
         
+        //update the player data
         NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.NOTPRESSED);
         
+        //only repaint if the player is still alive
         if(state == Constants.ALIVE)
         {
             this.repaintAll(NetworkController.realTimeData, false);
         }
     }
-     
+    
+    /**
+     * This function defines the mouseDragged event.  This will be triggered
+     * whenever mouse is moved on the content pane
+     * @param e 
+     */
     public void mouseDragged(MouseEvent e) {
+        
+        //Only get my own player data
         PlayerData playerData = NetworkController.realTimeData.getPlayerData(NetworkController.myIPAddress);
+        
+        //get more information about my own player
         int team = playerData.getTeam();
         int state = playerData.isAlive();
         
+        //get x,y coordinates of my mouse position
         int x = e.getX();
         int y = e.getY();
         
+        //make sure the player doesn't go out of bound
         if(team == Constants.TEAM1)
         {
             if(x > ClientGUIController.maxXForTEAM1)
@@ -281,16 +317,25 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
             }
         }
         
+        //update the player data with the new x,y coordinate
         NetworkController.realTimeData.setPlayerData(NetworkController.myIPAddress, x, y, Constants.PRESSED);
         
+        
+        //only repaint the screen when my own player is alive
         if(state == Constants.ALIVE)
         {
             this.repaintAll(NetworkController.realTimeData, false);
         }
     }
-
+    
+    /**
+     * This function will repaint the game screen(not including arena).
+     * @param data the RealTimeData that the new screen should be repainted based off
+     * @param isBasedOnPacketFromServer 
+     */
     public void repaintAll(RealTimeData data, boolean isBasedOnPacketFromServer) {
-
+        
+        //set the size of buttons and labels
         this.jButton1.setSize(200, 50);
         this.jButton1.setLocation(this.getContentPane().getWidth()/2 - 200, 0);
         this.jButton2.setSize(200, 50);
@@ -302,21 +347,26 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
         this.jLabel2.setLocation(this.getContentPane().getWidth()/2 + 200,0);
         this.jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
+        //get the hashmap that stores all the players data
         HashMap<InetAddress, PlayerData> playersData = data.getAllPlayerData();
 
-        //paint each of the player and its ball in the screen one by one
+        //set all the path/file name of all the icons
         String playerIconTeamOne = "/NetworksProjectPackage/athlete.png";
         String playerIconTeamTwo = "/NetworksProjectPackage/athleteblue.png";
         String ballIconTeamOne = "/NetworksProjectPackage/redBall.png";
         String ballIconTeamTwo = "/NetworksProjectPackage/blueBall.png";
         String deadAnimation = "/NetworksProjectPackage/explosion2.gif";
         
+        //more GUI component updates
         this.jLabel1.setText(""+NetworkController.realTimeData.getScore(Constants.TEAM1));
         this.jLabel2.setText(""+NetworkController.realTimeData.getScore(Constants.TEAM2));
         
+        //go through all the players and paint each individual players
         for (InetAddress ipAddress : playersData.keySet()) {
             
             PlayerData playerData = playersData.get(ipAddress);
+            
+            //if the player is exiting, remove him from the maps in the GUI, also remove the label for him
             if(playerData.getExiting() == Constants.EXITING)
             {
                 if(this.playerLabels.get(ipAddress) != null)
@@ -330,105 +380,109 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
                     this.ballLabels.remove(ipAddress);
                 }
                 
+                //if I exited, get rid of the game screen entirely
                 if(ipAddress.equals(NetworkController.myIPAddress))
                 {
                     this.getContentPane().removeAll();
                     this.main_menu.setVisible(true);   
                     this.setVisible(false);
+                    playerData.setExiting(Constants.NOT_EXITING);
                 }
+                
             }else
             {
-            if (playerData.isAlive() == Constants.ALIVE)
-            {
-                if(this.playerJustDied.get(ipAddress) != null && this.playerJustDied.get(ipAddress).intValue() == 1)
-                {
-                    this.playerJustDied.put(ipAddress, 0);
-                }
-//                System.out.println("Draw Alive Player");
+                //if the player is not exiting
                 
-                //player
-                if(this.playerLabels.get(ipAddress) == null)
+                //if the player is alive
+                if (playerData.isAlive() == Constants.ALIVE)
                 {
-                    JLabel newPlayerLabel = new JLabel(new ImageIcon(getClass().getResource(playerIconTeamOne)));
-//                    newPlayerLabel.addMouseMotionListener(this);
-                    this.playerLabels.put(ipAddress, newPlayerLabel);
+                    //reset his value in the playerJustDied map
+                    if(this.playerJustDied.get(ipAddress) != null && this.playerJustDied.get(ipAddress).intValue() == 1)
+                    {
+                        this.playerJustDied.put(ipAddress, 0);
+                    }
+
                     
+                    //if he is a newly joined player, add his label to the label map
+                    if(this.playerLabels.get(ipAddress) == null)
+                    {
+                        JLabel newPlayerLabel = new JLabel(new ImageIcon(getClass().getResource(playerIconTeamOne)));
+                        this.playerLabels.put(ipAddress, newPlayerLabel);
+
+
+                        movingObjects.add(this.playerLabels.get(ipAddress));
+                        this.getContentPane().add(this.playerLabels.get(ipAddress));
+
+
+                    }
                     
-                    movingObjects.add(this.playerLabels.get(ipAddress));
-                    this.getContentPane().add(this.playerLabels.get(ipAddress));
+                    //update the icon based on team
+                    if(playerData.getTeam() == Constants.TEAM1)
+                    {
+                        this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIconTeamOne)));
+                    }else if(playerData.getTeam() == Constants.TEAM2)
+                    {
+                        this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIconTeamTwo)));
+                    } 
+
+                    //create ball label for newly joined member
+                    if(this.ballLabels.get(ipAddress) == null)
+                    {
+                        JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIconTeamOne)));
+                        this.ballLabels.put(ipAddress, newBallLabel);
+
+                        movingObjects.add(this.ballLabels.get(ipAddress));
+                        this.getContentPane().add(this.ballLabels.get(ipAddress));
+                    }
                     
+                    //update ball label based on team
+                    if(playerData.getTeam() == Constants.TEAM1)
+                    {
+                        this.ballLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(ballIconTeamOne)));
+                    }else if(playerData.getTeam() == Constants.TEAM2)
+                    {
+                        this.ballLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(ballIconTeamTwo)));
+                    } 
                     
-                }
-                
-                if(playerData.getTeam() == Constants.TEAM1)
+                    //this is a work-around for after explosion
+                    if(!isBasedOnPacketFromServer || !ipAddress.equals(NetworkController.myIPAddress))
+                    {
+                        this.playerLabels.get(ipAddress).setSize(32, 32);
+                        this.playerLabels.get(ipAddress).setLocation(playerData.getPlayerX() - this.playerLabels.get(ipAddress).getWidth()/2, playerData.getPlayerY() - this.playerLabels.get(ipAddress).getHeight()/2);
+                        this.playerLabels.get(ipAddress).setVisible(true);
+                    }
+
+                    //update the ball label
+                    this.ballLabels.get(ipAddress).setSize(32, 32);
+                    this.ballLabels.get(ipAddress).setLocation(playerData.getBallX() - this.ballLabels.get(ipAddress).getWidth()/2, playerData.getBallY() - this.ballLabels.get(ipAddress).getHeight()/2);
+                    this.ballLabels.get(ipAddress).setVisible(true);
+
+                 //if the player just died
+                }else if (playersData.get(ipAddress).isAlive() == Constants.DEAD)
                 {
-                    this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIconTeamOne)));
-                }else if(playerData.getTeam() == Constants.TEAM2)
-                {
-                    this.playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(playerIconTeamTwo)));
-                } 
-                
-                if(this.ballLabels.get(ipAddress) == null)
-                {
-                    JLabel newBallLabel = new JLabel(new ImageIcon(getClass().getResource(ballIconTeamOne)));
-//                       newBallLabel.addMouseMotionListener(this);
-                    this.ballLabels.put(ipAddress, newBallLabel);
                     
-                    movingObjects.add(this.ballLabels.get(ipAddress));
-                    this.getContentPane().add(this.ballLabels.get(ipAddress));
-                }
-                
-                if(playerData.getTeam() == Constants.TEAM1)
-                {
-                    this.ballLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(ballIconTeamOne)));
-                }else if(playerData.getTeam() == Constants.TEAM2)
-                {
-                    this.ballLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(ballIconTeamTwo)));
-                } 
-                
-                if(!isBasedOnPacketFromServer || !ipAddress.equals(NetworkController.myIPAddress))
-                {
-                    this.playerLabels.get(ipAddress).setSize(32, 32);
-                    this.playerLabels.get(ipAddress).setLocation(playerData.getPlayerX() - this.playerLabels.get(ipAddress).getWidth()/2, playerData.getPlayerY() - this.playerLabels.get(ipAddress).getHeight()/2);
-                    this.playerLabels.get(ipAddress).setVisible(true);
-                }
-                
-                //ball
-                this.ballLabels.get(ipAddress).setSize(32, 32);
-                this.ballLabels.get(ipAddress).setLocation(playerData.getBallX() - this.ballLabels.get(ipAddress).getWidth()/2, playerData.getBallY() - this.ballLabels.get(ipAddress).getHeight()/2);
-                this.ballLabels.get(ipAddress).setVisible(true);
-                
-                
-                
-                
-            }else if (playersData.get(ipAddress).isAlive() == Constants.DEAD)
-            {
-                System.out.println("Draw Dead Animation");
-//                JLabel deadPlayer = new JLabel(new ImageIcon(getClass().getResource(deadAnimation)));
-                
-                playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(deadAnimation)));
-                if(this.playerJustDied.get(ipAddress) == null || this.playerJustDied.get(ipAddress).intValue() == 0)
-                {
-                    this.playerJustDied.put(ipAddress, 1);
+                    //dead animation icon needs to be loaded into the corresponding player label
                     playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(deadAnimation)));
                     
+                    //only play the animation once
+                    if(this.playerJustDied.get(ipAddress) == null || this.playerJustDied.get(ipAddress).intValue() == 0)
+                    {
+                        this.playerJustDied.put(ipAddress, 1);
+                        playerLabels.get(ipAddress).setIcon(new ImageIcon(getClass().getResource(deadAnimation)));
+
+                    }
+                    
+                    //ball needs to disappear(exist at the player's position) when the player is dead
+                    this.ballLabels.get(ipAddress).setVisible(false);
+                    this.ballLabels.get(ipAddress).setLocation(this.playerLabels.get(ipAddress).getLocation());
+
                 }
-                
-                this.ballLabels.get(ipAddress).setVisible(false);
-                this.ballLabels.get(ipAddress).setLocation(this.playerLabels.get(ipAddress).getLocation());
-                
-//                deadPlayer.setLocation(playersData.get(ipAddress).getPlayerX(), playersData.get(ipAddress).getPlayerY());
-//                deadPlayer.setVisible(true);
-                
             }
-        }
             
         }
 
-        //this.getContentPane().add(movingObjects);
+        //repain the content pane
         this.getContentPane().repaint();
-        //movingObjects.paintComponents(this.getContentPane().getGraphics());
-
     }
 
     /**
@@ -536,7 +590,7 @@ public class ClientGUIController extends javax.swing.JFrame implements MouseMoti
     }// </editor-fold>//GEN-END:initComponents
 
     
-        //Create a non-modal dialog box (so game can run in background) to allow user to exit game
+    //This function is deprecated
     private void escapeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_escapeKeyPressed
         if (evt.getKeyCode() == 27) {
             final JDialog optionPaneDialog = new JDialog(this, "Leave Game?");

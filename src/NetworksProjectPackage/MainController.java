@@ -4,57 +4,70 @@
  */
 package NetworksProjectPackage;
 
+import java.io.*;
 import java.net.InetAddress;
 import java.util.*;
 
-
-public class MainController extends Thread{// extends javax.swing.JFrame{
+/**
+ * MainController is the highest in the controller hierarchy.  It controls the overall
+ * game logic
+ * @author Siyuan Wang
+ */
+public class MainController extends Thread{
+    
+    //This variable is deprecated
     public static RealTimeData realTimeData = null;
+    
+    //Its minion controllers
     NetworkController networkController = null;
     ClientGUIController guiController = null;
+    
+    // session server
     static SessionServer ss = null;
-     private HashMap<InetAddress, Integer> activeGameServers;
+    
+    //keeps track of all active game session
+    private HashMap<InetAddress, Integer> activeGameServers;
 
-    //variables for the ball physics
-    final int RADIUS = 50;
-    final int DELAY = 50;
-    int centerX = 0;
-    int centerY = 0;
-    int orbitX;
-    int orbitY;
-    int frame_time = 5;
-    Thread animator;
-    double Vx = 0;
-    double Vy = 0;
-    double Ax = 0;
-    double Ay = 0;
-
-    //constructor
-    public MainController()
+    /**
+     * Constructor
+     * @param sessionIP string representation of session server ip if there is any. null if this station will serve
+     * as session server
+     */
+    public MainController(String sessionIP)
     {
         
         realTimeData = new RealTimeData();
         realTimeData.createTestPlayer();
         PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
-        networkController = new NetworkController("139.147.30.243", 4444, defaultPlayerData, this, null);
+        networkController = new NetworkController(sessionIP, 4444, defaultPlayerData, this);
         guiController = new ClientGUIController(this);
         guiController.drawMainMenu();
         activeGameServers = new HashMap<InetAddress, Integer>();
     }
     
     
-    
+    /**
+     * Start the NetworkController threads
+     */
     public void startNetworkController()
     {
         this.networkController.start();
         this.guiController.repaintAll(NetworkController.realTimeData, false);
     }
     
+    /**
+     * Deprecated function
+     * @return 
+     */
     public RealTimeData getRealTimedata()
     {
         return MainController.realTimeData;
     }
 
+    /**
+     * Deprecated function
+     * @param rtd 
+     */
     public void setRealTimeData(RealTimeData rtd){
         MainController.realTimeData = rtd;
 
@@ -67,7 +80,7 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
     }
 
     /*
-     * This method processes the playerdata to see
+     * Deprecated function
      *
      */
     public void processRealTimeData(){
@@ -99,84 +112,114 @@ public class MainController extends Thread{// extends javax.swing.JFrame{
 //        this.networkController.setRealTimeData(MainController.realTimeData);
     }
 
+    /**
+     * Add new player to a team
+     * @param ip
+     * @param team 
+     */
     public void addNewPlayer(InetAddress ip, int team){
         realTimeData.addNewPlayer(ip, new PlayerData(team));
     }
 
+    /**
+     * This is the function that will execute when the jar file is executed
+     * @param args nothing is needed
+     */
     public static void main(String[] args)
     {
+        boolean sessionServerIsMe = true;
+        String sessionIP = "";
+        MainController mainController = null;
         
-        System.out.println("about to created main controller");
-        MainController mainController = new MainController();
-        System.out.println("main controller created");
-        mainController.start();
-        System.out.println("main controller started");
-        
-        Scanner sc = new Scanner(System.in);
-        if(sc.nextLine().equals("Yes"))
+        //try reading a local file for session server ip address
+        try{
+            BufferedReader br = new BufferedReader(new FileReader("SessionServerAddress.txt"));
+            sessionIP = br.readLine();
+            if(!sessionIP.equals("Me"))
+            {
+                NetworkController.sessionServerAddress = InetAddress.getByName(sessionIP);
+                sessionServerIsMe = false;
+            }
+            br.close();
+            
+        }catch(Exception e)
         {
-            ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, "139.147.30.243");
+            System.out.println(e);
+        }
+                
+        //pass in different parameters for MainController depending on whether or not this station is the 
+        //session server as well
+        if(sessionServerIsMe)
+        {
+            mainController = new MainController(null);
+        }else
+        {
+            mainController = new MainController(sessionIP);
+        }
+        
+        //start MainController thread
+        mainController.start();
+        
+        //initiate and start running the session server if this is the session server
+        if(sessionServerIsMe)
+        {
+            String myIP = NetworkController.myIPAddress.toString();
+            ss = new SessionServer(ProtocolInfo.DEFAULT_SESSION_SERVER_PORT_NUMBER, myIP.substring(1, myIP.length()));
             ss.start();
         }
     }
     
+    /**
+     * Deprecated function
+     * @param playerAddress
+     * @param playerData 
+     */
     public void setPlayerData(InetAddress playerAddress, PlayerData playerData){
         realTimeData.setPlayerData(playerAddress, playerData);
-        //update the GUI when the player data changes
-        //guiController.repaintAll(realTimeData);
-        
     }
 
-
+    /**
+     * Ask the networkController to request the list of all game servers
+     */
     public void requestGameServers(){
         this.networkController.requestGameServers();
     }
 
-
-
+    /**
+     * add a host server into the main menu
+     * @param ip
+     * @param port 
+     */
     public void addHostServerInMainMenu(InetAddress ip, int port){
         if(this.activeGameServers == null)
             this.activeGameServers = new HashMap<InetAddress, Integer>();
         this.activeGameServers.put(ip, port);
-
-        if(this.guiController == null)
-            System.out.println("GuiController null");
-
-        if(this.guiController.main_menu == null)
-            System.out.println("mainmenu null");
+        
         this.guiController.main_menu.updateServerListComboBox(ip);
 
     }
     
+    /**
+     * accessor for active game servers
+     * @return 
+     */
     public HashMap<InetAddress, Integer> getActiveGameServers()
     {
         return this.activeGameServers;
     }
     
+    //ask the GUIController to repaint everything whenever a broadcast is received
     public void multicastReceived()
     {
         this.guiController.repaintAll(NetworkController.realTimeData, true);
     }
     
+    /**
+     * This is the only thing that MainController thread does
+     */
     public void run()
     {
-        
         this.guiController.drawArena();
-
-//        while(true)
-//        {
-            //acquire new data and call the guicontroller's repaint function
-            
-        //this.guiController.repaintAll(MainController.realTimeData);
-
-
-            //then pause for a while
-//            try {
-//                    Thread.sleep(1000/60);
-//            } catch (InterruptedException e) {
-//                    System.out.println("MainController thread interrupted!");
-//            }
-//        }
     }
 
 

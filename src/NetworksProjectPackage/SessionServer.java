@@ -9,8 +9,8 @@ import java.util.*;
 import java.lang.*;
 
 /**
- *
- * @author This PC
+ * The SessionServer is the server that keeps track of all game sessions going on
+ * @author Siyuan Wang
  */
 public class SessionServer extends Thread{
     private DatagramSocket listen_socket = null;
@@ -22,6 +22,11 @@ public class SessionServer extends Thread{
 
     private int request_type;
     
+    /**
+     * constructor
+     * @param _listen_port
+     * @param _ipAddress 
+     */
     public SessionServer(int _listen_port, String _ipAddress)
     {
         try {
@@ -54,24 +59,15 @@ public class SessionServer extends Thread{
         
         //this.protocolInfo = new ProtocolInfo();
         this.servers = new HashMap<InetAddress, ServerData>();
-
-        //test data
-        ServerData newServer1 = new ServerData(4444, "", Constants.MAX_PLAYERS);
-        ServerData newServer2 = new ServerData(4444, "", Constants.MAX_PLAYERS);
-        String ip1 = "139.147.103.6";
-        String ip2 = "127.188.5.7";
-
-        try{
-        //this.servers.put(InetAddress.getByName(ip1), newServer1);
-//        this.servers.put(InetAddress.getByName(ip2), newServer2);
-        }catch(Exception e){
-            System.out.println("Exception in testing data in sessionserver");
-        }
-
     }
     
 
-
+    
+    /**
+     * process a request from a new player
+     * @param payload
+     * @return 
+     */
     public int processRequest(byte[] payload)
     {
         boolean error = false;
@@ -89,7 +85,6 @@ public class SessionServer extends Thread{
 
         if(error)
         {
-            //sendErrorPacket(dp.getAddress(), dp.getPort(), error_msg);
             System.out.println("Error");
             return -1;
         }
@@ -99,7 +94,6 @@ public class SessionServer extends Thread{
 
         if(client_version_maj != ProtocolInfo.MAJOR_VERSION_NUMBER || client_version_minor != ProtocolInfo.MINOR_VERSION_NUMBER)
         {
-            //sendErrorPacket(dp.getAddress(), dp.getPort(), "Version number mismatch(" + client_version_maj + "." + client_version_minor + ").");
             System.out.println("Error");
             return -1;
         }
@@ -110,8 +104,7 @@ public class SessionServer extends Thread{
 
         if(packet_type != ProtocolInfo.TYPE_REQUEST && packet_type != ProtocolInfo.TYPE_UNICAST_JOINGAME && packet_type != ProtocolInfo.TYPE_UNICAST_HOSTGAME)
         {
-            //sendErrorPacket(dp.getAddress(), dp.getPort(), "Received non-request packet.");
-            System.out.println("adfsError: " + packet_type);
+            System.out.println("Error: " + packet_type);
             return -1;
         }
 
@@ -120,22 +113,19 @@ public class SessionServer extends Thread{
             System.out.println("Error");
         }
 
-
-
-
-        System.out.println("Received Request");
         int clientPort = (int)payload[14];
-        //System.out.println(clientPort);
         clientPort <<= 8;
-        //System.out.println(clientPort);
         int temp = (int)(payload[15]);
         temp &= 0x000000FF;
         clientPort |=temp;
 
-//        System.out.println(clientPort);
         return clientPort;
     }
     
+    /**
+     * when the session server thread starts, it will keep listening for a new packet to arrive and process the
+     * incoming request accordingly
+     */
     public void run()
     {
         System.out.println("Session server running at "+ ipAddress.toString() + " at port: "+this.listen_port +".");
@@ -144,19 +134,15 @@ public class SessionServer extends Thread{
             byte[] buffer = new byte[65535];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {
-                System.out.println("Waiting for a packet");
                 listen_socket.receive(dp);
             }
             catch(IOException ioe)
             {
                 System.err.println("Warning: Could not receive datagram packet.");
             }
-
-            System.out.println("Received a request!");
             
             if(dp.getLength() < 14)
             {
-                //sendErrorPacket(dp.getAddress(), dp.getPort(), "Incorrect packet length:"+dp.getLength());
                 continue;
             }
             byte[] payload = new byte[dp.getLength()];
@@ -170,43 +156,30 @@ public class SessionServer extends Thread{
                 continue;
             }
             
-            System.out.println("Client Port number:"+clientListenPort);
-
-//            if(this.servers.isEmpty())
-//            {
-//                //create a new serverdata wrapper class
-//                ServerData newServer = new ServerData(clientListenPort, "", Constants.MAX_PLAYERS);
-//
-//                this.sendPacket(dp.getAddress(), clientListenPort, "No server's running.");
-//                this.servers.put(dp.getAddress(), newServer);
-//            }
             if(this.request_type == ProtocolInfo.TYPE_UNICAST_HOSTGAME)
             {
                 String sessionName = "Room ";
                 sessionName += this.servers.size()+1;
                 ServerData serverData = new ServerData(clientListenPort, sessionName, 8);
                 this.servers.put(dp.getAddress(), serverData);
-                System.out.println("New server added");
             }else if(this.request_type == ProtocolInfo.TYPE_UNICAST_JOINGAME)
             {
                 for(InetAddress serverIps: this.servers.keySet()){
-                    System.out.println("Serverdata.tostrint(): " + serverIps.toString());
                     this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, serverIps, this.servers.get(serverIps).port, ProtocolInfo.TYPE_UNICAST_JOINGAME );
-                    System.out.println("Server Info Sent");
-
                 }
-
-//                Iterator it = this.servers.entrySet().iterator();
-//                Map.Entry server = (Map.Entry)it.next();
-//                this.sendPacketWithServerInformation(dp.getAddress(), clientListenPort, ((InetAddress)(server.getKey())).toString().substring(1), ((Integer)(server.getValue())).intValue());
-//                //this.sendPacketWithClientInformation((InetAddress)server.getKey(), (int)servers.get((InetAddress)server.getKey()), dp.getAddress().toString().substring(1), clientListenPort);
-//                System.out.println("Server Info Sent");
             }
         }
     }
 
 
-
+    /**
+     * send out a packet with one game server information
+     * @param address game server ip
+     * @param port game server port
+     * @param ipAddress target ip
+     * @param portNum target port
+     * @param type message type
+     */
     public void sendPacketWithServerInformation(InetAddress address, int port, InetAddress ipAddress, int portNum, int type)
     {
         try {
@@ -246,6 +219,13 @@ public class SessionServer extends Thread{
         }
     }
     
+    /**
+     * deprecated function
+     * @param address
+     * @param port
+     * @param ipAddress
+     * @param portNum 
+     */
     public void sendPacketWithClientInformation(InetAddress address, int port, String ipAddress, int portNum)
     {
         try {
@@ -271,6 +251,12 @@ public class SessionServer extends Thread{
         }
     }
     
+    /**
+     * send an udp packet with string message in the data section
+     * @param address
+     * @param port
+     * @param message 
+     */
     public void sendPacket(InetAddress address, int port, String message)
     {
         try {
@@ -292,7 +278,5 @@ public class SessionServer extends Thread{
         {
                 System.err.println("ERROR: Could not send packet to " + address + ":" + port + ".");
         }
-    }
-    
-    
+    }  
 }

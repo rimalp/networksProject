@@ -8,7 +8,9 @@ import java.net.*;
 import java.util.*;
 
 /**
- *
+ * This class is used by NetworkController
+ * It takes care of the network layer details regarding the specific bytes to send 
+ * and process.
  * @author This PC
  */
 public class UDPClient extends Thread{
@@ -23,6 +25,10 @@ public class UDPClient extends Thread{
     private DatagramSocket listen_socket = null;
 
     
+    /**
+     * constructor
+     * @param _networkController 
+     */
     public UDPClient(NetworkController _networkController)
     {
         this.networkController = _networkController;
@@ -50,7 +56,9 @@ public class UDPClient extends Thread{
     
     
     
-    //process the packet received from the server
+    /**
+     * process the packet received from the server
+     */
     public String processPacket(InetAddress clientAddress, byte[] data)
     {
         if(data.length <= 14)
@@ -85,10 +93,7 @@ public class UDPClient extends Thread{
         {
             dataBuffer[i] = data[i + 14];
         }
-//        System.out.println("Data Buffer size is: "+dataBuffer.length);
-//        System.out.println("data size is: "+data.length);
-//        System.out.println("Start switching!");
-        //System.out.println("Type is:" +packet_type);
+        
         switch(packet_type)
         {
             case ProtocolInfo.TYPE_REQUEST: break;
@@ -142,38 +147,58 @@ public class UDPClient extends Thread{
         return "";
     }
 
+    /**
+     * Process the packet with information indicating a player is exiting
+     * @param clientAddress
+     * @return 
+     */
     public String processPacketWithPlayerExitInfo(InetAddress clientAddress)
     {
         NetworkController.realTimeData.getPlayerData(clientAddress).setExiting(Constants.EXITING);
         return "One Player is Exiting";
     }
 
+    /**
+     * process the broadcast packet from game server
+     * @param data
+     * @return 
+     */
     public String processMulticastPacket(byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromServer(data);
-        //System.out.println("After received multicast packet");
-//        System.out.println(NetworkController.realTimeData.printPlayersData());
-        //System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.multicastReceived();
-        
+        NetworkController.realTimeData.printPlayersData();
         return "Multicast Message received";
     }
     
+    /**
+     * process the packet from individual player regarding their new player data
+     * @param address
+     * @param data
+     * @return 
+     */
     public String processUnicastPacketWithPlayerData(InetAddress address, byte[] data)
     {
         NetworkController.realTimeData.updateBasedOnBytesFromClient(data);
-        //System.out.println("After receiving palyer data");
-        //System.out.println(NetworkController.realTimeData.printPlayersData());
         this.networkController.broadcastMessage();
         return "Player Data Update Received";
     }
     
+    /**
+     * process a packet that is purely a byte array representing of a string
+     * @param data
+     * @return 
+     */
     public String processPacket(byte[] data)
     {
         String msg = new String(data);
         return msg;
     }
     
+    /**
+     * retrieve the bytes for a particular player's information(ip and port number)
+     * @return 
+     */
     public byte[] getBytesForNewPlayerInfo()
     {
         byte[] bytesToReturn = new byte[6];
@@ -182,9 +207,7 @@ public class UDPClient extends Thread{
         byte[] portNumBuffer = new byte[2];
         
         ipBuffer = NetworkController.myIPAddress.getAddress();
-        
-        //System.out.println(NetworkController.clientListenPortNumber);
-        
+                
         portNumBuffer[1] = (byte)(NetworkController.clientListenPortNumber >> 8);
         portNumBuffer[0] = (byte)(NetworkController.clientListenPortNumber);
         
@@ -201,6 +224,11 @@ public class UDPClient extends Thread{
         return bytesToReturn;
     }
 
+    /**
+     * process a packet from the session server regarding the host information
+     * @param data
+     * @return 
+     */
     public String processPacketWithHostServersInformation(byte[] data){
         int myServerListenPort = 0;
         myServerListenPort = 0;
@@ -223,18 +251,22 @@ public class UDPClient extends Thread{
         InetAddress inet = null;
         try{
          inet = InetAddress.getByAddress(ipBuffer);
-//         newIp = inet.getHostAddress();
         }catch(Exception e){
             System.out.println("Exception in converting sessionserver");
             return "Cannot find server address";
         }
         if(inet != null){
-//        String newIp = inet.toString();
         this.networkController.mainController.addHostServerInMainMenu(inet, myServerListenPort);
         }
         return "Received Server Information";
     }
-    //rimalp
+    
+    /**
+     * process a packet with server's information
+     * deprecated**
+     * @param data
+     * @return 
+     */
     public String processPacketWithServerInformation(byte[] data)
     {
         int myServerListenPort = 0;
@@ -250,29 +282,20 @@ public class UDPClient extends Thread{
         
         
         NetworkController.serverListenPortNumber = myServerListenPort;
-        
-        //construct a string from all the byte in the data section, which is the error message
-
 
         //update the main menu combobox items
         InetAddress inet = null;
         try{
-         inet = InetAddress.getByAddress(ipBuffer);
-//         newIp = inet.getHostAddress();
+             inet = InetAddress.getByAddress(ipBuffer);
         }catch(Exception e){System.out.println("Exception in converting sessionserver");}
         if(inet != null){
-        String newIp = inet.toString();
-        System.out.println("udpclient server: " + newIp);
-        this.networkController.mainController.addHostServerInMainMenu(inet, myServerListenPort);
+            String newIp = inet.toString();
+            this.networkController.mainController.addHostServerInMainMenu(inet, myServerListenPort);
         }
 
         String msg = new String(data);
-      	try{                  
-            System.out.println(myServerListenPort);
-            
+      	try{                              
             NetworkController.serverAddress = InetAddress.getByAddress(ipBuffer);
-            
-            System.out.println(NetworkController.serverAddress.getHostAddress());
             PlayerData defaultPlayerData = new PlayerData(300,300,450,450);
             NetworkController.realTimeData.addNewPlayer(NetworkController.myIPAddress, defaultPlayerData);
             this.sendPacket(NetworkController.serverAddress, NetworkController.serverListenPortNumber, this.getBytesForNewPlayerInfo(), ProtocolInfo.TYPE_UNICAST_WITH_NEW_PLAYER_INFO);
@@ -283,6 +306,12 @@ public class UDPClient extends Thread{
         return "Received Server Information";
     }
     
+    
+    /**
+     * process a packet regarding the adding of a player into the game
+     * @param data
+     * @param clientAddress 
+     */
     public void processPacketWithNewPlayerInformation(byte[] data, InetAddress clientAddress)
     {
         int newClientListenPort = (int)data[1];
@@ -294,7 +323,9 @@ public class UDPClient extends Thread{
     }
     
     
-    //This method will process the error packet and display proper message to the user
+    /**
+     * This method will process the error packet and display proper message to the user
+     */
     public void processErrorPacket(byte[] data)
     {
         //construct a string from all the byte in the data section, which is the error message
@@ -304,7 +335,10 @@ public class UDPClient extends Thread{
         System.out.println("[An error has occurred]:"+errorMsg);
     }
     
-    //send the request packet
+    /**
+     * send the request packet
+     * deprecated*
+     */
     public void sendRequestPacket()
     {
         //create a buffer that stores all the byte to send
@@ -312,11 +346,8 @@ public class UDPClient extends Thread{
         System.arraycopy(ProtocolInfo.REQUEST_PACKET_WIHTOUT_LENGTH_DATA, 0, data_to_send, 0, 12);
         data_to_send[12] = 0x00;
         data_to_send[13] = 0x02;
-        //System.out.println("My Listening port is:" + this.myListenPort);
         data_to_send[14] = (byte)((NetworkController.clientListenPortNumber >> 8) & 0x000000FF);
-        //System.out.println((int)data_to_send[14]);
         data_to_send[15] = (byte)(NetworkController.clientListenPortNumber & 0x000000FF);
-        //System.out.println((int)data_to_send[15]);
         
         //construct a DatagramPacket
         DatagramPacket sendPacket =  new DatagramPacket(    data_to_send, 
@@ -331,9 +362,15 @@ public class UDPClient extends Thread{
         {
             System.out.println("IO Exception has occured while sending the request packet");
         }
-        System.out.println("Request Packet Sent");
     } 
     
+    /**
+     * send a raw packet
+     * @param targetAddress
+     * @param targetPort
+     * @param msg
+     * @param type 
+     */
     public void sendPacket(InetAddress targetAddress, int targetPort, byte[] msg, int type)
     {
         if(msg == null)
@@ -364,16 +401,18 @@ public class UDPClient extends Thread{
         //Try sending the packet. Let the user know when an exception has occurred.
         try{
             clientSocket.send(sendPacket);  
-            if(type == ProtocolInfo.TYPE_UNICAST_HOSTGAME)
-            {
-                System.out.println("A packet is just sent from UDP Client to "+ targetAddress.toString() + " at port " +targetPort);
-            }
         }catch(IOException e)
         {
             System.out.println("IO Exception has occured while sending the request packet");
         }
     }
     
+    /**
+     * send an error packet
+     * @param address
+     * @param port
+     * @param message 
+     */
     private void sendErrorPacket(InetAddress address, int port, String message)
     {
         try {
@@ -398,12 +437,22 @@ public class UDPClient extends Thread{
         displayErrorFromClient(address, port, message);
     }
     
+    /**
+     * display the error from an error packet
+     * @param ip
+     * @param port
+     * @param message 
+     */
     private void displayErrorFromClient(InetAddress ip, int port, String message)
     {
         System.err.println("[" + ip + ":" + port + "] ERROR: " + message);
     }
     
-    
+    /**
+     * It will constantly wait for the next packet while this Thread starts
+     * It will process the incoming packet and call the appropriate function to process
+     * the incoming packet for other controllers to use
+     */
     public void run()
     {
         byte[] buffer = new byte[65535];
@@ -411,7 +460,6 @@ public class UDPClient extends Thread{
         while(true)
         {
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
-            //System.out.println("Ready to receive a new packet!");
             
             try {
                 listen_socket.receive(dp);

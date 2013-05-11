@@ -8,11 +8,11 @@ import java.net.*;
 import java.util.*;
 import java.nio.*;
 /**
- *
- * @author This PC
+ * The PlayerData wraps all the data regarding an individual player 
+ * @author Siyuan Wang
  */
 public class PlayerData {
-    //private InetAddress address = null;
+    
     private int playerX;
     private int playerY;
     private int ballX;
@@ -27,7 +27,7 @@ public class PlayerData {
     
     public static int SIZE_OF_BYTES_FOR_CLIENT = 8;
     public static int SIZE_OF_BYTES_FOR_SERVER = 16;
-//    public static PlayerData DEFAULT_PLAYER_DATA= new PlayerData(300,300,450,450);
+
     
     //here are the variables for ball position logic
     final int RADIUS = 50;
@@ -43,6 +43,12 @@ public class PlayerData {
     final int MAXIMUM_WAIT_BEFORE_REVIVAL = 80;
     int timeToRevive = MAXIMUM_WAIT_BEFORE_REVIVAL;
     
+    
+    /**
+     * Constructor
+     * @param _playerX
+     * @param _playerY 
+     */
     public PlayerData(int _playerX, int _playerY)
     {
         this.playerX = _playerX;
@@ -54,7 +60,13 @@ public class PlayerData {
         this.mousePressed = Constants.NOTPRESSED;
     }
     
-    //constructor 2
+    /**
+     * Another constructor
+     * @param _playerX
+     * @param _playerY
+     * @param _ballX
+     * @param _ballY 
+     */
     public PlayerData(int _playerX, int _playerY, int _ballX, int _ballY)
     {
         this.playerX = _playerX;
@@ -66,7 +78,15 @@ public class PlayerData {
         this.mousePressed = Constants.NOTPRESSED;
     }
 
-    //constructor 3
+    /**
+     * Another Constructor
+     * @param _playerX
+     * @param _playerY
+     * @param _ballX
+     * @param _ballY
+     * @param _alive
+     * @param _team 
+     */
     public PlayerData(int _playerX, int _playerY, int _ballX, int _ballY, int _alive, int _team)
     {
         //this.address = _address;
@@ -78,7 +98,11 @@ public class PlayerData {
         this.team = _team;
         this.mousePressed = Constants.NOTPRESSED;
     }
-
+    
+    /**
+     * Another Constructor
+     * @param _team 
+     */
     public PlayerData(int _team)
     {
         //this.address = _address;
@@ -95,7 +119,9 @@ public class PlayerData {
     }
 
 
-    //see if this player's ball hits the other player itself
+    /**
+     * see if this player's ball hits the other player itself
+     */
     public boolean hits(PlayerData other)
     {
         Point ballCenter = new Point (this.ballX, this.ballY);
@@ -104,33 +130,50 @@ public class PlayerData {
         if(ballCenter.distance(otherPlayerCenter) < 30){
             //kaboom
             return true;
-        }else{
-//            System.out.println(ballCenter.distance(otherPlayerCenter));
         }
 
         return false;
     }
 
+    /**
+     * get player X position
+     * @return 
+     */
     public int getPlayerX()
     {
         return this.playerX;
     }
     
+    /**
+     * get the player Y position
+     * @return 
+     */
     public int getPlayerY()
     {
         return this.playerY;
     }
     
+    /**
+     * get ball x
+     * @return 
+     */
     public int getBallX()
     {
         return this.ballX;
     }
     
+    /**
+     * get ball Y
+     * @return 
+     */
     public int getBallY()
     {
         return this.ballY;
     }
 
+    /**
+     * don't revive the player when the animation is playing
+     */
     public void keepDying()
     {
         this.timeToRevive--;
@@ -141,27 +184,51 @@ public class PlayerData {
         }
     }
     
+    /**
+     * set a player's exit status
+     * @param status 
+     */
     public void setExiting(int status)
     {
         this.exiting = status;
     }
 
+    /**
+     * set player x position
+     * @param x 
+     */
     public void setPlayerX(int x){
         this.playerX = x;
     }
 
+    /**
+     * set player Y position
+     * @param y 
+     */
     public void setPlayerY(int y){
         this.playerY = y;
     }
 
+    /**
+     * set ball X position
+     * @param x 
+     */
     public void setBallX(int x){
         this.ballX = x;
     }
-
+    
+    /**
+     * set ball Y position
+     * @param y 
+     */
     public void setBallY(int y){
         this.ballY = y;
     }
-
+    
+    /**
+     * set player alive information
+     * @param state 
+     */
     public void setAlive(int state){
         if(state !=Constants.ALIVE && state != Constants.DEAD)
             return;
@@ -169,29 +236,53 @@ public class PlayerData {
         this.alive = state;
     }
 
+    /**
+     * retrieve player alive information
+     * @return 
+     */
     public int isAlive(){
         return this.alive;
     }
 
+    /**
+     * retrieve team information
+     * @return 
+     */
     public int getTeam(){
         return this.team;
     }
     
+    /**
+     * get power throw info
+     * @return 
+     */
     public int getMousePressed()
     {
         return this.mousePressed;
     }
     
+    /**
+     * set power throw status
+     * @param _mousePressed 
+     */
     public void setMousePressed(int _mousePressed)
     {
         this.mousePressed = _mousePressed;
     }
     
+    /**
+     * get exit status
+     * @return 
+     */
     public int getExiting()
     {
         return this.exiting;
     }
 
+    /**
+     * These are the bytes for client to send to its game server
+     * @return 
+     */
     public byte[] getBytesForClient()
     {
         byte[] bytesToReturn = new byte[SIZE_OF_BYTES_FOR_CLIENT];
@@ -205,6 +296,10 @@ public class PlayerData {
         return bytesToReturn;
     }
     
+    /**
+     * These are the bytes for a server to send(but still need to concatenate with other players' data)
+     * @return 
+     */
     public byte[] getBytesForServer()
     {
         byte[] bytesToReturn = new byte[SIZE_OF_BYTES_FOR_SERVER];
@@ -226,6 +321,11 @@ public class PlayerData {
         return bytesToReturn;
     }
     
+    /**
+     * update this player data with the bytes received from server
+     * @param newPlayerData
+     * @return 
+     */
     public boolean updateBasedOnBytesFromServer(byte[] newPlayerData)
     {        
         if(newPlayerData.length != SIZE_OF_BYTES_FOR_SERVER)
@@ -247,6 +347,13 @@ public class PlayerData {
         return true; 
     }
     
+    /**
+     * Get the next ball position based on the mouse position update from client
+     * This is where the ball physics lies
+     * 
+     * @param mousePositionUpdate
+     * @return 
+     */
     public boolean getNextPlayerData(byte[] mousePositionUpdate)
     {
                 
@@ -328,11 +435,19 @@ public class PlayerData {
         
     }
     
+    /**
+     * retrieve is alive information
+     * @return 
+     */
     public int getIsAlive()
     {
         return this.alive;
     }
     
+    /**
+     * convert all the information in a string format
+     * @return 
+     */
     public String toString()
     {
         String str = "";
@@ -350,6 +465,11 @@ public class PlayerData {
         
     }
     
+    /**
+     * set the team of the players
+     * @param _team
+     * @return 
+     */
     public boolean setTeam(int _team)
     {
         if(this.team != _team)

@@ -5,8 +5,8 @@
 package NetworksProjectPackage;
 
 /**
- *
- * @author This PC
+ * This interface wraps all the constants regarding network protocol
+ * @author Siyuan Wang
  */
 interface ProtocolInfo {
     public final char[] PROTOCOL_HEADER = {'C','S','3','0','5','T','S','P'};
